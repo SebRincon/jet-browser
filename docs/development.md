@@ -121,10 +121,10 @@ JET_SIGN_IDENTITY="Developer ID Application: …" JET_NOTARY_PROFILE=<profile> s
 Entitlements live in `packaging/entitlements/`: bundled CPython gets library-validation
 and unsigned-executable-memory exceptions (third-party wheels), JetWorkflow and the CEF
 helpers get JIT, Grok gets network only, and the app keeps `Release.entitlements`.
-An ad-hoc hardened-runtime bundle passed `codesign --verify --deep --strict` and ran
-the service, JetWorkflow, Grok and the SemIf engine (MLX + torch). Notarization uploads
-the app to Apple; neither it nor a Developer ID signature nor the native UI under the
-hardened runtime has been run yet.
+A Developer ID-signed, hardened-runtime bundle passed `codesign --verify --deep --strict`,
+launched natively, initialized CEF and passed native form checks (2026-09-28). Gatekeeper
+still rejects it until it is notarized; notarization (which uploads the app to Apple)
+has not been run.
 
 The launcher starts bundled Python before exec into Flutter/CEF; never move that
 spawn into the initialized native browser. The app can be relocated without the
