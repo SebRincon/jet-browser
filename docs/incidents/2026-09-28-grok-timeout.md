@@ -68,3 +68,9 @@ The incident-shaped request (20 synthetic bookmarks, review at ten) ran through 
 Grok chose the `tagged_feed` template and first saved it after 31 s; the authoring turn
 ended normally at 65 s. The checkpoint review took 49 s and the run completed 20 unique
 records. No watchdog stall occurred. The real top-100 run is a separate, user-started check.
+
+## Real request — 2026-09-28 23:25 CDT
+
+The real top-100 request then completed in an isolated profile: Grok configured the
+template in its first turn and the run saved 100 unique bookmarks with ten reviews
+([evidence](../evidence/real-top100-20260928.json)). No authoring stall occurred.

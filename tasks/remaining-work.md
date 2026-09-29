@@ -17,7 +17,7 @@ Clean, simple single chat based on the [Orca/T3 source audit](../docs/chat-and-h
 
 ## Next smallest deliverable
 
-**Done 2026-09-28: the repaired Grok authoring path passed a paid synthetic rerun.** **Next: the real top-100 archive run and native UI checks.** The watchdog, saved-state failure report, `tagged_feed` template and local slice continuation are implemented and tested offline. A user-authorized, isolated rerun of the top-100 bookmark request must confirm Grok selects the template and the run completes. See [incident](../docs/incidents/2026-09-28-grok-timeout.md) and [templates](../docs/portable-workflows.md#built-in-templates).
+**Done 2026-09-28:** paid synthetic rerun, native UI checks on the pinned CEF and a Developer ID build, and the real top-100 run (100/100). **Next:** tag coverage (23/100 untagged), notarization, clean-account test. The watchdog, saved-state failure report, `tagged_feed` template and local slice continuation are implemented and tested offline. A user-authorized, isolated rerun of the top-100 bookmark request must confirm Grok selects the template and the run completes. See [incident](../docs/incidents/2026-09-28-grok-timeout.md) and [templates](../docs/portable-workflows.md#built-in-templates).
 
 **Then: held-out categorization, account identity/cursor recovery and wider feed compatibility.** The initial bookmark adapter, per-post chunking and four bounded native passes are complete; see [feed audit](../docs/feed-collections.md). Broader lab foundation continues as **B01 → B02 → B03 → B04 → B05 → B06:** resettable fixtures, bounded choices, shared outcomes, independent runner, one watched task and exact-value extraction. Preserve navigation and Stop. B33–B34 isolate service/runtime and browser profile before native Watch. Offline replay can proceed independently. No desktop takeover.
 
@@ -25,7 +25,8 @@ Clean, simple single chat based on the [Orca/T3 source audit](../docs/chat-and-h
 
 | Work | State | Completion dependency |
 |---|---|---|
-| Grok authoring reliability | Done: live paid rerun of the incident-shaped request passed 2026-09-28 (template saved at 31 s, 20/20 records) | Real top-100 archive run (user-started, isolated) |
+| Grok authoring reliability | Done: paid synthetic rerun and the real top-100 run completed 2026-09-28 (100/100 records, 10 reviews) | — |
+| Tag coverage | Open: 23/100 real records untagged; synthetic held-out recall weak for design/research | Improve local recall on development data, new held-out set; consider a local second pass for untagged items |
 | U01 chat projection | Implemented; offline tests | Stable turn IDs and collapsed completed steps |
 | H01–H06/H08, U02–U03 website loop | First slice implemented; feed loop has native/resume evidence, wider acceptance pending | Bounded plans/store/local classifier/runner/MCP/results; further child acceptance remains |
 | Tag calibration | Baseline measured 2026-09-28 on synthetic held-out tags (SemIf micro F1 0.788; threshold gave no gain) | Improve design/research recall on development, then score a new held-out set; real-archive spot checks with user permission |

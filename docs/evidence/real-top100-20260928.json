@@ -1,0 +1,49 @@
+{
+ "run": "Real top-100 X Bookmarks, 2026-09-28 22:59-23:25 CDT, isolated packaged instance (port 9198), user signed in to X in that profile, review samples shared with the user's permission",
+ "request": "Organize my first 100 X bookmarks with overlapping tags (mobile, web, desktop, design, research, tools, open source); short summary, link and date for each; review every ten.",
+ "privacy": "Aggregate counts only. No bookmark URLs, text, authors or summaries are recorded here; the records and CSV stay in the isolated profile.",
+ "result": {
+  "records": 100,
+  "unique_urls": 100,
+  "with_summary": 100,
+  "with_date": 100,
+  "with_author": 100,
+  "untagged": 23,
+  "still_truncated": 1,
+  "grok_corrected": 37,
+  "recovered_source": 33,
+  "tag_counts": {
+   "tools": 57,
+   "open_source": 32,
+   "web": 25,
+   "research": 16,
+   "mobile": 15,
+   "desktop": 9,
+   "design": 9
+  },
+  "mean_tags": 1.63,
+  "workflow": {
+   "status": "completed",
+   "revision": 1,
+   "counters": {
+    "calls": 444,
+    "saved": 100,
+    "classified": 99,
+    "scrolls": 79,
+    "elapsed_ms": 352851
+   }
+  }
+ },
+ "grok": {
+  "authoring": "chose tagged_feed, workflow saved and started in the first turn",
+  "reviews": 10,
+  "review_actions": "added missing tags and corrected summaries on sampled records (37 records carry a Grok audit entry)"
+ },
+ "incidents_during_run": [
+  "Review at 10 ended because the workflow review profile denied read-only list_tabs; fixed in c10b7d8, service restarted with the fix and the paused run resumed from the card control.",
+  "Item 51: a detail-tab Runtime.evaluate timed out after 12 s and paused the slice; Grok's error review resumed it. Fixed in 84cb282 (blocked recovery, not a run failure); that item remains partial and untagged."
+ ],
+ "quality_gaps": [
+  "23 of 100 records have no tags (local recall; reviews sample 5 per checkpoint). Some posts may fit none of the seven tags; not assessed without reading content."
+ ]
+}
