@@ -14,9 +14,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--models", nargs="+", default=["lfm_rlcd", "laya_mlx", "laya_typed", "qwen4b_semif_shared"])
     parser.add_argument("--replacement", action="store_true")
+    parser.add_argument("--port", type=int, default=9148, help="service port of the instance under test")
+    parser.add_argument("--data-root", type=Path, default=ROOT,
+                        help="that instance's JET_DATA_ROOT (its .runtime/token authenticates the checks)")
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "artifacts")
     args = parser.parse_args()
-    client = httpx.Client(base_url="http://127.0.0.1:9148", timeout=25,
-                         headers={"Authorization": "Bearer " + (ROOT / ".runtime/token").read_text().strip()})
+    # The token is read privately and never printed.
+    client = httpx.Client(base_url=f"http://127.0.0.1:{args.port}", timeout=25,
+                         headers={"Authorization": "Bearer " + (args.data_root / ".runtime/token").read_text().strip()})
 
     def tool(name, arguments):
         response = client.post('/mcp/tool', json={"name": name, "arguments": arguments})
@@ -26,7 +31,7 @@ def main():
     rows = []
     for model in args.models:
         tab_id = client.get('/state').json()['browser']['active_tab_id']
-        url = 'http://127.0.0.1:9148/fixture'
+        url = f'http://127.0.0.1:{args.port}/fixture'
         if args.replacement:
             url += '?team=Home&email=old%40example.test'
         tool('open_url', {"url": url, "tab_id": tab_id})
@@ -64,7 +69,7 @@ def main():
                           "elapsed_ms": task['elapsed_ms'], "load_ms": task.get('load_ms'),
                           "steps": task['steps'], "native_calls": task['native_calls'],
                           "typing_calls": task['typing_calls'], "error": task.get('error')}), flush=True)
-    folder = ROOT / 'artifacts'
+    folder = args.output_dir
     folder.mkdir(exist_ok=True)
     output = folder / ('native-check-' + str(time.time_ns()) + '.json')
     output.write_text(json.dumps(rows, indent=2))
