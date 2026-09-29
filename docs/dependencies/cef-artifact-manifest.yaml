@@ -1,3 +1,11 @@
+# Jet's pinned CEF (2026-09-28): vten's `cef-147.0.11-vten-frame-lease-075` release,
+# SebRincon/webview_cef, archive SHA-256 122fca71…, framework binary 49077a83…,
+# wrapper b302fc83…. Authoritative pins: packaging/pins.json; installer:
+# scripts/install_cef.sh. Headers are identical to the build described below.
+#
+# The record below is the ORIGINAL 2026-05 local build that Jet's first native checks
+# used (framework 72f77a75…, wrapper cd15103a…). It lacks vten's frame-lease patches
+# and cannot be reproduced from a published source. Absolute paths are provenance.
 generated_at: "2026-05-13T00:25:19Z"
 source_distribution: "/Users/sebastian/Developer/cef_7727/chromium_git/chromium/src/cef/binary_distrib/cef_binary_147.0.11+g04f1d22+chromium-147.0.7727.138_macosarm64"
 cef:

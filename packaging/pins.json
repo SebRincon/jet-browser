@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "cef": {
+    "version": "147.0.11+g04f1d22+chromium-147.0.7727.138",
+    "profile": "vten frame-lease 075 (CEF 147.0.11 with vten OSR frame-lease patches)",
+    "release_repo": "SebRincon/webview_cef",
+    "release_tag": "cef-147.0.11-vten-frame-lease-075",
+    "archive": "vten-cef-147.0.11-frame-lease-macos-arm64.tar.gz",
+    "archive_sha256": "122fca7115b530a09e604ffbd217448a5a287d6e15daf6b76bfe5dfda9ff8103",
+    "framework_binary_sha256": "49077a83be60539b405b4be6a2980aabced34365eba8800bbc3a6fb8ea9dd28c",
+    "wrapper_sha256": "b302fc83fab633eb23d3fe990bd3fa21b92a6023ccf942373f74cf792bceef25",
+    "include_tree_sha256": "ef550264709cd6dcb501afc652bc3936fba3f2f90a9368b7e34c4455186585ea",
+    "credits_sha256": "854e0d66044bcd150efcb60b04840992ce45a7739e64385735d3cde3ff0031df",
+    "license_sha256": "058c3827ffb827ff3edda471ae7e1bb1d1aa5931985f0126043ccd33409e792f"
+  },
+  "grok": {
+    "version": "1.0.41",
+    "build": "4220f3b224a6",
+    "binary": "grok-1.0.41-macos-aarch64",
+    "sha256": "9c844eb13365180787d9ad22b2b3748a024be8e1ed845253cc114781b31c591d"
+  }
+}

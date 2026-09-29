@@ -6,6 +6,7 @@ import os
 import plistlib
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,6 +14,46 @@ SKIP = shutil.ignore_patterns("__pycache__", "*.pyc", ".DS_Store", ".git", ".ven
 
 def copy_tree(source, target):
     shutil.copytree(source, target, dirs_exist_ok=True, symlinks=False, ignore=SKIP)
+
+def sha256(path):
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for block in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+def verified_grok(pins):
+    """Return the Grok CLI path only if it is the pinned build; never bundle another."""
+    grok = Path(os.environ.get("JET_BUILD_GROK", Path.home() / ".grok/bin/grok")).resolve()
+    if not grok.is_file():
+        raise SystemExit(f"Provide the pinned Grok {pins['version']} binary through JET_BUILD_GROK")
+    actual = sha256(grok)
+    if actual != pins["sha256"]:
+        raise SystemExit(f"{grok} is not the pinned Grok {pins['version']} ({pins['binary']}): "
+                         f"SHA-256 {actual}. Set JET_BUILD_GROK to the pinned binary.")
+    # An empty HOME keeps the probe from reading or writing the builder's Grok state.
+    with tempfile.TemporaryDirectory(prefix="jet-grok-probe-") as home:
+        probe = subprocess.run([str(grok), "--version"], capture_output=True, text=True, timeout=30, check=False,
+                               env={"HOME": home, "PATH": "/usr/bin:/bin"})
+    expected = f"grok {pins['version']} ({pins['build']})"
+    if probe.returncode != 0 or not probe.stdout.startswith(expected):
+        raise SystemExit(f"Grok version probe did not report {expected!r}")
+    return grok
+
+def cef_assets(pins):
+    """Verify the vendored CEF against packaging/pins.json before it is built into the app."""
+    check = subprocess.run([str(ROOT / "scripts/install_cef.sh"), "--check"], capture_output=True, text=True, check=False)
+    print(check.stdout, end="")
+    pinned = check.returncode == 0
+    if not pinned and os.environ.get("JET_ALLOW_UNPINNED_CEF") != "1":
+        raise SystemExit("CEF assets are not the pinned build. Run scripts/install_cef.sh, or set "
+                         "JET_ALLOW_UNPINNED_CEF=1 for a local-only build.")
+    frameworks = ROOT / "vendor/flutter_cef_browser/macos/Frameworks"
+    return {
+        "pinned_release": pins["release_tag"] if pinned else None,
+        "framework_binary_sha256": sha256(frameworks / "Chromium Embedded Framework.framework/Chromium Embedded Framework"),
+        "wrapper_sha256": sha256(frameworks / "libcef_dll_wrapper.a"),
+    }
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -24,6 +65,9 @@ def main():
     required = [runtime_python / "bin/python3.12", service_packages / "aiohttp", ROOT / "model-downloads.json", ROOT / "native/JetLauncher/main.swift"]
     if not all(p.exists() for p in required):
         raise SystemExit("Run scripts/prepare_portable_runtime.sh before packaging")
+    pins = json.loads((ROOT / "packaging/pins.json").read_text())
+    grok = verified_grok(pins["grok"])
+    cef = cef_assets(pins["cef"])
     if not args.no_build:
         subprocess.run(["flutter", "build", "macos", "--release"], cwd=ROOT / "app", check=True)
     source = ROOT / "app/build/macos/Build/Products/Release/Jet Browser.app"
@@ -50,13 +94,15 @@ def main():
             raise SystemExit(f"Missing build dependencies: {name}; run scripts/setup_models.sh")
         copy_tree(packages, resources / "packages" / name)
     copy_tree(ROOT / "native/RuntimeLicenses", resources / "licenses")
+    # Chromium/CEF redistribution notices; the framework itself carries none.
+    frameworks = ROOT / "vendor/flutter_cef_browser/macos/Frameworks"
+    (resources / "licenses/CEF").mkdir(parents=True, exist_ok=True)
+    for name in ("LICENSE.txt", "CREDITS.html"):
+        shutil.copy2(frameworks / name, resources / "licenses/CEF" / name)
     shutil.copy2(ROOT / "model-downloads.json", resources / "model-downloads.json")
     binaries = resources / "bin"
     binaries.mkdir(exist_ok=True)
     subprocess.run([str(ROOT / "scripts/build_workflow_runtime.sh"), str(binaries / "JetWorkflow")], check=True)
-    grok = Path(os.environ.get("JET_BUILD_GROK", Path.home() / ".grok/bin/grok")).resolve()
-    if not grok.is_file():
-        raise SystemExit("Provide the pinned Grok binary through JET_BUILD_GROK")
     shutil.copy2(grok, binaries / "grok")
     (binaries / "grok").chmod(0o755)
     launcher = output / "Contents/MacOS/JetLauncher"
@@ -78,7 +124,9 @@ def main():
         versions[folder.name] = packages
     (resources / "bundle-manifest.json").write_text(json.dumps({
         "schema_version": 1, "python": "3.12.13", "platform": "macos-arm64",
-        "grok_sha256": hashlib.sha256((binaries / "grok").read_bytes()).hexdigest(),
+        "grok_version": pins["grok"]["version"],
+        "grok_sha256": sha256(binaries / "grok"),
+        "cef": cef,
         "packages": versions,
         "mlx_lm_semif_revision": "a63e24c389382619eb6d9af656e3b46024be217a",
         "models_included": False,
