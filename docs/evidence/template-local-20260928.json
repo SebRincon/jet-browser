@@ -1,0 +1,86 @@
+{
+ "run_at": "2026-09-28T22:20-05:00",
+ "kind": "template-local: packaged runtime (clean-worktree build, pinned vten CEF, ad-hoc hardened-runtime signature), real SemIf 4B, isolated headless Chromium, synthetic 25-post feed, no provider; code resumed the review",
+ "command": "python3.12 scripts/verify_portable_workflow.py --scenario template-local ...",
+ "passed": true,
+ "template": true,
+ "workflow": {
+  "status": "completed",
+  "revision": 1,
+  "counters": {
+   "calls": 79,
+   "saved": 20,
+   "classified": 20,
+   "scrolls": 13,
+   "elapsed_ms": 59325
+  },
+  "limits": {
+   "max_seconds": 900,
+   "max_calls": 3000,
+   "max_items": 20
+  }
+ },
+ "records": 20,
+ "unique_urls": 20,
+ "with_summary": 20,
+ "with_date": 20,
+ "with_author": 0,
+ "tag_counts": {
+  "web": 11,
+  "design": 7,
+  "tools": 13,
+  "research": 4,
+  "open_source": 6,
+  "desktop": 3,
+  "mobile": 3
+ },
+ "sample": [
+  {
+   "url": "https://workflow.test/posts/1",
+   "published_at": "2026-09-27T10:00:00Z",
+   "tags": [
+    "web",
+    "design",
+    "tools"
+   ],
+   "summary": "The post describes a browser design toolkit featuring reusable components and color themes."
+  },
+  {
+   "url": "https://workflow.test/posts/2",
+   "published_at": "2026-09-26T10:00:00Z",
+   "tags": [
+    "web",
+    "research"
+   ],
+   "summary": "The post announces a research study evaluating AI agents that operate web browsers."
+  },
+  {
+   "url": "https://workflow.test/posts/3",
+   "published_at": "2026-09-25T10:00:00Z",
+   "tags": [
+    "tools",
+    "open_source"
+   ],
+   "summary": "The post describes a fast, MIT-licensed command line tool for searching code."
+  },
+  {
+   "url": "https://workflow.test/posts/4",
+   "published_at": "2026-09-24T10:00:00Z",
+   "tags": [
+    "desktop",
+    "tools"
+   ],
+   "summary": "The post describes a macOS menu bar utility designed for window tiling."
+  },
+  {
+   "url": "https://workflow.test/posts/5",
+   "published_at": "2026-09-23T10:00:00Z",
+   "tags": [
+    "web",
+    "design"
+   ],
+   "summary": "The post provides typography guidance for product landing pages."
+  }
+ ],
+ "limits_of_evidence": "Synthetic posts; no Grok call, no native CEF window; authors stay null because the generic feed extractor did not establish them."
+}

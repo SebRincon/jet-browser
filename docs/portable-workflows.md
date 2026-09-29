@@ -100,6 +100,8 @@ The present 2.5 GB app is locally ad hoc signed. Public distribution still needs
 
 The real user bookmark job and existing browser were not resumed or replaced by these tests. The prior top-100 job is still unfinished. Classification accuracy, calibration, generic website-specific extraction, large CSV exports and multi-hour archive behavior require further measured work.
 
+`--scenario template-local` runs the `tagged_feed` template on a 25-post synthetic feed with the packaged runtime, real SemIf and isolated headless Chromium but no provider (free). On 2026-09-28 it saved 20 unique records with summaries and dates, paused once for review at ten and completed in 59 s of local execution ([evidence](evidence/template-local-20260928.json)). `--scenario template` sends the incident-shaped request to real Grok and passes only if Grok chose the template and the same 20 records complete; it has not been run yet.
+
 The replayable live harness is `scripts/verify_portable_workflow.py`. It requires an explicit isolated data directory, a bundled runtime, prepared models, a Chromium test executable and an authenticated Grok account. It uses only synthetic posts, makes paid provider calls, and never attaches to the user's browser. `--help` is safe and does not load Jet or contact a provider.
 
 ```sh
