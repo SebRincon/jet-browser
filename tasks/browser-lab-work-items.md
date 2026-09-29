@@ -455,9 +455,9 @@ uv run --project backend python -m pytest backend/tests/test_references.py backe
 
 **Outcome:** Replace a prefilled field reliably after navigation and preserve the intended value.
 
-**Progress:** Not started. Continues the existing known prefilled-form issue.
+**Progress:** Offline repair landed 2026-09-28; native confirmation pending.
 
-**Current truth:** tasks/todo.md retains this native-input failure; fresh-form successes do not prove replacement works.
+**Current truth:** The retained native failure's own diagnostics show `document.hasFocus()` true but `activeElement` still BODY after each acknowledged press: the mouse never reached the checkbox. Isolated headless Chromium does not reproduce it (the same executor toggles the checkbox and replaces the prefilled text), so the fault is in native-view delivery or coordinate mapping. The executor now sends two harmless pointer moves, requires a `mousemove` on the target before pressing, requires the press on the target, and requires focus before any keystroke; otherwise it raises `InputNotDelivered` with the probe (arrival point, visual viewport, device pixel ratio, visibility) in input diagnostics. A simulated shift previously submitted the form through the button below the checkbox; now no press is sent.
 
 **Pins:** Shared baseline above; no new result or source revision claimed.
 
@@ -469,9 +469,9 @@ uv run --project backend python -m pytest backend/tests/test_references.py backe
 
 **Acceptance:**
 
-- [ ] A minimal fixture reproduces the prefilled issue and retains before/after field state.
-- [ ] Replacement does not append, duplicate, type into another field or automatically retry an uncertain mutation.
-- [ ] Offline regression covers the identified cause; native success is separately recorded only in a user-started isolated run.
+- [x] A minimal fixture reproduces the prefilled issue and retains before/after field state (headless reproduces the delivery fault by simulation; the native cause itself needs a native run).
+- [x] Replacement does not append, duplicate, type into another field or automatically retry an uncertain mutation.
+- [ ] Offline regression covers the identified cause (done: `backend/tests/test_prefilled_input.py`); native success is separately recorded only in a user-started isolated run (pending; the probe will identify the native mapping fault if it recurs).
 
 **Verification:** From project root, after adding this slice's tests:
 

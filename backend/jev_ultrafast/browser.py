@@ -16,6 +16,61 @@ class StalePage(ValueError):
     """A decision no longer refers to the observed page."""
 
 
+class InputNotDelivered(RuntimeError):
+    """Chromium acknowledged native input that never reached the observed target.
+
+    Raised instead of continuing, so no text is typed into another element and the
+    same click is not repeated; the probe details go to input diagnostics.
+    """
+
+
+# Capture listeners record where pointer moves and the press actually land. The
+# click is sent only after a harmless move reached the target, so misrouted native
+# input cannot press another control. The probe runs in the page: a hostile page can
+# only make delivery look failed, which stops the task (fail-safe).
+_PROBE_ARM = """(node => {
+  const target = window.__jevFast?.nodes.get(node);
+  const onTarget = hit => !!target && !!hit && (target === hit || target.contains(hit) ||
+    [...(target.labels || [])].some(label => label.contains(hit)));
+  const probe = {moved: false, move_on_target: false, pressed: false};
+  const listener = event => {
+    const hit = event.target;
+    if (event.type === 'mousemove') {
+      probe.moved = true;
+      probe.move_on_target = probe.move_on_target || onTarget(hit);
+      probe.move_x = event.clientX;
+      probe.move_y = event.clientY;
+      probe.move_tag = hit?.tagName || null;
+    } else if (!probe.pressed) {
+      probe.pressed = true;
+      probe.on_target = onTarget(hit);
+      probe.x = event.clientX;
+      probe.y = event.clientY;
+      probe.tag = hit?.tagName || null;
+    }
+  };
+  addEventListener('mousemove', listener, true);
+  addEventListener('mousedown', listener, true);
+  window.__jevInputProbe = {probe, listener, target};
+  return true;
+})(%s)"""
+_PROBE_PEEK = "(() => ({...(window.__jevInputProbe?.probe || {})}))()"
+_PROBE_READ = """(() => {
+  const armed = window.__jevInputProbe;
+  if (!armed) return null;
+  removeEventListener('mousemove', armed.listener, true);
+  removeEventListener('mousedown', armed.listener, true);
+  delete window.__jevInputProbe;
+  const active = document.activeElement, viewport = window.visualViewport;
+  return {...armed.probe,
+    focused: !!armed.target && !!active && (active === armed.target || armed.target.contains(active)),
+    active_tag: active?.tagName || null,
+    viewport: viewport ? {x: viewport.offsetLeft, y: viewport.offsetTop, scale: viewport.scale} : null,
+    device_pixel_ratio: devicePixelRatio,
+    visibility: document.visibilityState};
+})()"""
+
+
 class Browser:
     def __init__(self, url=None, transport=None):
         if transport is None:
@@ -119,6 +174,61 @@ def fingerprint(state):
     return hashlib.sha256(json.dumps(content, sort_keys=True).encode()).hexdigest()
 
 
+def _record_probe(session, action, probe, x, y, stage):
+    safe = {key: probe.get(key) for key in (
+        "moved", "move_on_target", "move_x", "move_y", "move_tag", "pressed", "on_target", "x", "y", "tag",
+        "focused", "active_tag", "viewport", "device_pixel_ratio", "visibility") if key in probe}
+    safe["expected"] = {"x": x, "y": y}
+    session.input_diagnostics.append({"method": "input.probe", "stage": stage, "kind": action["kind"], "probe": safe})
+    return safe
+
+
+def _check_pointer(session, evaluate, action, x, y):
+    """Refuse to press unless a harmless pointer move reached the observed target."""
+    probe = evaluate(_PROBE_PEEK) or {}
+    if probe.get("move_on_target"):
+        return
+    _record_probe(session, action, probe, x, y, "pointer")
+    try:
+        evaluate(_PROBE_READ)  # Disarm; the page stays untouched.
+    except StalePage:
+        pass
+    if getattr(session, "trace", None):
+        session.trace.emit("browser.input.probe", tab_id=session.tab_id, status="error",
+                           reason="pointer_missed" if probe.get("moved") else "pointer_not_delivered")
+    if not probe.get("moved"):
+        raise InputNotDelivered(
+            "Chromium acknowledged pointer movement, but the page received none; "
+            "the click was not sent and nothing was typed.")
+    raise InputNotDelivered(
+        f"The pointer arrived over {probe.get('move_tag')} at ({probe.get('move_x')}, {probe.get('move_y')}) "
+        f"instead of the target at ({round(x)}, {round(y)}); the click was not sent and nothing was typed.")
+
+
+def _check_delivery(session, evaluate, action, x, y):
+    try:
+        probe = evaluate(_PROBE_READ)
+    except StalePage:
+        return  # The click replaced the document (e.g. a link); delivery is implied.
+    if probe is None:
+        return  # A new document has no armed probe: the click navigated.
+    _record_probe(session, action, probe, x, y, "press")
+    if getattr(session, "trace", None):
+        session.trace.emit("browser.input.probe", tab_id=session.tab_id, status="ok" if probe.get("on_target") else "error",
+                           reason=None if probe.get("on_target") else ("missed_target" if probe.get("pressed") else "not_delivered"))
+    if not probe.get("pressed"):
+        raise InputNotDelivered(
+            "Chromium acknowledged the click, but the page received no mouse press "
+            f"(page {probe.get('visibility')}); nothing was typed and the click was not retried.")
+    if not probe.get("on_target"):
+        raise InputNotDelivered(
+            f"The click landed on {probe.get('tag')} at ({probe.get('x')}, {probe.get('y')}) instead of "
+            f"the target at ({round(x)}, {round(y)}); nothing was typed and the click was not retried.")
+    if action["kind"] == "fill" and not probe.get("focused"):
+        raise InputNotDelivered(
+            f"The field did not receive focus ({probe.get('active_tag')} is focused); no text was typed.")
+
+
 def browser_operation(request):
     operation = request["operation"]
     session = request["session"]
@@ -178,8 +288,14 @@ def browser_operation(request):
                 raise StalePage("Target changed or is covered. Observe again.")
             if kind != "select":
                 x, y = target["x"], target["y"]
+                evaluate(_PROBE_ARM % json.dumps(action["node"]))
+                # Two moves guarantee a position change, so Chromium emits mousemove.
+                for dy in (-1, 0):
+                    call("Input.dispatchMouseEvent", type="mouseMoved", x=x, y=y + dy)
+                _check_pointer(session, evaluate, action, x, y)
                 for event in ("mousePressed", "mouseReleased"):
                     call("Input.dispatchMouseEvent", type=event, x=x, y=y, button="left", clickCount=1)
+                _check_delivery(session, evaluate, action, x, y)
                 if kind == "fill":
                     call(
                         "Input.dispatchKeyEvent",

@@ -5,7 +5,7 @@
 - [x] Vendor vten's shadcn_flutter locally and migrate browser/chat controls.
 - [x] Consolidate all task activity into one Grok chat interface; local models are tools.
 - [x] Improve the GUI with high-contrast dark styling and vten-style Markdown messages.
-- [ ] Resolve the intermittent prefilled-form input failure after navigation (retained evidence; fresh forms pass).
+- [ ] Resolve the intermittent prefilled-form input failure after navigation (retained evidence; fresh forms pass). Offline guard and delivery probe landed 2026-09-28; native confirmation pending.
 - [x] Implement private native bridge and serialized local task control plane.
 - [x] Extract/configure LFM, SemIf and Laya adapters plus local typing helper.
 - [x] Stream Grok chat and connect task-level MCP tools (live list-tabs verified).

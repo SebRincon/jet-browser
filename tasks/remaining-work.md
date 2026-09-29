@@ -7,7 +7,7 @@ Updated 2026-09-28. Owner: standalone Jet browser-agent experience. Charter: [SP
 - Initial source baseline and [agent handoff](../docs/HANDOFF.md) are prepared on `main`. Final checks: 345 backend, 61 app and 9 vendored-chat tests passed; lint/analyzers clean. Late progress can no longer overwrite completed local tasks. The existing bundle has not been rebuilt for that guard.
 
 - Implemented foundations: standalone CEF shell, local shadcn/vten chat forks, one chat, Grok ACP, local adapters, durable sessions, private traces, Stop fences, navigation goals and Wikipedia/YouTube checks.
-- Partial: general form DONE remains `manual_check`; prefilled-input failure remains open. Packaged native startup, DOM read and chat hide/restore now pass after the accessibility repair; background endurance is still open.
+- Partial: general form DONE remains `manual_check`; the prefilled-input failure is guarded offline (no press or typing unless pointer and focus reach the target) but its native cause is unconfirmed. Packaged native startup, DOM read and chat hide/restore now pass after the accessibility repair; background endurance is still open.
 - Open: shared bounded selection for links/page actions (tabs done), shared outcomes, extraction/find, structured references, GitHub resources, saved forms/filters, cited research, replay and held-out calibration.
 - [Baseline](browser-lab-baseline.json): selected source hashes and reference pins, unborn checkout, no new benchmark run. Board search found no matching Jet issue or local mapping; children are [local work items](browser-lab-work-items.md).
 

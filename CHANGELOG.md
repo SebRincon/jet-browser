@@ -25,6 +25,11 @@
 
 ### Fixed
 
+- Native clicks and fills are sent only after a harmless pointer move reaches the observed
+  target, and text only after the field has focus. Misrouted or dropped native input now
+  stops the task with delivery diagnostics instead of pressing another control or typing
+  elsewhere (the retained prefilled-form failure).
+
 - Tab switching/closing can select among more than 15 tabs: bounded chunks with an
   escape and a final round between chunk winners (previously the first 24 tabs in one
   over-limit question).
