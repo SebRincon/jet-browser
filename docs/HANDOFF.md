@@ -1,6 +1,6 @@
 # Agent handoff
 
-Checkpoint: 2026-09-28 (evening), app `0.1.0+1`, tag `checkpoint-2026-09-28b` on `main`.
+Checkpoint: 2026-09-28 (late), app `0.1.0+1`, tag `checkpoint-2026-09-28c` on `main`.
 Not a public release. Start with [AGENTS.md](../AGENTS.md), then
 [architecture](architecture.md) and [development commands](development.md).
 
@@ -55,27 +55,40 @@ templates and in-app setup. See [workflow contract](portable-workflows.md),
    - The packaged runtime ran the template end to end, with real SemIf and headless
      Chromium, for 20 records.
 
-Checks at this checkpoint: 369 backend (real-DOM and JavaScriptCore cases included),
-62 app and 9 vendored-chat tests passed; ruff and `flutter analyze` clean.
+5. **Live confirmation (user-approved, same night).**
+   - Paid Grok, synthetic incident request: template saved 31 s into a 65 s authoring
+     turn; 20/20 records completed.
+   - Native app on the pinned vten CEF: startup, fresh and prefilled forms.
+     Prefilled failures traced to covered windows; fixed via Chromium switches.
+   - The composer's direct tasks now start the typing helper.
+   - A Developer ID, hardened-runtime build verified strictly and passed native form
+     checks with its window fully covered. Notarization was skipped by the user.
+   - **Real top-100 X Bookmarks run completed:** 100/100 records, 33 recovered posts,
+     10 Grok reviews correcting 37 records, 23 untagged. Two interruptions were fixed
+     during the run: denied `list_tabs` in reviews, and an unresponsive detail tab.
+     [Evidence](evidence/real-top100-20260928.json) holds counts only.
+
+Checks at this checkpoint: 379 backend (real-DOM and JavaScriptCore included), 63 app and
+9 vendored-chat tests passed; ruff and `flutter analyze` clean.
 [Verification](VERIFICATION.md) keeps the dated history.
 
 ## Next work, in order
 
-1. **Live confirmation (needs the user's go-ahead: paid calls or native windows).**
-   - Paid Grok: `scripts/verify_portable_workflow.py --scenario template`.
-   - Native UI on the pinned vten CEF, also under the hardened runtime.
-   - Native prefilled-form rerun: the new probe will name the cause if it recurs.
-   - Hidden-tab endurance, and the real top-100 bookmark request in an isolated profile.
-2. **Release.** First Developer ID signature and notarization
-   (`JET_SIGN_IDENTITY=… JET_NOTARY_PROFILE=… scripts/sign_release.sh`; uploads to
-   Apple), clean-account test, and a license review of the bundled wheels.
-3. **Tag recall.** Tune design/research questions on development data, then score a
-   new held-out set; the current one is used up.
+1. **Tag coverage.** 23/100 real records are untagged, and synthetic held-out recall is
+   weak for design and research. Tune local questions on development data, then score a
+   new held-out set. Consider a local second pass for untagged items before review.
+2. **Release.**
+   - Notarize (`xcrun notarytool store-credentials jet-notary …`, then
+     `JET_NOTARY_PROFILE=jet-notary scripts/sign_release.sh`; this uploads to Apple).
+   - Clean-account test.
+   - License review of the bundled wheels.
+3. **Hidden-tab endurance.** A covered window now stays active, but a non-active Jet
+   tab is still a hidden view. Measure long runs on a background tab.
 4. **Remaining browser gaps.**
    - Generic form completion: a DONE decision is still `manual_check`.
-   - Shared bounded selection for link and page actions: link selection is still first-match.
+   - Shared bounded selection for links and page actions.
    - Cross-origin frames and complex editors.
-   - Claude Code/Codex providers and the broader Browser Lab.
+   - Claude Code/Codex providers.
    Ordered details: [remaining work](../tasks/remaining-work.md).
 
 ## State and operational cautions
@@ -85,9 +98,19 @@ Checks at this checkpoint: 369 backend (real-DOM and JavaScriptCore cases includ
 - `vendor/flutter_cef_browser/macos/Frameworks/` now holds the pinned vten CEF;
   `Frameworks.previous/` holds the original 2026-05 build, the one used by the
   earlier native checks. `scripts/install_cef.sh --check` tells which is installed.
-- Scratch artifacts from this session (clean worktree, relocated bundle, isolated data
-  with cloned weights) live under the session scratchpad, not in the repository.
-  `git worktree prune` cleans the worktree record if that directory is removed.
+- Instances left running at handoff, all on loopback:
+  - 9198: the isolated real-run app and service, data in
+    `/private/tmp/jet-live-20260928`, with the X session, 100 records and the CSV. It
+    runs from `dist/`: do not repackage `dist/` until that app is closed.
+  - 9168: the earlier incident profile's service; its window was already closed and it
+    still holds a model worker.
+  - 9148: a development service.
+  Closing a Jet window does not stop its service. Stop a service only after confirming
+  its port and pid.
+- The Developer ID-signed release copy and the clean worktree are in the session
+  scratchpad (`…/scratchpad/release`, `…/scratchpad/jet-clean`), not in the repository.
+  Rebuild them with `package_runtime.py --output …` and `sign_release.sh`.
+  `git worktree prune` cleans the worktree record once that directory is removed.
 - Workspaces normally use `~/.jet-browser/workspaces` even when `JET_DATA_ROOT`
   changes. Set `JET_WORKSPACE_ROOT` explicitly as well for complete test isolation.
 - The developer `./jet` CLI still targets repository credentials and port `9148`.
