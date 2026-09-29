@@ -568,6 +568,8 @@ class Service:
                     "text": str(page.get("text", ""))[:20000],
                     "actions": page.get("actions", [])[:100]}
         if name == "run_task":
+            # Fill actions need the bundled typing helper; start it before any input.
+            await self.text_runtime.ensure()
             task = self.submit_task(args.get("goal"), args.get("model", self.settings["local_model"]), args.get("tab_id"))
             if self.response:
                 self.store.save_message(self.response)
@@ -689,6 +691,8 @@ def create_app(service):
         elif path == "/tasks":
             if service.busy:
                 raise ValueError('A conversation turn or browser task is already running')
+            # Direct UI tasks never pass through chat(), which otherwise starts the helper.
+            await service.text_runtime.ensure()
             result = service.submit_task(body.get("goal"), body.get("model", service.settings['local_model']), body.get("tab_id"))
         elif path == "/tasks/stop":
             result = service.tasks.stop() or {"status": "idle"}

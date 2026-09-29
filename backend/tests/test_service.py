@@ -184,3 +184,27 @@ async def test_stalled_turn_reports_a_saved_but_unstarted_workflow(tmp_path, mon
     assert '“Bookmarks” was saved (revision 1) but not started' in text
     assert not service.workflows.running
     assert service.workflows.summaries(service.store.current_id)[0]['status'] == 'prepared'
+
+
+async def test_direct_and_delegated_tasks_start_the_typing_helper_first(tmp_path):
+    service = Service(tmp_path)
+    order = []
+
+    async def ensure():
+        order.append('ensure')
+
+    def submit(goal, model, tab_id):
+        order.append('submit')
+        return {'id': 'task', 'status': 'loading'}
+
+    service.text_runtime.ensure = ensure
+    service.submit_task = submit
+    async with TestServer(create_app(service)) as server, ClientSession() as client:
+        headers = {"Host": f"127.0.0.1:{PORT}", 'Authorization': 'Bearer ' + service.token}
+        response = await client.post(server.make_url('/tasks'), json={'goal': 'Enter Solstice in Team name', 'tab_id': 'tab'},
+                                     headers=headers)
+        assert response.status == 200
+    assert order == ['ensure', 'submit']
+    order.clear()
+    await service._tool('run_task', {'goal': 'Enter Solstice in Team name', 'tab_id': 'tab'})
+    assert order[:2] == ['ensure', 'submit']

@@ -30,6 +30,11 @@
 
 ### Fixed
 
+- Packaged app: direct browser tasks (`/tasks`, used by the composer's inline actions) and
+  delegated `run_task` now start the bundled typing helper first; before, a fill failed with
+  "Model connection failed" unless a chat turn had already started it. Found in the first
+  native run on the pinned CEF.
+
 - Native clicks and fills are sent only after a harmless pointer move reaches the observed
   target, and text only after the field has focus. Misrouted or dropped native input now
   stops the task with delivery diagnostics instead of pressing another control or typing
