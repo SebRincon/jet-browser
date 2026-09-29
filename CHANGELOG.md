@@ -39,6 +39,10 @@
 
 ### Fixed
 
+- A recovery that finds less text than the saved capture is a blocked `no_additional_text`
+  result, not a script error; `patch_workflow_records` batches up to 20 corrections so repair
+  turns stay under the time limit. Second live repair pass: untagged 14 → 6.
+
 - Found in the live repair of the real run: `patch_workflow_record` refused completed runs; a
   failed turn that had already repaired records claimed nothing was saved; and the stage text
   said "writing the workflow" after Grok merely read the guide. Repairs on real data took

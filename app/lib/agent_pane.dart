@@ -862,7 +862,8 @@ String grokStageLabel(Object? raw) {
   if (stage == 'responding') return 'Grok is replying';
   if (done.contains('recover_workflow_record') ||
       done.contains('retag_workflow_records') ||
-      done.contains('patch_workflow_record')) {
+      done.contains('patch_workflow_record') ||
+      done.contains('patch_workflow_records')) {
     return 'Grok is repairing records';
   }
   if (done.contains('workflow_sdk') && !done.contains('save_workflow')) {

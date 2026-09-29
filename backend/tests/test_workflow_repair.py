@@ -91,3 +91,34 @@ async def test_completed_runs_accept_reviewer_patches(tmp_path):
     with pytest.raises(RuntimeError, match="pause the workflow"):
         await workflow_tools.tool(service, "patch_workflow_record", {
             "workflow_id": wid, "item_id": iid, "expected_revision": patched["revision"], "patch": {"tags": ["web"]}})
+
+
+async def test_recovered_text_shorter_than_the_capture_is_blocked_not_an_error(tmp_path, monkeypatch):
+    """Live repair: the saved text was an image label longer than the post itself."""
+    store, wid, service, iid, _ = world(tmp_path)
+
+    async def recover(bridge, item, tab, stopped):
+        return dict(ITEM, text="Short", truncated=False, captured_at=125.0)
+
+    class Collector:
+        def __init__(self, *args, **kwargs):
+            pass
+
+    monkeypatch.setattr(workflow_capabilities, "recover_post", recover)
+    monkeypatch.setattr(workflow_capabilities, "FeedCollector", Collector)
+    result = await workflow_tools.tool(service, "recover_workflow_record", {"workflow_id": wid, "item_id": iid})
+    assert result == {"item_id": iid, "status": "blocked", "reason": "no_additional_text"}
+    assert store.get_record("session", wid, iid)["text"] == ITEM["text"]  # Fuller evidence kept.
+
+
+async def test_batch_patch_applies_each_record_independently(tmp_path):
+    store, wid, service, iid, _ = world(tmp_path, status="completed")
+    revision = store.get_record("session", wid, iid)["revision"]
+    result = await workflow_tools.tool(service, "patch_workflow_records", {"workflow_id": wid, "patches": [
+        {"item_id": iid, "expected_revision": revision, "patch": {"tags": ["mobile", "web"]}},
+        {"item_id": iid, "expected_revision": revision, "patch": {"tags": ["web"]}},  # Now stale.
+    ]})
+    first, second = result["results"]
+    assert first["ok"] and first["tags"] == ["mobile", "web"]
+    assert not second["ok"] and "revision" in second["error"]
+    assert store.get_record("session", wid, iid)["tags"] == ["mobile", "web"]

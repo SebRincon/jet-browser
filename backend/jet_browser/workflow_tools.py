@@ -18,6 +18,7 @@ NAMES = frozenset(
         "control_workflow",
         "workflow_records",
         "patch_workflow_record",
+        "patch_workflow_records",
         "workflow_sdk",
         "recover_workflow_record",
         "retag_workflow_records",
@@ -278,6 +279,18 @@ def schemas(schema):
                 "patch": patch,
             },
             ("workflow_id", "item_id", "expected_revision", "patch"),
+        ),
+        (
+            "patch_workflow_records",
+            "Edit tags or summaries on up to 20 records of a paused or completed workflow in one call. "
+            "Each patch applies independently; results report per-record success or the reason it failed.",
+            {
+                "workflow_id": {"type": "string"},
+                "patches": {"type": "array", "minItems": 1, "maxItems": 20, "items": obj(
+                    {"item_id": {"type": "string"}, "expected_revision": {"type": "integer"}, "patch": patch},
+                    ("item_id", "expected_revision", "patch"))},
+            },
+            ("workflow_id", "patches"),
         ),
         (
             "workflow_sdk",
@@ -608,6 +621,21 @@ async def tool(service, name, args):
             "tags": updated.get("tags"),
             "summary": updated.get("summary"),
         }
+    if name == "patch_workflow_records":
+        data = _args(args, {"workflow_id", "patches"}, ("workflow_id", "patches"))
+        patches = data["patches"]
+        if not isinstance(patches, list) or not 1 <= len(patches) <= 20:
+            raise ValueError("patches must list 1 to 20 record patches")
+        results = []
+        for entry in patches:
+            item_args = _args(entry, {"item_id", "expected_revision", "patch"}, ("item_id", "expected_revision", "patch"))
+            try:
+                updated = await tool(service, "patch_workflow_record", {"workflow_id": data["workflow_id"], **item_args})
+                results.append({"item_id": item_args["item_id"], "ok": True, "revision": updated["revision"],
+                                "tags": updated["tags"]})
+            except (ValueError, RuntimeError) as exc:
+                results.append({"item_id": item_args["item_id"], "ok": False, "error": str(exc)[:200]})
+        return {"results": results}
     if name == "recover_workflow_record":
         data = _args(args, {"workflow_id", "item_id"}, ("workflow_id", "item_id"))
         return await workflow_repair.recover(service, sid, data["workflow_id"], data["item_id"])

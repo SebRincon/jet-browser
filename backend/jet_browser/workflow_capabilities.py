@@ -355,8 +355,15 @@ class WorkflowCapabilities:
         if not isinstance(observed, dict) or not observed.get("url"):
             raise ValueError("empty recovery")
         self._guard()
-        row = _as_dict(self.store.recover_record(self.sid, self.wid, iid, self._observed(observed), revision,
-                                                 requested_by="grok" if self.repair else None))
+        try:
+            row = _as_dict(self.store.recover_record(self.sid, self.wid, iid, self._observed(observed), revision,
+                                                     requested_by="grok" if self.repair else None))
+        except ValueError as exc:
+            if str(exc) != "recovery shortened evidence":
+                raise
+            # The saved capture already holds more text (e.g. an image label) than the post
+            # itself: nothing more to recover, and the fuller evidence is kept.
+            return {"status": "blocked", "blocked": True, "reason": "no_additional_text"}
         full = dict(observed)
         full["id"] = iid
         self._remember(full)

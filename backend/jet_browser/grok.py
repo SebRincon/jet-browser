@@ -24,7 +24,7 @@ BROWSER_TOOLS = frozenset(
                  "inspect_collection_source", "configure_collection", "collection_review", "review_collection", "recover_collection_item",
                  "workspace_list", "workspace_read", "workspace_write",
                  "save_workflow", "read_workflow", "run_workflow", "workflow_status", "control_workflow", "workflow_records", "patch_workflow_record", "workflow_sdk",
-                 "recover_workflow_record", "retag_workflow_records")
+                 "recover_workflow_record", "retag_workflow_records", "patch_workflow_records")
 )
 NATIVE_TOOLS = ("search_tool", "use_tool", "web_search", "web_fetch")
 READ_ONLY_WEB_TOOLS = frozenset({"web_search", "web_fetch"})
@@ -153,7 +153,8 @@ show progress. Do not repeatedly poll. For errors inspect read_workflow and work
 revise the SAME workflow with expected_revision (a template workflow is revised by saving
 new template options), keep scope and budgets, and resume.
 At checkpoints workflow_records offers at most five authorized 400-character samples.
-patch_workflow_record edits a paused or completed row's tags or summary with an audit. Source
+patch_workflow_record edits a paused or completed row's tags or summary with an audit
+(patch_workflow_records does up to 20 in one call; prefer it for several records). Source
 evidence can only be replaced by actual post recovery, never by Grok: recover_workflow_record
 opens one cut-off X post in full (once per turn, never retried) and re-tags it locally, and
 retag_workflow_records re-runs local tagging on up to 20 records. Use workflow_records with
@@ -196,6 +197,7 @@ _MILESTONES = (
     ("recover_workflow_record", "after repairing saved records"),
     ("retag_workflow_records", "after repairing saved records"),
     ("patch_workflow_record", "after repairing saved records"),
+    ("patch_workflow_records", "after repairing saved records"),
     ("workflow_sdk", "after reading the workflow guide"),
 )
 _TERMINAL_TOOL_STATUSES = frozenset({"completed", "failed", "cancelled"})
@@ -726,7 +728,7 @@ class GrokClient:
         owned_name = self._owned_tool(call) if valid_turn else None
         # list_tabs is read-only metadata. Denying it made Grok end a real checkpoint
         # review as cancelled, leaving the run paused; run_workflow re-verifies the tab.
-        review_tools = ({'browser__' + name for name in ('save_workflow', 'read_workflow', 'run_workflow', 'workflow_status', 'control_workflow', 'workflow_records', 'patch_workflow_record', 'workflow_sdk', 'list_tabs', 'recover_workflow_record', 'retag_workflow_records')} if self.review_only == 'workflow' else {'browser__collection_review', 'browser__review_collection', 'browser__recover_collection_item'})
+        review_tools = ({'browser__' + name for name in ('save_workflow', 'read_workflow', 'run_workflow', 'workflow_status', 'control_workflow', 'workflow_records', 'patch_workflow_record', 'workflow_sdk', 'list_tabs', 'recover_workflow_record', 'retag_workflow_records', 'patch_workflow_records')} if self.review_only == 'workflow' else {'browser__collection_review', 'browser__review_collection', 'browser__recover_collection_item'})
         if self.review_only and owned_name not in review_tools:
             owned_name = None
         options = params.get("options", [])

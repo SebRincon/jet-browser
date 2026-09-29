@@ -64,6 +64,13 @@ for later (`backend/jet_browser/workflow_repair.py`). Grok chooses; code acts:
   most once per turn, at most 20 per turn, and never retried.
 - `retag_workflow_records` re-runs local tagging, including the second pass, on up to 20
   stored records, optionally re-summarizing.
+- `patch_workflow_records` applies up to 20 justified tag/summary corrections in one call,
+  each independently (single-record `patch_workflow_record` remains).
+- A recovery whose post text is shorter than the saved capture (e.g. an image label) returns
+  `blocked: no_additional_text` and keeps the fuller evidence.
+
+On the real top-100 run these tools took untagged bookmarks from 23 to 6 and the last cut-off
+post to full text over two short repair turns ([evidence](evidence/real-top100-20260928.json)).
 
 All three require a paused or completed run, honor Stop, and return metadata only. When
 a problem repeats, the review prompt tells Grok to change template options or the script
