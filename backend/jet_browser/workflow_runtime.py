@@ -88,3 +88,27 @@ async def run_script(executable, source, input_value, capabilities, stopped, *, 
             with suppress(ProcessLookupError):
                 process.kill()
         await process.wait()
+
+
+async def check_script(executable, source, timeout=10.0):
+    """Compile source as a run would, without executing it. Returns {ok, error?, line?}."""
+    if not isinstance(source, str) or len(source.encode()) > 32000:
+        raise ValueError("Workflow source exceeds 32KB")
+    process = await asyncio.create_subprocess_exec(
+        str(executable), "--check",
+        stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.DEVNULL,
+        limit=_LIMIT + 1, env={"PATH": "/usr/bin:/bin", "LANG": "en_US.UTF-8"},
+    )
+    try:
+        out, _ = await asyncio.wait_for(
+            process.communicate(json.dumps({"source": source}).encode() + b"\n"), timeout)
+    finally:
+        if process.returncode is None:
+            with suppress(ProcessLookupError):
+                process.kill()
+            await process.wait()
+    message = json.loads(out.decode().splitlines()[0]) if out.strip() else {}
+    if message.get("type") != "check":
+        raise RuntimeError("Workflow check failed to run")
+    return {key: message[key] for key in ("ok", "error", "line") if key in message}
+

@@ -33,6 +33,9 @@
 - Reviewer repair tools: Grok can list untagged or cut-off records (ids only), have code open
   and expand an exact X post into a record, and re-run local tagging on up to 20 records;
   reviews are told to fix records and improve the loop instead of deferring.
+- `save_workflow` compiles custom JavaScript first (`JetWorkflow --check`, no execution) and
+  rejects syntax errors with their line or calls to undeclared capabilities;
+  `workflow_status` reports the loop's own counters for the next refinement.
 
 ### Fixed
 

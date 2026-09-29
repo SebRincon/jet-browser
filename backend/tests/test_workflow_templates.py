@@ -300,3 +300,30 @@ async def test_template_v2_branches_can_be_turned_off(tmp_path):
     row = store.get("session", wid)
     assert row["status"] == "completed" and row["checkpoint"]["untagged"] == 3
     assert feed.items[1]["url"] not in feed.recovered and "best" not in worker.questions
+
+
+async def test_save_workflow_rejects_uncompilable_or_undeclared_source(tmp_path):
+    store = WorkflowStore(tmp_path)
+    service = SimpleNamespace(store=SimpleNamespace(current_id="session"), workflow_store=store,
+                              workflows=SimpleNamespace(running=False, _runtime_path=lambda: EXECUTABLE))
+    raw = definition("const x = ;")
+    with pytest.raises(ValueError, match="syntax error on line 1"):
+        await workflow_tools.tool(service, "save_workflow", {"definition": raw})
+    raw = definition("jet.call('feed.teleport', {});")
+    with pytest.raises(ValueError, match="feed.teleport"):
+        await workflow_tools.tool(service, "save_workflow", {"definition": raw})
+    saved = await workflow_tools.tool(service, "save_workflow",
+                                      {"definition": definition("jet.call('run.progress', {message: 'ok'});")})
+    assert saved["revision"] == 1
+    store.close()
+
+
+async def test_workflow_status_reports_the_loops_own_counters(tmp_path):
+    feed = Feed(6)
+    store, wid, manager, _ = template_world(tmp_path, feed, {"first_review": 0}, max_items=6)
+    await manager.start("session", wid)
+    await settle(manager)
+    service = SimpleNamespace(store=SimpleNamespace(current_id="session"), workflow_store=store, workflows=manager)
+    status = await workflow_tools.tool(service, "workflow_status", {"workflow_id": wid})
+    assert status["status"] == "completed" and "6 items" in status["last_result"]
+    assert {"untagged", "partial", "fallback_tags", "expanded_by_decision"} <= set(status["checkpoint"])

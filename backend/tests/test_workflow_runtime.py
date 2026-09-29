@@ -57,3 +57,13 @@ async def test_stop_prevents_a_second_host_call(executable):
     with pytest.raises(asyncio.CancelledError):
         await run_script(executable, 'jet.call("stop", {}); jet.call("stop", {});', {}, {"stop": stop}, event)
     assert len(calls) == 1
+
+
+async def test_check_mode_reports_the_source_line_without_running(executable):
+    from jet_browser.workflow_runtime import check_script
+
+    assert await check_script(executable, "jet.call('run.progress', {message: 'x'});\nreturn 1;") == {"ok": True}
+    bad = await check_script(executable, "const a = 1;\nconst b = 2;\nconst c = ;")
+    assert bad["ok"] is False and bad["line"] == 3 and "Unexpected" in bad["error"]
+    # A check never executes: an infinite loop still compiles and returns at once.
+    assert (await check_script(executable, "while (true) {}", timeout=2))["ok"] is True

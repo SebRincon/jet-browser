@@ -68,6 +68,30 @@ let rpc: @convention(block) (String, String) -> String = { method, args in
     return box(["result": resp["result"] ?? NSNull()])
 }
 
+// --check compiles the source the way a run wraps it, without executing any of it, so a
+// reviewer can fix syntax before spending a run. Reports the source line of the error.
+var checkProblem: (String, Int)? = nil
+if CommandLine.arguments.dropFirst().first == "--check" {
+    guard let line = stdinLine(200_000), let ld = line.data(using: .utf8),
+          let root = (try? JSONSerialization.jsonObject(with: ld)) as? [String: Any],
+          let source = root["source"] as? String, source.utf8.count <= 32_000 else { fail("bad input") }
+    let check = JSContext()!
+    check.exceptionHandler = { _, e in
+        let message = e?.objectForKeyedSubscript("message")?.toString() ?? "syntax error"
+        let line = Int(e?.objectForKeyedSubscript("line")?.toInt32() ?? 0)
+        checkProblem = (clip(message, 500), line)
+    }
+    check.setObject(source, forKeyedSubscript: "__jetSource" as NSString)
+    _ = check.evaluateScript("new Function('jet', '\"use strict\";\\n' + __jetSource)")
+    if let (message, line) = checkProblem {
+        // new Function adds "function anonymous(jet" and ") {" lines; the strict line adds one.
+        out(["type": "check", "ok": false, "error": message, "line": max(1, line - 3)])
+    } else {
+        out(["type": "check", "ok": true])
+    }
+    exit(0)
+}
+
 guard let line = stdinLine(200_000), let ld = line.data(using: .utf8),
       let root = (try? JSONSerialization.jsonObject(with: ld)) as? [String: Any],
       let source = root["source"] as? String, source.utf8.count <= 32_000,

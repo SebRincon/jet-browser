@@ -37,6 +37,20 @@ Definitions declare tab, start URL, source kind, model, taxonomy, enabled capabi
 
 Review sharing follows the existing user preference: at most five 400-character excerpts per review, with no paging through the whole private dataset. A restricted review profile can operate only on the same workflow/session. Full records stay in local SQLite and are available to the UI and local script. Grok is a remote model; the categorization and summary model calls run locally.
 
+## Write, check, run, refine
+
+Workflows are JavaScript in JavaScriptCore, which ships with macOS; it plays the role an
+embedded Lua would, with nothing to install. The loop Grok follows:
+
+1. `save_workflow` compiles custom source with `JetWorkflow --check` (never executing it)
+   and rejects a syntax error with its source line, or a literal `jet.call` to a
+   capability the definition does not list. Templates are rendered from vetted source.
+2. `run_workflow` runs it in bounded slices.
+3. `workflow_status` returns the run's own counters (for `tagged_feed`: untagged, partial,
+   expanded by decision, second-pass tags) and the last result.
+4. Grok fixes records (below) and, when a problem repeats, saves a new revision with
+   changed options or source and runs again. Scope, model and lifetime limits cannot grow.
+
 ## Reviewer repairs
 
 At a checkpoint, or after a run completes, Grok fixes records rather than leaving them

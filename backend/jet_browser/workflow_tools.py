@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
+import re
+
 from . import workflow_repair, workflow_templates
 from .workflow_store import CAPABILITIES
+
+_LITERAL_CALL = re.compile(r"""jet\.call\(\s*['"]([A-Za-z_.]+)['"]""")
 
 NAMES = frozenset(
     {
@@ -55,6 +59,8 @@ _CALLS = (
 )
 
 _SDK = """\
+save_workflow compiles custom source first and rejects a syntax error (with its line) or a
+literal jet.call to a capability the definition does not list; fix and save again.
 Prefer a built-in template (see templates) whenever one fits: call save_workflow with
 definition.template {name, options} and no source or capabilities. Write custom
 JavaScript only when no template can express the request, and keep it small.
@@ -454,6 +460,23 @@ def _patch(raw):
     return out
 
 
+async def _check_source(service, definition):
+    """Reject custom source that cannot run, before a run is spent on it."""
+    declared = set(definition["capabilities"])
+    for called in sorted(set(_LITERAL_CALL.findall(definition["source"]))):
+        if called not in declared:
+            raise ValueError(f"source calls {called}, which is not in this workflow's capabilities")
+    runtime = getattr(getattr(service, "workflows", None), "_runtime_path", None)
+    path = runtime() if callable(runtime) else None
+    if path is None or not path.is_file():
+        return  # The run itself still fails closed without the helper.
+    from .workflow_runtime import check_script
+
+    result = await check_script(path, definition["source"])
+    if not result.get("ok"):
+        raise ValueError(f"source has a syntax error on line {result.get('line')}: {result.get('error')}")
+
+
 async def tool(service, name, args):
     if name not in NAMES:
         raise ValueError("unknown tool")
@@ -465,6 +488,8 @@ async def tool(service, name, args):
         if getattr(workflows, "running", False):
             raise RuntimeError("pause the workflow before saving")
         definition = _definition(data["definition"])
+        if data["definition"].get("template") is None:
+            await _check_source(service, definition)
         kwargs = {}
         if "workflow_id" in data:
             if not isinstance(data["workflow_id"], str) or not data["workflow_id"]:
@@ -512,7 +537,13 @@ async def tool(service, name, args):
         if "workflow_id" in data:
             if not isinstance(data["workflow_id"], str) or not data["workflow_id"]:
                 raise ValueError("workflow_id is invalid")
-            return workflows.summary(sid, data["workflow_id"], include_source=False)
+            result = workflows.summary(sid, data["workflow_id"], include_source=False)
+            row = store.get(sid, data["workflow_id"]) or {}
+            # How the last slice went (a script's own counters, e.g. untagged/partial/expanded),
+            # so the reviewer can decide whether to change options or the script.
+            result["checkpoint"] = row.get("checkpoint")
+            result["last_result"] = row.get("last_result")
+            return result
         return {"workflows": workflows.summaries(sid)}
     if name == "control_workflow":
         data = _args(args, {"workflow_id", "action"}, ("workflow_id", "action"))
