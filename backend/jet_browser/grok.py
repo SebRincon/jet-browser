@@ -226,7 +226,7 @@ class GrokClient:
 
     def __init__(self, cwd: Path, mcp_command: list[str], emit: Callable[[dict], None],
                  trace: Callable[..., None] | None = None, review_only: bool = False,
-                 grok_home: Path | None = None):
+                 grok_home: Path | None = None, executable: Path | None = None):
         if not mcp_command or not all(isinstance(x, str) and x for x in mcp_command):
             raise ValueError("mcp_command must contain an executable and optional arguments")
         self.cwd = Path(cwd).expanduser().resolve()
@@ -235,6 +235,7 @@ class GrokClient:
         self.trace = trace
         self.review_only = review_only
         self.grok_home = grok_home
+        self.executable = executable
         self.session_id: str | None = None
         self._process: asyncio.subprocess.Process | None = None
         self._readers: list[asyncio.Task] = []
@@ -283,7 +284,8 @@ class GrokClient:
             started = time.perf_counter()
             self._trace("grok.provider.start")
             self._status("starting")
-            executable = os.environ.get("JET_GROK_PATH", str(Path.home() / ".grok/bin/grok"))
+            executable = str(self.executable) if self.executable else os.environ.get(
+                "JET_GROK_PATH", str(Path.home() / ".grok/bin/grok"))
             try:
                 # Agent profiles are supported in ACP; --tools alone is documented
                 # for headless -p and is insufficient to restrict an ACP session.

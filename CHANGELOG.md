@@ -36,8 +36,14 @@
 - `save_workflow` compiles custom JavaScript first (`JetWorkflow --check`, no execution) and
   rejects syntax errors with their line or calls to undeclared capabilities;
   `workflow_status` reports the loop's own counters for the next refinement.
+- Grok is no longer pinned: the packager bundles the latest release (`grok update`), and a
+  bundled app updates Grok in its own Grok home at every start and uses the newer copy
+  (floor 1.0.41). Verified live with Grok 1.0.44.
 
 ### Fixed
+
+- Development checkouts were treated as packaged apps for the Grok home because the repo
+  also holds `model-downloads.json`; only `bundle-manifest.json` now marks a bundle.
 
 - A recovery that finds less text than the saved capture is a blocked `no_additional_text`
   result, not a script error; `patch_workflow_records` batches up to 20 corrections so repair

@@ -9,7 +9,7 @@ Use Apple Silicon macOS 14+, Xcode/command-line tools, Flutter (verified: 3.41.6
 CocoaPods and `uv` with Python 3.12. Dependency locks are `backend/uv.lock`,
 `app/pubspec.lock`, `app/macos/Podfile.lock`, the hash-pinned engine locks in
 `vendor/local-engines/locks/` and [packaging/pins.json](../packaging/pins.json)
-for CEF and the Grok CLI.
+for CEF. Grok is deliberately not pinned (latest release).
 
 **CEF.** Jet uses the same CEF artifact as vten: the `cef-147.0.11-vten-frame-lease-075`
 release of `SebRincon/webview_cef` (CEF 147.0.11 with vten's OSR frame-lease patches).
@@ -101,12 +101,14 @@ bash scripts/start.sh
 ```
 
 The packager builds Flutter, copies runtime dependencies, compiles Swift helpers
-and ad hoc signs `dist/Jet Browser.app`. It refuses a Grok CLI whose SHA-256 or
-`--version` (probed with an empty HOME) differs from `packaging/pins.json`, and CEF
-assets that fail `install_cef.sh --check`. `JET_ALLOW_UNPINNED_CEF=1` permits a
-local-only build with other CEF assets; `bundle-manifest.json` then records
-`pinned_release: null` with the actual hashes. CEF's license and Chromium credits
-ship in `jet-runtime/licenses/CEF/`.
+and ad hoc signs `dist/Jet Browser.app`. Grok is not pinned: the packager runs
+`grok update` on the builder's CLI and bundles the newest release (`--no-grok-update`
+bundles the installed one; `JET_BUILD_GROK` names a specific binary). It only refuses a
+Grok older than 1.0.41, the first release whose ACP tool identity Jet reads, and
+records the bundled version and hash in `bundle-manifest.json`. CEF must pass
+`install_cef.sh --check`; `JET_ALLOW_UNPINNED_CEF=1` permits a local-only build with
+other CEF assets (`pinned_release: null`). CEF's license and Chromium credits ship in
+`jet-runtime/licenses/CEF/`.
 `--no-build` deliberately reuses the existing Flutter build; avoid it after UI or
 native changes. Build output is not committed. Developer ID/notarization is pending.
 
@@ -131,7 +133,10 @@ package, the local engines, the Grok CLI, JetWorkflow (Apple's JavaScriptCore, p
 macOS) and CEF; model weights and Grok sign-in come from the setup screen. A packaged
 app keeps Grok's config, sign-in and sessions in `<data>/.runtime/grok-home`
 (`GROK_HOME`), so a developer's global `~/.grok` MCP servers, hooks and plugins never
-load into Jet; development builds use `~/.grok` unless `JET_GROK_HOME` is set. A
+load into Jet; development builds use `~/.grok` unless `JET_GROK_HOME` is set. At every
+start a bundled app runs `grok update` into that home in the background and then uses
+whichever Grok is newer, the bundled one or the updated one (the signed bundle itself is
+never modified). Sessions pass `--no-auto-update`, so a running turn never switches. A
 2026-09-28 audit ran the packaged service, SemIf tagging/summaries, JetWorkflow,
 headless Chromium and the typing model with `HOME` pointing at an empty folder: all
 passed, and the only file written there was Jet's own `~/.jet-browser` workspace index.

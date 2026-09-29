@@ -3,7 +3,9 @@
 `backend/jet_browser/grok.py` runs the installed Grok Build CLI as a dedicated ACP
 stdio process. It does not connect to a vten session or use a CLI wrapper. Its
 default executable is `~/.grok/bin/grok`; `JET_GROK_PATH` can select another native
-installation. The implementation was grounded in the installed v1.0.41 docs.
+installation. The implementation was grounded in the installed v1.0.41 docs and verified live
+with 1.0.44 (2026-09-29). Jet uses the newest Grok available and keeps only a 1.0.41 floor; if a
+later release changes the `_meta["x.ai/tool"]` identity, permissions fail closed (denied).
 
 ## Python contract
 

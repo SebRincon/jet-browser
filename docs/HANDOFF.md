@@ -38,7 +38,8 @@ templates and in-app setup. See [workflow contract](portable-workflows.md),
    - `scripts/install_cef.sh` installs vten's pinned CEF (`cef-147.0.11-vten-frame-lease-075`)
      and verifies it by hash. The main checkout now uses it; the old build is in
      `Frameworks.previous/`.
-   - Hash-locked engine environments; the packager rejects an unpinned Grok CLI or CEF.
+   - Hash-locked engine environments; the packager rejects CEF that fails its check.
+     Grok is not pinned (latest release; see item 7).
    - CEF/Chromium notices now ship in the bundle.
    - `scripts/sign_release.sh` signs with the hardened runtime and can notarize.
    - A clean worktree built, packaged, ad-hoc signed and ran the service headlessly.
@@ -92,6 +93,15 @@ templates and in-app setup. See [workflow contract](portable-workflows.md),
      - a shorter recovered text raised a raw error;
      - one-at-a-time patches ran into the 300 s limit.
 
+7. **Latest Grok, no pin (2026-09-29, at the user's request).**
+   - The packager runs `grok update` and bundles the newest release, refusing only
+     releases older than 1.0.41.
+   - A bundled app runs `grok update` into its own Grok home at every start and uses the
+     newer of the bundled and updated copies.
+   - Development no longer counts as packaged just because `model-downloads.json` exists;
+     only `bundle-manifest.json` marks a bundle.
+   - Verified live with Grok 1.0.44: 20/20 records; 10/10 tool permissions recognized.
+
 Checks at this checkpoint: 394 backend (real-DOM and JavaScriptCore included), 63 app and
 9 vendored-chat tests passed; ruff and `flutter analyze` clean.
 [Verification](VERIFICATION.md) keeps the dated history.
@@ -110,9 +120,8 @@ Checks at this checkpoint: 394 backend (real-DOM and JavaScriptCore included), 6
      `JET_NOTARY_PROFILE=jet-notary scripts/sign_release.sh`; this uploads to Apple).
    - Clean-account test.
    - License review of the bundled wheels.
-   - The dev machine's Grok CLI auto-updated to 1.0.44. Package with
-     `JET_BUILD_GROK=~/.grok/downloads/grok-1.0.41-macos-aarch64` until 1.0.44 is tested and
-     pinned in `packaging/pins.json`.
+   - Grok is not pinned: the packager bundles the latest release and the app updates it in
+     its own Grok home. Verified live with 1.0.44.
 4. **Hidden-tab endurance.** A covered window now stays active, but a non-active Jet
    tab is still a hidden view. Measure long runs on a background tab.
 5. **Remaining browser gaps.**

@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import plistlib
+import re
 import shutil
 import subprocess
 import tempfile
@@ -22,23 +23,31 @@ def sha256(path):
             digest.update(block)
     return digest.hexdigest()
 
-def verified_grok(pins):
-    """Return the Grok CLI path only if it is the pinned build; never bundle another."""
-    grok = Path(os.environ.get("JET_BUILD_GROK", Path.home() / ".grok/bin/grok")).resolve()
+# Jet ships the newest Grok; this is only a floor (see runtime_setup.GROK_MIN_VERSION).
+GROK_MIN_VERSION = (1, 0, 41)
+
+def latest_grok(update=True):
+    """Bring the builder's Grok CLI to the latest release and return (path, version)."""
+    explicit = os.environ.get("JET_BUILD_GROK")
+    grok = Path(explicit) if explicit else Path.home() / ".grok/bin/grok"
+    if update and not explicit:
+        print("Updating the Grok CLI to the latest release (grok update)")
+        subprocess.run([str(grok), "update"], check=False, timeout=300)
+    grok = grok.resolve()
     if not grok.is_file():
-        raise SystemExit(f"Provide the pinned Grok {pins['version']} binary through JET_BUILD_GROK")
-    actual = sha256(grok)
-    if actual != pins["sha256"]:
-        raise SystemExit(f"{grok} is not the pinned Grok {pins['version']} ({pins['binary']}): "
-                         f"SHA-256 {actual}. Set JET_BUILD_GROK to the pinned binary.")
+        raise SystemExit("No Grok CLI found; install it or set JET_BUILD_GROK")
     # An empty HOME keeps the probe from reading or writing the builder's Grok state.
     with tempfile.TemporaryDirectory(prefix="jet-grok-probe-") as home:
         probe = subprocess.run([str(grok), "--version"], capture_output=True, text=True, timeout=30, check=False,
                                env={"HOME": home, "PATH": "/usr/bin:/bin"})
-    expected = f"grok {pins['version']} ({pins['build']})"
-    if probe.returncode != 0 or not probe.stdout.startswith(expected):
-        raise SystemExit(f"Grok version probe did not report {expected!r}")
-    return grok
+    match = re.match(r"grok (\d+)\.(\d+)\.(\d+)", probe.stdout.strip())
+    if probe.returncode != 0 or not match:
+        raise SystemExit(f"{grok} did not report a Grok version")
+    version = tuple(int(part) for part in match.groups())
+    if version < GROK_MIN_VERSION:
+        raise SystemExit(f"Grok {'.'.join(map(str, version))} is older than the supported floor "
+                         f"{'.'.join(map(str, GROK_MIN_VERSION))}")
+    return grok, ".".join(map(str, version))
 
 def cef_assets(pins):
     """Verify the vendored CEF against packaging/pins.json before it is built into the app."""
@@ -58,6 +67,8 @@ def cef_assets(pins):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--no-build", action="store_true")
+    parser.add_argument("--no-grok-update", action="store_true",
+                        help="bundle the installed Grok CLI without running grok update first")
     parser.add_argument("--output", type=Path, default=ROOT / "dist/Jet Browser.app")
     args = parser.parse_args()
     runtime_python = ROOT / ".runtime/portable-python/cpython-3.12.13-macos-aarch64-none"
@@ -66,7 +77,7 @@ def main():
     if not all(p.exists() for p in required):
         raise SystemExit("Run scripts/prepare_portable_runtime.sh before packaging")
     pins = json.loads((ROOT / "packaging/pins.json").read_text())
-    grok = verified_grok(pins["grok"])
+    grok, grok_version = latest_grok(update=not args.no_grok_update)
     cef = cef_assets(pins["cef"])
     if not args.no_build:
         subprocess.run(["flutter", "build", "macos", "--release"], cwd=ROOT / "app", check=True)
@@ -124,7 +135,7 @@ def main():
         versions[folder.name] = packages
     (resources / "bundle-manifest.json").write_text(json.dumps({
         "schema_version": 1, "python": "3.12.13", "platform": "macos-arm64",
-        "grok_version": pins["grok"]["version"],
+        "grok_version": grok_version,
         "grok_sha256": sha256(binaries / "grok"),
         "cef": cef,
         "packages": versions,

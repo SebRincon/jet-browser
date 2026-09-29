@@ -72,7 +72,7 @@ API and later feature docs describe extensions.
 | shadcn_flutter | `vendor/shadcn_flutter`, 0.0.47, extraction revision `8dc009e44cb915525243a07f7c6e705c0261f9ea` | Independent vten fork; retain BSD license and extraction manifest |
 | vten chat | `vendor/vten_chat`, source revision `cc497919140469d58c71849f44210e35c3206766` | Presentation port, constructor-based host boundary; upstream license placeholder is retained |
 | CEF plugin | `vendor/flutter_cef_browser`, source `a14b590260a0ed334a7a089db0f733f5818bc0c9` | Native sibling views; exact CEF 147.0.11 / Chromium 147.0.7727.138 assets required |
-| Grok Build | Packaged CLI 1.0.41; `native/RuntimeLicenses/sources.json` | ACP stdio plus scoped MCP; external login required |
+| Grok Build | Latest release, bundled at build time and updated in Jet's own Grok home at runtime (floor 1.0.41; verified live with 1.0.44); `native/RuntimeLicenses/sources.json` | ACP stdio plus scoped MCP; sign-in in Jet's setup |
 | Controller | `backend/pyproject.toml`, `backend/uv.lock`; bundled CPython 3.12.13 | aiohttp/httpx and local OpenTelemetry; no remote telemetry exporter |
 | Local engines | `vendor/local-engines/*requirements.txt`, vendored Laya package | LFM RLCD 350M, Laya 421M, typed Laya 421M, SemIf/Qwen 4B |
 | Weight downloads | `model-downloads.json` | Pinned snapshots, sizes, SHA256; includes separate Qwen 0.8B typing helper |

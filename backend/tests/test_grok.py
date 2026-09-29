@@ -921,3 +921,15 @@ async def test_grok_child_uses_the_jet_owned_home(rig, tmp_path):
         assert env["GROK_HOME"] == str(home) and env["GROK_FOLDER_TRUST"] == "0"
     finally:
         await client.close()
+
+
+async def test_grok_client_launches_the_chosen_binary(rig, tmp_path):
+    original, process, events, launches = rig
+    chosen = tmp_path / "grok-1.0.50"
+    client = GrokClient(original.cwd, original.mcp_command, events.append, executable=chosen)
+    client.startup_timeout = 0.1
+    try:
+        await client.start()
+        assert launches[-1][0][0] == str(chosen)
+    finally:
+        await client.close()

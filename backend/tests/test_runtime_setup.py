@@ -259,8 +259,9 @@ def test_packaged_app_owns_its_grok_home_and_ignores_global_login(tmp_path: Path
     monkeypatch.delenv("JET_GROK_HOME", raising=False)
     (tmp_path / "res").mkdir()
     (tmp_path / "res" / "model-downloads.json").write_text('{"schema_version": 1, "models": []}', encoding="utf-8")
+    (tmp_path / "res" / "bundle-manifest.json").write_text("{}", encoding="utf-8")
     runtime = RuntimeSetup(tmp_path / "data", tmp_path / "res")
-    assert runtime.packaged
+    assert runtime.packaged and runtime.bundled
     jet_home = runtime.grok_home()
     assert jet_home == tmp_path / "data" / ".runtime" / "grok-home"
     assert stat.S_IMODE(jet_home.stat().st_mode) == 0o700
@@ -277,5 +278,67 @@ def test_packaged_app_owns_its_grok_home_and_ignores_global_login(tmp_path: Path
 
 def test_development_keeps_the_developer_grok_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("JET_GROK_HOME", raising=False)
+    # A checkout ships model-downloads.json too; only the bundle manifest marks a packaged app.
+    (tmp_path / "res").mkdir()
+    (tmp_path / "res" / "model-downloads.json").write_text('{"schema_version": 1, "models": []}', encoding="utf-8")
     runtime = RuntimeSetup(tmp_path / "data", tmp_path / "res")
     assert runtime.grok_home() is None and "GROK_HOME" not in runtime._app_env()
+
+
+def _fake_grok(path: Path, version: str, update_to: str | None = None) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    update = ""
+    if update_to:
+        name = f"grok-{update_to}-macos-aarch64"
+        update = (
+            'if [ "$1" = "update" ]; then\n'
+            '  mkdir -p "$GROK_HOME/downloads" "$GROK_HOME/bin"\n'
+            f"  printf '#!/bin/sh\\necho \"grok {update_to} (new) [stable]\"\\n' > \"$GROK_HOME/downloads/{name}\"\n"
+            f'  chmod 755 "$GROK_HOME/downloads/{name}"\n'
+            f'  ln -sf ../downloads/{name} "$GROK_HOME/bin/grok"\n'
+            "  exit 0\n"
+            "fi\n"
+        )
+    path.write_text(f'#!/bin/sh\n{update}echo "grok {version} (abc) [stable]"\n', encoding="utf-8")
+    os.chmod(path, 0o755)
+    return path
+
+
+def _bundled(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, version: str, update_to: str | None = None) -> RuntimeSetup:
+    monkeypatch.delenv("JET_GROK_HOME", raising=False)
+    monkeypatch.delenv("JET_GROK_PATH", raising=False)
+    res = tmp_path / "res"
+    (res / "bin").mkdir(parents=True)
+    (res / "model-downloads.json").write_text('{"schema_version": 1, "models": []}', encoding="utf-8")
+    (res / "bundle-manifest.json").write_text("{}", encoding="utf-8")
+    _fake_grok(res / "bin" / "grok", version, update_to)
+    return RuntimeSetup(tmp_path / "data", res)
+
+
+def test_newest_usable_grok_wins_and_the_floor_holds(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    runtime = _bundled(tmp_path, monkeypatch, "1.0.44")
+    assert runtime.grok_binary() == tmp_path / "res" / "bin" / "grok"
+    home = runtime.grok_home()
+    newer = _fake_grok(home / "downloads" / "grok-1.0.50-macos-aarch64", "1.0.50")
+    (home / "bin").mkdir()
+    (home / "bin" / "grok").symlink_to("../downloads/grok-1.0.50-macos-aarch64")
+    assert runtime.grok_binary() == newer.resolve()
+    assert runtime.status()["grok"]["version"] == "1.0.50"
+    # An updated copy older than the bundle loses; a link outside downloads/ is ignored.
+    _fake_grok(newer, "1.0.42")
+    assert runtime.grok_binary() == tmp_path / "res" / "bin" / "grok"
+    outside = _fake_grok(tmp_path / "elsewhere" / "grok", "9.9.9")
+    (home / "bin" / "grok").unlink()
+    (home / "bin" / "grok").symlink_to(outside)
+    assert runtime.grok_binary() == tmp_path / "res" / "bin" / "grok"
+    _fake_grok(tmp_path / "res" / "bin" / "grok", "1.0.30")
+    assert runtime.grok_binary() is None  # Below the ACP floor.
+
+
+def test_update_installs_the_latest_grok_into_jets_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    runtime = _bundled(tmp_path, monkeypatch, "1.0.44", update_to="1.0.60")
+    result = asyncio.run(runtime.update_grok())
+    assert result == {"status": "current", "version": "1.0.60"}
+    chosen = runtime.grok_binary()
+    assert chosen.parent == (runtime.grok_home() / "downloads").resolve() and chosen.name.startswith("grok-1.0.60")
+    assert runtime.status()["grok"]["update"] == "current"

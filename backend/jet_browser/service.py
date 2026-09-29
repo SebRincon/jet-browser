@@ -360,7 +360,8 @@ class Service:
             command = [sys.executable, str(RESOURCE_ROOT / "backend/jet_browser/mcp.py"),
                        '--provider-id', self.provider_id]
             self.grok = GrokClient(cwd=RESOURCE_ROOT / "backend", mcp_command=command, emit=emit, trace=trace_callback,
-                                   review_only=review_only, grok_home=self.runtime_setup.grok_home())
+                                   review_only=review_only, grok_home=self.runtime_setup.grok_home(),
+                                   executable=self.runtime_setup.grok_binary())
             await self.grok.start()
         else:
             self.grok.emit = emit
@@ -740,6 +741,9 @@ def create_app(service):
     register_workspace_routes(app, service)
 
     async def cleanup(_):
+        task = getattr(service, 'grok_update_task', None)
+        if task is not None and not task.done():
+            task.cancel()
         await service.stop()
         service.bridge.fail_pending("Jet Browser service is shutting down")
         if service.grok:
@@ -757,6 +761,11 @@ def create_app(service):
         service.workspace.close()
         service.trace.emit('service.closed')
         service.trace.close()
+    async def update_grok(_):
+        # Keep Grok current without blocking startup; failures leave the bundled copy in use.
+        service.grok_update_task = asyncio.create_task(service.runtime_setup.update_grok())
+
+    app.on_startup.append(update_grok)
     app.on_cleanup.append(cleanup)
     return app
 

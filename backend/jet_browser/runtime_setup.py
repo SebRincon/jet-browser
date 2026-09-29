@@ -45,6 +45,12 @@ _CODE_RE = re.compile(
 _RANGE_RE = re.compile(r"bytes (\d+)-(\d+)/(\d+|\*)")
 _REDIRECT_HOSTS = ("huggingface.co", "hf.co", "xethub.hf.co", "cloudfront.net")
 _ENV_KEEP = ("PATH", "HOME", "USER", "LOGNAME", "LANG", "LC_ALL", "TMPDIR", "SYSTEMROOT")
+_GROK_VERSION_RE = re.compile(r"^grok (\d+)\.(\d+)\.(\d+)\b")
+# Jet always uses the newest Grok it has; this is only a floor. 1.0.41 is the first release
+# whose ACP tool identity (`_meta["x.ai/tool"]`) Jet's permission check reads. An older or
+# unrecognized binary is never chosen; a newer one that changes that format fails closed.
+GROK_MIN_VERSION = (1, 0, 41)
+GROK_UPDATE_TIMEOUT_S = 300
 
 
 def redirect_host_allowed(url: str) -> bool:
@@ -64,6 +70,9 @@ class RuntimeSetup:
         self.port = int(port)
         shipped = self.resource_root / "model-downloads.json"
         self.packaged = shipped.is_file()
+        # Only package_runtime.py writes this. A checkout also has model-downloads.json,
+        # so `packaged` alone would give development runs an unsigned-in Jet Grok home.
+        self.bundled = (self.resource_root / "bundle-manifest.json").is_file()
         if manifest is not None:
             self._manifest = manifest
         elif self.packaged:
@@ -87,11 +96,13 @@ class RuntimeSetup:
         self._verification_url: str | None = None
         self._user_code: str | None = None
         self._login_error: str | None = None
+        self._grok_versions: dict[tuple, tuple | None] = {}
+        self._grok_update: dict = {"status": "idle"}
 
     def grok_home(self) -> Path | None:
         """Grok's config, sign-in and session directory for this Jet install.
 
-        A packaged app owns its Grok home under its data root, so the user's global
+        A bundled app owns its Grok home under its data root, so the user's global
         ~/.grok MCP servers, hooks, plugins and sessions never load into Jet, and sign-in
         happens in Jet's setup. Development uses the developer's ~/.grok unless
         JET_GROK_HOME names another directory.
@@ -99,7 +110,7 @@ class RuntimeSetup:
         override = os.environ.get("JET_GROK_HOME")
         if override:
             home = Path(override).expanduser()
-        elif self.packaged:
+        elif self.bundled:
             home = self.data_root / ".runtime" / "grok-home"
         else:
             return None
@@ -117,8 +128,12 @@ class RuntimeSetup:
         active = None
         if self._task is not None and not self._task.done() and self._active_id:
             active = self._active_id
+        binary = self.grok_binary()
+        version = self.grok_version(binary) if binary is not None else None
         grok: dict = {
-            "available": self.grok_binary() is not None,
+            "available": binary is not None,
+            "version": ".".join(map(str, version)) if version else None,
+            "update": self._grok_update.get("status"),
             "authenticated": self._cached_login(),
             "login_status": self._login_status,
         }
@@ -233,18 +248,94 @@ class RuntimeSetup:
                 pass
 
     def grok_binary(self) -> Path | None:
-        override = os.environ.get("JET_GROK_PATH")
-        if override:
-            path = Path(override)
-            if path.is_file() and not path.is_symlink():
-                return path
-        packaged = self.resource_root / "bin" / "grok"
-        if packaged.is_file() and not packaged.is_symlink():
-            return packaged
-        dev = Path.home() / ".grok" / "bin" / "grok"
-        if dev.is_file() and not dev.is_symlink():
-            return dev
-        return None
+        """The newest usable Grok: the bundled one, or a newer one Grok's updater put in Jet's home."""
+        candidates = []
+        shipped = Path(os.environ.get("JET_GROK_PATH") or self.resource_root / "bin" / "grok")
+        if shipped.is_file() and not shipped.is_symlink():
+            candidates.append(shipped)
+        home = self.grok_home()
+        if home is not None:
+            updated = self._updated_grok(home)
+            if updated is not None:
+                candidates.append(updated)
+        elif not candidates:
+            dev = Path.home() / ".grok" / "bin" / "grok"  # The developer's own CLI; its updater keeps it current.
+            if dev.exists():
+                candidates.append(dev.resolve())
+        best, best_version = None, None
+        for path in candidates:
+            version = self.grok_version(path)
+            if version is not None and version >= GROK_MIN_VERSION and (best_version is None or version > best_version):
+                best, best_version = path, version
+        return best
+
+    def _updated_grok(self, home: Path) -> Path | None:
+        """Grok's updater links bin/grok into downloads/; accept only that, owned by this user."""
+        link = home / "bin" / "grok"
+        if not link.exists():
+            return None
+        target = link.resolve()
+        downloads = (home / "downloads").resolve()
+        try:
+            st = target.stat()
+        except OSError:
+            return None
+        if target.parent != downloads or not stat.S_ISREG(st.st_mode) or stat.S_IMODE(st.st_mode) & 0o022:
+            return None
+        if hasattr(os, "getuid") and st.st_uid != os.getuid():
+            return None
+        return target
+
+    def grok_version(self, path: Path) -> tuple | None:
+        try:
+            st = path.stat()
+        except OSError:
+            return None
+        key = (str(path), st.st_mtime_ns, st.st_size)
+        if key not in self._grok_versions:
+            import subprocess
+
+            env = self._app_env()
+            try:
+                probe = subprocess.run([str(path), "--version"], capture_output=True, text=True,
+                                       timeout=10, env=env, check=False)
+                match = _GROK_VERSION_RE.match(probe.stdout.strip()) if probe.returncode == 0 else None
+            except (OSError, subprocess.SubprocessError):
+                match = None
+            self._grok_versions[key] = tuple(int(part) for part in match.groups()) if match else None
+        return self._grok_versions[key]
+
+    async def update_grok(self) -> dict:
+        """Install the latest Grok into Jet's own Grok home (packaged apps only).
+
+        The bundled binary is read-only inside the signed app, so Grok's updater writes to
+        <data>/.runtime/grok-home and grok_binary() then prefers the newer copy. Sessions
+        keep --no-auto-update so a running turn is never swapped mid-way.
+        """
+        if self.grok_home() is None:
+            self._grok_update = {"status": "developer_cli"}
+            return self._grok_update
+        binary = self.grok_binary()
+        if binary is None:
+            self._grok_update = {"status": "unavailable"}
+            return self._grok_update
+        self._grok_update = {"status": "checking"}
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                str(binary), "update", stdin=asyncio.subprocess.DEVNULL,
+                stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL, env=self._app_env())
+            code = await asyncio.wait_for(proc.wait(), GROK_UPDATE_TIMEOUT_S)
+        except (OSError, TimeoutError):
+            if "proc" in locals() and proc.returncode is None:
+                proc.kill()
+                await proc.wait()
+            self._grok_update = {"status": "failed"}
+            return self._grok_update
+        current = self.grok_binary()
+        version = self.grok_version(current) if current else None
+        self._grok_update = {"status": "current" if code == 0 else "failed",
+                             "version": ".".join(map(str, version)) if version else None}
+        return self._grok_update
 
     @staticmethod
     def hash_file(path: Path) -> str:

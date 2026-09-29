@@ -12,11 +12,5 @@
     "include_tree_sha256": "ef550264709cd6dcb501afc652bc3936fba3f2f90a9368b7e34c4455186585ea",
     "credits_sha256": "854e0d66044bcd150efcb60b04840992ce45a7739e64385735d3cde3ff0031df",
     "license_sha256": "058c3827ffb827ff3edda471ae7e1bb1d1aa5931985f0126043ccd33409e792f"
-  },
-  "grok": {
-    "version": "1.0.41",
-    "build": "4220f3b224a6",
-    "binary": "grok-1.0.41-macos-aarch64",
-    "sha256": "9c844eb13365180787d9ad22b2b3748a024be8e1ed845253cc114781b31c591d"
   }
 }

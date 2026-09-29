@@ -1,0 +1,23 @@
+{
+ "run_at": "2026-09-29T15:45-05:00",
+ "grok_version": "1.0.44 (latest stable; no pin)",
+ "kind": "paid live Grok + packaged runtime + SemIf + headless Chromium; synthetic 25-post feed",
+ "passed": true,
+ "grok_chose_template": true,
+ "wall_seconds": 126.52,
+ "grok_turns": [
+  {
+   "status": "ok",
+   "error_type": null,
+   "duration_ms": 45230.165
+  },
+  {
+   "status": "ok",
+   "error_type": null,
+   "duration_ms": 61070.354
+  }
+ ],
+ "permission_decisions": "10 allowed via x.ai/tool identity, 0 denied",
+ "records": 20,
+ "unique_urls": 20
+}

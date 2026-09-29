@@ -1,6 +1,10 @@
 # Verification
 
 
+## 2026-09-29: latest Grok
+
+Grok is no longer pinned. With the packager bundling Grok 1.0.44 (the latest stable release), `verify_portable_workflow.py --scenario template` passed: Grok chose `tagged_feed`, all 10 tool permissions were recognized through `_meta["x.ai/tool"]` and allowed, and 20/20 records completed (authoring turn 45 s, review 61 s, 127 s total). `grok update` into an isolated Grok home installed 1.0.44 in 3.6 s. [Evidence](evidence/grok-latest-1.0.44-20260929.json).
+
 ## 2026-09-28 evening checkpoint
 
 Offline and local checks for commits `d35bdd8`..`checkpoint-2026-09-28b`:
