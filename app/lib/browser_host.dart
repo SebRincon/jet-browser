@@ -35,6 +35,15 @@ class BrowserTab {
   Map<String, dynamic> toJson() => {'id': id, 'url': url, 'title': title};
 }
 
+/// Chromium otherwise treats a covered Jet window as hidden: pages throttle, and
+/// acknowledged mouse presses from an agent task can be dropped (the prefilled-form
+/// failure; see docs/VERIFICATION.md). Agent work must continue while the user
+/// works in other apps.
+const jetChromiumSwitches = <String, String?>{
+  'disable-backgrounding-occluded-windows': null,
+  'disable-renderer-backgrounding': null,
+};
+
 class BrowserHost extends ChangeNotifier {
   BrowserHost(this.root, this.api);
   final String root;
@@ -89,6 +98,7 @@ class BrowserHost extends ChangeNotifier {
         deterministicCreateTimeoutMs: 10000,
         launchMode: 'jet-standalone',
         logFilePath: '$root/.runtime/cef.log',
+        extraSwitches: jetChromiumSwitches,
       );
       if (!result.success) {
         throw StateError(result.message ?? 'CEF initialization failed');

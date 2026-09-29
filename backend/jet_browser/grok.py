@@ -376,8 +376,13 @@ class GrokClient:
                 "prompt": [{"type": "text", "text": text}],
             }, self.prompt_timeout, watch=True)
             stop_reason = result.get("stopReason")
-            if self._cancelled or stop_reason == "cancelled":
+            if self._cancelled:
                 raise GrokCancelled("Grok turn cancelled")
+            if stop_reason == "cancelled":
+                # Not a user Stop: Grok ends a turn this way after a denied tool.
+                denied = sum(1 for call in self._tool_calls.values() if call.get("status") == "failed")
+                raise GrokError("Grok ended the turn itself" + (" after a denied tool" if denied else "")
+                                + "; nothing was retried")
             safe_stop = stop_reason if isinstance(stop_reason, str) and stop_reason in {
                 "end_turn", "max_tokens", "max_turn_requests", "refusal"
             } else "unknown"
@@ -706,7 +711,9 @@ class GrokClient:
         valid_turn = (self._prompt_active and not self._cancelled
                       and params.get("sessionId") == self.session_id)
         owned_name = self._owned_tool(call) if valid_turn else None
-        review_tools = ({'browser__' + name for name in ('save_workflow', 'read_workflow', 'run_workflow', 'workflow_status', 'control_workflow', 'workflow_records', 'patch_workflow_record', 'workflow_sdk')} if self.review_only == 'workflow' else {'browser__collection_review', 'browser__review_collection', 'browser__recover_collection_item'})
+        # list_tabs is read-only metadata. Denying it made Grok end a real checkpoint
+        # review as cancelled, leaving the run paused; run_workflow re-verifies the tab.
+        review_tools = ({'browser__' + name for name in ('save_workflow', 'read_workflow', 'run_workflow', 'workflow_status', 'control_workflow', 'workflow_records', 'patch_workflow_record', 'workflow_sdk', 'list_tabs')} if self.review_only == 'workflow' else {'browser__collection_review', 'browser__review_collection', 'browser__recover_collection_item'})
         if self.review_only and owned_name not in review_tools:
             owned_name = None
         options = params.get("options", [])

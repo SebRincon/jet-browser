@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_cef_browser/flutter_cef_browser.dart';
@@ -59,6 +61,24 @@ void main() {
     expect(host.startupError, isNull);
     expect(api.requests.single['path'], '/state');
     expect(calls, isEmpty);
+  });
+
+  test('Chromium starts with occluded-window backgrounding disabled', () async {
+    final root = Directory.systemTemp.createTempSync('jet-host-');
+    addTearDown(() => root.deleteSync(recursive: true));
+    final started = BrowserHost(root.path, api);
+    addTearDown(started.dispose);
+    api.response = {
+      'setup': {'packaged': true, 'ready': true}
+    };
+    await started.initialize();
+    final init = calls.firstWhere((call) =>
+        call.arguments is Map && (call.arguments as Map)['config'] is Map);
+    final config = (init.arguments as Map)['config'] as Map;
+    final switches = config['extraSwitches'] as Map;
+    expect(switches.containsKey('disable-backgrounding-occluded-windows'),
+        isTrue);
+    expect(switches.containsKey('disable-renderer-backgrounding'), isTrue);
   });
 
   test('collection workspace remains visible when backend selects another tab',

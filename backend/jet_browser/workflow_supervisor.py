@@ -81,7 +81,8 @@ class WorkflowSupervisor:
                 'add a topic category if the user already allowed it, and run_workflow '
                 'to continue the same scope and remaining limits. For truncated posts revise the script to use '
                 'post.recover before categorizing; do not invent missing information. Preserve checkpoint state. '
-                'Fix a script error rather than repeating it. Do not poll. If real blockers, repeated no-progress '
+                'Fix a script error rather than repeating it. Do not poll. run_workflow itself re-verifies the saved '
+                'tab, its source URL and ownership, so do not inspect or switch tabs here. If real blockers, repeated no-progress '
                 'or missing authorization remain, leave paused and ask one short question. If the original request '
                 'authorized continued processing, continue after reviewing. Keep any chat response to one sentence. '
                 'Status metadata follows: ' + json.dumps(summary)

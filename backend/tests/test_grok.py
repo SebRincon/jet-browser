@@ -865,3 +865,46 @@ async def test_stop_during_silent_turn_is_bounded_and_not_reported_as_stall(rig)
         await asyncio.wait_for(task, 1)
     assert process.returncode is not None
     await client.close()
+
+
+@pytest.mark.parametrize(
+    "name,allowed",
+    [
+        ("browser__run_workflow", True),
+        ("browser__workflow_records", True),
+        ("browser__list_tabs", True),  # Read-only; a denial cancelled a real review turn.
+        ("browser__inspect_collection_source", False),
+        ("browser__browser_action", False),
+        ("browser__open_url", False),
+        ("web_fetch", False),
+    ],
+)
+async def test_workflow_review_profile_allows_read_only_tab_listing(rig, name, allowed):
+    client, process, _, _ = rig
+    client.review_only = "workflow"
+    try:
+        task = asyncio.create_task(client.prompt("Review this workflow checkpoint"))
+        await wait_until(lambda: process.prompt_id is not None)
+        process.receive({"id": "wf-permission", "method": "session/request_permission", "params": {
+            "sessionId": "session-1", "toolCall": {"toolCallId": "review", "name": name},
+            "options": [{"kind": "allow_once", "optionId": "yes"}, {"kind": "reject_once", "optionId": "no"}]}})
+        await wait_until(lambda: any(m.get("id") == "wf-permission" for m in process.sent))
+        result = next(m for m in process.sent if m.get("id") == "wf-permission")
+        assert result["result"]["outcome"]["optionId"] == ("yes" if allowed else "no")
+        process.finish()
+        await task
+    finally:
+        await client.close()
+
+
+async def test_provider_ended_turn_is_an_error_not_a_user_stop(rig):
+    client, process, events, _ = rig
+    task = asyncio.create_task(client.prompt("Review"))
+    await wait_until(lambda: process.prompt_id is not None)
+    browser_tool(process, "denied", "list_tabs", "pending")
+    process.update("tool_call_update", toolCallId="denied", status="failed")
+    process.finish("cancelled")
+    with pytest.raises(GrokError, match="ended the turn itself after a denied tool") as raised:
+        await asyncio.wait_for(task, 2)
+    assert not isinstance(raised.value, GrokCancelled)
+    await client.close()

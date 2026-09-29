@@ -30,6 +30,15 @@
 
 ### Fixed
 
+- Real top-100 run: the workflow checkpoint review denied read-only `list_tabs`, and Grok
+  then ended the turn as cancelled, leaving the run paused at ten. Reviews now allow
+  `list_tabs`, the review prompt says `run_workflow` re-verifies the tab, and a turn Grok
+  ends itself is reported as such instead of as a user Stop.
+- A covered Jet window no longer counts as hidden to Chromium
+  (`disable-backgrounding-occluded-windows`, `disable-renderer-backgrounding`). Native runs
+  showed hidden pages dropping the first press into a prefilled field (3/3 with SemIf);
+  with the window in front the same check passed.
+
 - Packaged app: direct browser tasks (`/tasks`, used by the composer's inline actions) and
   delegated `run_task` now start the bundled typing helper first; before, a fill failed with
   "Model connection failed" unless a chat turn had already started it. Found in the first
