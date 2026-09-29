@@ -216,3 +216,24 @@ async def test_pause_between_local_slices_cancels_the_continuation(tmp_path):
     await asyncio.sleep(0.05)
     assert not manager.running and manager._continuation is None
     assert store.records("session", wid)["total"] < 20
+
+
+async def test_template_endurance_many_local_slices_to_the_item_limit(tmp_path):
+    """300 items across dozens of slices: one review, no duplicates, counters consistent."""
+    feed = Feed(400, blocked=tuple(range(0, 400, 40)))
+    store, wid, manager, reviews = template_world(
+        tmp_path, feed, {"first_review": 10, "summarize": False}, max_items=300, budget_calls=40)
+    await manager.start("session", wid)
+    await settle(manager)
+    assert store.get("session", wid)["error"] == "checkpoint_review" and reviews == [wid]
+    await manager.start("session", wid)
+    await settle(manager)
+    row = store.get("session", wid)
+    assert row["status"] == "completed", row["error"]
+    assert row["checkpoint"]["slices"] >= 20 and reviews == [wid]
+    records = store.records("session", wid, limit=0)["total"]
+    urls = {r["url"] for offset in range(0, records, 100)
+            for r in store.records("session", wid, limit=100, offset=offset)["items"]}
+    assert records == 300 == len(urls) == row["counters"]["saved"]
+    assert row["checkpoint"]["partial"] == len([n for n in range(0, 300, 40)])  # Blocked recoveries kept partial.
+    assert row["counters"]["calls"] <= row["definition"]["limits"]["max_calls"]
