@@ -30,6 +30,10 @@
 
 ### Fixed
 
+- An unresponsive X detail tab during truncated-post recovery now blocks that one recovery
+  (`detail_unresponsive`, partial evidence kept) instead of pausing the whole run; seen at
+  item 51 of the real top-100 run.
+
 - Real top-100 run: the workflow checkpoint review denied read-only `list_tabs`, and Grok
   then ended the turn as cancelled, leaving the run paused at ten. Reviews now allow
   `list_tabs`, the review prompt says `run_workflow` re-verifies the tab, and a turn Grok

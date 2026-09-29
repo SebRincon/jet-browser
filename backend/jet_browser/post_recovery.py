@@ -214,6 +214,19 @@ async def _eval(bridge: object, tab_id: object, expression: str):
     return result.get("value")
 
 
+async def _eval_owned(bridge: object, tab_id: object, expression: str):
+    """Evaluate in the owned detail tab; an unresponsive page blocks this recovery only.
+
+    A real run paused at item 51 when one read timed out after 12 s. The detail tab is
+    closed in cleanup, the feed is untouched, and the Show-more click is never repeated,
+    so the item keeps its partial evidence and the workflow continues.
+    """
+    try:
+        return await _eval(bridge, tab_id, expression)
+    except Exception as exc:
+        raise RecoveryBlocked("detail_unresponsive") from exc
+
+
 def _payload(item_url: str, data: dict, title: object, expanded: bool, status_id: str) -> dict:
     text = data.get("text") if isinstance(data.get("text"), str) else ""
     author = data.get("author") if isinstance(data.get("author"), str) and data.get("author") else None
@@ -320,7 +333,7 @@ async def recover_post(bridge, item, feed_tab_id, stopped):
                 raise RecoveryBlocked("tab_lost")
             if (meta.get("url") or "") not in ("", "about:blank"):
                 loaded = True
-            data = await _eval(bridge, owned, _js_call(READ_POST, {"url": item_url, "statusId": status_id}))
+            data = await _eval_owned(bridge, owned, _js_call(READ_POST, {"url": item_url, "statusId": status_id}))
             if not isinstance(data, dict):
                 await asyncio.sleep(_POLL_S)
                 continue
@@ -350,7 +363,7 @@ async def recover_post(bridge, item, feed_tab_id, stopped):
                     "n": data.get("n"),
                 }
                 clicked = True
-                result = await _eval(bridge, owned, _js_call(EXPAND_POST, guard))
+                result = await _eval_owned(bridge, owned, _js_call(EXPAND_POST, guard))
                 if isinstance(result, dict) and result.get("ok") is True:
                     expanded = True
                     expand_until = time.monotonic() + _EXPAND_S

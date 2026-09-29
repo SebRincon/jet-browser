@@ -198,3 +198,44 @@ async def test_background_recovery_preserves_foreground_and_releases_lease(selec
     assert not bridge.owners
     assert bool(bridge.tab("detail")) == selected_detail
     assert not any(method == "Browser.selectTab" for _, method in bridge.calls)
+
+
+async def test_unresponsive_detail_tab_blocks_only_this_recovery():
+    """Real run, item 51: one detail-tab read timed out after 12 s and paused the whole run."""
+    import threading
+
+    from jet_browser.bridge import BridgeError
+    from jet_browser.post_recovery import RecoveryBlocked, recover_post
+
+    class Bridge:
+        active_tab_id = "feed"
+        tabs = [{"id": "feed", "url": "https://x.com/i/history"}]
+        calls = []
+
+        def tab(self, tid):
+            if any(t["id"] == tid for t in self.tabs):
+                return tid
+            raise ValueError("gone")
+
+        async def call(self, tid, method, params=None):
+            self.calls.append((tid, method))
+            if method == "Browser.openTab":
+                self.tabs.append({"id": "owned", "url": params["url"], "title": "Post"})
+                self.active_tab_id = "owned"
+                return {"tab_id": "owned"}
+            if method == "Runtime.evaluate" and tid == "owned":
+                raise BridgeError("TimeoutException after 0:00:12.000000: Future not completed")
+            if method == "Browser.selectTab":
+                self.active_tab_id = tid
+                return {}
+            if method == "Browser.closeTab":
+                self.tabs = [t for t in self.tabs if t["id"] != tid]
+                return {}
+            return {"result": {"value": None}}
+
+    b = Bridge()
+    with pytest.raises(RecoveryBlocked, match="detail_unresponsive"):
+        await recover_post(
+            b, {"url": "https://x.com/demo/status/101", "text": "Short", "truncated": True}, "feed", threading.Event()
+        )
+    assert ("owned", "Browser.closeTab") in b.calls and [t["id"] for t in b.tabs] == ["feed"]
