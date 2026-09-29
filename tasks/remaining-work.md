@@ -8,7 +8,7 @@ Updated 2026-09-28. Owner: standalone Jet browser-agent experience. Charter: [SP
 
 - Implemented foundations: standalone CEF shell, local shadcn/vten chat forks, one chat, Grok ACP, local adapters, durable sessions, private traces, Stop fences, navigation goals and Wikipedia/YouTube checks.
 - Partial: general form DONE remains `manual_check`; prefilled-input failure remains open. Packaged native startup, DOM read and chat hide/restore now pass after the accessibility repair; background endurance is still open.
-- Open: selection above 15 tabs, shared outcomes, extraction/find, structured references, GitHub resources, saved forms/filters, cited research, replay and held-out calibration.
+- Open: shared bounded selection for links/page actions (tabs done), shared outcomes, extraction/find, structured references, GitHub resources, saved forms/filters, cited research, replay and held-out calibration.
 - [Baseline](browser-lab-baseline.json): selected source hashes and reference pins, unborn checkout, no new benchmark run. Board search found no matching Jet issue or local mapping; children are [local work items](browser-lab-work-items.md).
 
 ## Current user priority

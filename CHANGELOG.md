@@ -25,6 +25,10 @@
 
 ### Fixed
 
+- Tab switching/closing can select among more than 15 tabs: bounded chunks with an
+  escape and a final round between chunk winners (previously the first 24 tabs in one
+  over-limit question).
+
 - A fresh clone could not build: `.gitignore`'s `models/` also hid ten CEF plugin
   source files under `lib/src/models/`.
 

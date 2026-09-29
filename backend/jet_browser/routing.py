@@ -142,6 +142,35 @@ class LocalRouter:
             "model": result.get("model"), "inference_ms": result.get("latency_ms"),
         }
 
+    # SemIf's finite-choice head accepts at most 16 options, including the escape.
+    MAX_CHOICE_OPTIONS = 16
+
+    def choose_bounded(self, model, state, question, candidates, escape, stopped=None):
+        """Choose among any number of candidates within the local option limit.
+
+        Every question carries the escape option. Probabilities are normalized per
+        question, so chunks are never compared with each other: each chunk yields at
+        most one winner, and the winners meet again in a final round with the escape.
+        Returns (choice, audits, rounds); the choice may be the escape id.
+        """
+        escape_id, escape_text = escape
+        items = [(key, text) for key, text in candidates.items() if key != escape_id]
+        size = self.MAX_CHOICE_OPTIONS - 1
+        audits, rounds = [], 0
+        while True:
+            rounds += 1
+            winners = []
+            for start in range(0, len(items), size):
+                chunk = dict(items[start:start + size])
+                chunk[escape_id] = escape_text
+                choice, audit = self.choose(model, state, question, chunk, stopped)
+                audits.append(audit)
+                if choice != escape_id:
+                    winners.append(choice)
+            if len(items) <= size or len(winners) <= 1:
+                return (winners[0] if winners else escape_id), audits, rounds
+            items = [(key, candidates[key]) for key in winners]
+
     def _selected(self, started, model, operation, audits, local=None):
         if local is None:
             local = operation not in {"summarize", "explain", "collect"}
@@ -239,12 +268,15 @@ class LocalRouter:
             return plan
         if operation in {'switch_tab', 'close_tab'}:
             choices = {t['id']: ("Current tab: " if t['id'] == plan['tab_id'] else "Tab: ")
-                       + t.get('title', '') + ' ' + t.get('url', '')[:160] for t in browser.get('tabs', [])[:24]}
+                       + t.get('title', '') + ' ' + t.get('url', '')[:160] for t in browser.get('tabs', [])}
             if not choices:
                 raise ValueError("There are no observed tabs to choose")
-            choices['UNRESOLVED'] = 'No single observed tab is identified by the request.'
-            tab, audit = self.choose(model, state, "Which observed tab does the user mean?", choices, stopped)
-            route['audit'].append(audit)
+            tab, audits, rounds = self.choose_bounded(
+                model, state, "Which observed tab does the user mean?", choices,
+                ('UNRESOLVED', 'No single observed tab is identified by the request.'), stopped)
+            route['audit'].extend(audits)
+            route['audit'].append({'rule': 'bounded_tab_selection', 'candidates': len(choices),
+                                   'questions': len(audits), 'rounds': rounds, 'answer': tab})
             if tab == 'UNRESOLVED':
                 raise ValueError('The requested tab is ambiguous')
             plan['tab_id'] = tab

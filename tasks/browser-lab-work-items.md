@@ -56,9 +56,9 @@ uv run --project backend python -m pytest backend/tests/test_lab_cases.py -q
 
 **Outcome:** Select a relevant observed target even when it occurs after the first chunk or among more than 15 tabs.
 
-**Progress:** Not started.
+**Progress:** Tab selection done 2026-09-28; link/page selection not yet moved to the shared selector.
 
-**Current truth:** routing.py slices up to 24 tabs and adds UNRESOLVED; search/page execution already have different batching paths.
+**Current truth:** `LocalRouter.choose_bounded` selects among any number of tabs in chunks of at most 15 plus UNRESOLVED; chunk winners meet in a final round, so per-chunk probabilities are never compared. Link selection in `conversation.py` still takes the first non-NONE batch (first-match), and page execution has its own batching.
 
 **Pins:** Shared baseline above; no new result or source revision claimed.
 
@@ -70,7 +70,7 @@ uv run --project backend python -m pytest backend/tests/test_lab_cases.py -q
 
 **Acceptance:**
 
-- [ ] Respect each adapter's candidate/context limits with an escape in every question; no silent truncation.
+- [ ] Respect each adapter's candidate/context limits with an escape in every question; no silent truncation. (Tabs: done.)
 - [ ] Late correct targets, duplicate labels, reordered candidates and no-match cases are covered.
 - [ ] Never compare probabilities normalized in separate chunks as a common distribution; preserve Stop and stale guards.
 

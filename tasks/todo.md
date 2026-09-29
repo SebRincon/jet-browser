@@ -36,7 +36,7 @@ Remaining product work: the known prefilled-form input issue; broader held-out w
 - [x] Known-site homepages without query extraction; resource-specific YouTube navigation with independent native checks.
 - [ ] Extend goal/outcome contracts to generic page tasks and form verification.
 - [ ] GitHub repository/release workflows and a broader owned site-fixture corpus.
-- [ ] Capability-aware tab selection beyond 15 tabs.
+- [x] Capability-aware tab selection beyond 15 tabs (2026-09-28, `LocalRouter.choose_bounded`).
 - [ ] Local exact-span extraction and semantic find-in-page, with no-answer checks.
 - [ ] Calibrated per-skill routing/recovery and 120-case whole-goal corpus with separate held-out data.
 
