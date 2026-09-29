@@ -110,6 +110,22 @@ ship in `jet-runtime/licenses/CEF/`.
 `--no-build` deliberately reuses the existing Flutter build; avoid it after UI or
 native changes. Build output is not committed. Developer ID/notarization is pending.
 
+For distribution, sign inside out with the hardened runtime, then optionally notarize:
+
+```sh
+scripts/sign_release.sh --list                         # what would be signed, with entitlements
+JET_SIGN_IDENTITY=- scripts/sign_release.sh            # ad hoc, local structure check
+JET_SIGN_IDENTITY="Developer ID Application: …" JET_NOTARY_PROFILE=<profile> scripts/sign_release.sh
+```
+
+Entitlements live in `packaging/entitlements/`: bundled CPython gets library-validation
+and unsigned-executable-memory exceptions (third-party wheels), JetWorkflow and the CEF
+helpers get JIT, Grok gets network only, and the app keeps `Release.entitlements`.
+An ad-hoc hardened-runtime bundle passed `codesign --verify --deep --strict` and ran
+the service, JetWorkflow, Grok and the SemIf engine (MLX + torch). Notarization uploads
+the app to Apple; neither it nor a Developer ID signature nor the native UI under the
+hardened runtime has been run yet.
+
 The launcher starts bundled Python before exec into Flutter/CEF; never move that
 spawn into the initialized native browser. The app can be relocated without the
 checkout, uses in-app weight downloads, and needs network access for Grok sign-in.

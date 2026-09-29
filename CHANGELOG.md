@@ -22,6 +22,8 @@
   versioned framework bundle; hash-pinned local-engine locks
   (`vendor/local-engines/locks/`, `scripts/lock_engines.sh`); the packager rejects an
   unpinned Grok CLI or CEF and bundles the CEF license and Chromium credits.
+- `scripts/sign_release.sh`: inside-out Developer ID signing with the hardened runtime and
+  per-component entitlements, optional notarization and stapling; `--list` dry run.
 
 ### Fixed
 
