@@ -1,6 +1,6 @@
 # Agent handoff
 
-Checkpoint: 2026-09-28 (late), app `0.1.0+1`, tag `checkpoint-2026-09-28c` on `main`.
+Checkpoint: 2026-09-29, app `0.1.0+1`, tag `checkpoint-2026-09-29a` on `main`.
 Not a public release. Start with [AGENTS.md](../AGENTS.md), then
 [architecture](architecture.md) and [development commands](development.md).
 
@@ -68,23 +68,54 @@ templates and in-app setup. See [workflow contract](portable-workflows.md),
      during the run: denied `list_tabs` in reviews, and an unresponsive detail tab.
      [Evidence](evidence/real-top100-20260928.json) holds counts only.
 
-Checks at this checkpoint: 379 backend (real-DOM and JavaScriptCore included), 63 app and
+6. **Self-contained app and an adaptive loop (2026-09-29).**
+   - A packaged app keeps Grok's config, sign-in and sessions in `<data>/.runtime/grok-home`.
+     The developer's `~/.grok` MCP servers and hooks no longer load into Jet.
+   - An empty-HOME audit of the packaged runtime passed; the only write was Jet's own
+     `~/.jet-browser` workspace index. Users install nothing: CPython, packages, engines,
+     Grok CLI and CEF are bundled; the script engine is macOS's JavaScriptCore.
+   - `tagged_feed` v2: the local model decides whether to open a post that looks cut off,
+     and untagged posts get a one-best-category second pass (`model.best_tag`).
+     Development micro F1 0.791 → 0.854 with no added false tags.
+   - Grok repair tools for paused or completed runs:
+     - `workflow_records needs=untagged|truncated` lists ids only;
+     - `recover_workflow_record` has code open one exact post;
+     - `retag_workflow_records` re-runs local tagging;
+     - `patch_workflow_records` batches corrections.
+   - `save_workflow` compiles custom JavaScript first (`JetWorkflow --check`), and
+     `workflow_status` reports the loop's own counters.
+   - **Live repair of the real run:** two short Grok turns took untagged bookmarks from
+     23 to 6 and the last cut-off post to full text. The turns exposed four bugs, all
+     fixed:
+     - patches were refused on completed runs;
+     - a failed turn misreported "nothing saved" after repairing records;
+     - a shorter recovered text raised a raw error;
+     - one-at-a-time patches ran into the 300 s limit.
+
+Checks at this checkpoint: 394 backend (real-DOM and JavaScriptCore included), 63 app and
 9 vendored-chat tests passed; ruff and `flutter analyze` clean.
 [Verification](VERIFICATION.md) keeps the dated history.
 
 ## Next work, in order
 
-1. **Tag coverage.** 23/100 real records are untagged, and synthetic held-out recall is
-   weak for design and research. Tune local questions on development data, then score a
-   new held-out set. Consider a local second pass for untagged items before review.
-2. **Release.**
+1. **Tag coverage.** 6/100 real records remain untagged after repairs; some may fit no tag.
+   Design and research recall remain weakest. The synthetic held-out set is used up, so
+   write a new one before claiming further gains.
+2. **Tab identity across restarts.** A workflow binds to a per-launch tab id. After a
+   relaunch, recovery worked only because reopening X Bookmarks got the same id. Add a
+   code-verified rebind to a new tab with the same canonical start URL (audited, paused
+   runs only).
+3. **Release.**
    - Notarize (`xcrun notarytool store-credentials jet-notary …`, then
      `JET_NOTARY_PROFILE=jet-notary scripts/sign_release.sh`; this uploads to Apple).
    - Clean-account test.
    - License review of the bundled wheels.
-3. **Hidden-tab endurance.** A covered window now stays active, but a non-active Jet
+   - The dev machine's Grok CLI auto-updated to 1.0.44. Package with
+     `JET_BUILD_GROK=~/.grok/downloads/grok-1.0.41-macos-aarch64` until 1.0.44 is tested and
+     pinned in `packaging/pins.json`.
+4. **Hidden-tab endurance.** A covered window now stays active, but a non-active Jet
    tab is still a hidden view. Measure long runs on a background tab.
-4. **Remaining browser gaps.**
+5. **Remaining browser gaps.**
    - Generic form completion: a DONE decision is still `manual_check`.
    - Shared bounded selection for links and page actions.
    - Cross-origin frames and complex editors.
@@ -98,15 +129,15 @@ Checks at this checkpoint: 379 backend (real-DOM and JavaScriptCore included), 6
 - `vendor/flutter_cef_browser/macos/Frameworks/` now holds the pinned vten CEF;
   `Frameworks.previous/` holds the original 2026-05 build, the one used by the
   earlier native checks. `scripts/install_cef.sh --check` tells which is installed.
-- Instances left running at handoff, all on loopback:
-  - 9198: the isolated real-run app and service, data in
-    `/private/tmp/jet-live-20260928`, with the X session, 100 records and the CSV. It
-    runs from `dist/`: do not repackage `dist/` until that app is closed.
-  - 9168: the earlier incident profile's service; its window was already closed and it
-    still holds a model worker.
-  - 9148: a development service.
-  Closing a Jet window does not stop its service. Stop a service only after confirming
-  its port and pid.
+- Running at handoff: port 9198 only, the isolated real-run profile
+  (`/private/tmp/jet-live-20260928`) with your X session, 100 records and the CSV.
+  - Its app runs from the rebuilt `dist/` (`b0e0e68`, pinned Grok 1.0.41). Do not
+    repackage `dist/` while it is open.
+  - Its service was restarted from the checkout backend (`e495e3d`) with
+    `JET_GROK_HOME=~/.grok`, so it reuses the developer's Grok sign-in.
+  - The user is browsing in that window.
+  Ports 9168 and 9148 are down. Closing a Jet window does not stop its service; stop a
+  service only after confirming its port and pid.
 - The Developer ID-signed release copy and the clean worktree are in the session
   scratchpad (`…/scratchpad/release`, `…/scratchpad/jet-clean`), not in the repository.
   Rebuild them with `package_runtime.py --output …` and `sign_release.sh`.

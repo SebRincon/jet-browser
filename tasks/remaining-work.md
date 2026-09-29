@@ -26,7 +26,8 @@ Clean, simple single chat based on the [Orca/T3 source audit](../docs/chat-and-h
 | Work | State | Completion dependency |
 |---|---|---|
 | Grok authoring reliability | Done: paid synthetic rerun and the real top-100 run completed 2026-09-28 (100/100 records, 10 reviews) | — |
-| Tag coverage | Open: 23/100 real records untagged; synthetic held-out recall weak for design/research | Improve local recall on development data, new held-out set; consider a local second pass for untagged items |
+| Tag coverage | Improved: v2 second pass + Grok repair tools; real run 23 → 6 untagged | New held-out set before further claims; check whether the last 6 fit any tag |
+| Tab identity across restarts | Open: workflows bind to per-launch tab ids | Audited rebind of a paused run to a new tab with the same canonical start URL |
 | U01 chat projection | Implemented; offline tests | Stable turn IDs and collapsed completed steps |
 | H01–H06/H08, U02–U03 website loop | First slice implemented; feed loop has native/resume evidence, wider acceptance pending | Bounded plans/store/local classifier/runner/MCP/results; further child acceptance remains |
 | Tag calibration | Baseline measured 2026-09-28 on synthetic held-out tags (SemIf micro F1 0.788; threshold gave no gain) | Improve design/research recall on development, then score a new held-out set; real-archive spot checks with user permission |
