@@ -110,3 +110,77 @@ async def test_unified_stop_during_provider_startup_cannot_start_a_late_prompt(t
     assert 'prompt' not in calls
     assert 'close' in calls
     assert service.provider_status == 'ready'
+
+
+def _stalling_provider(on_prompt):
+    from jet_browser.grok import GrokStalled
+
+    class StallingProvider:
+        def __init__(self, **kwargs):
+            self.emit = kwargs['emit']
+            self.review_only = kwargs.get('review_only', False)
+
+        async def start(self):
+            pass
+
+        async def prompt(self, text):
+            self.emit({'type': 'status', 'status': 'running', 'stage': 'thinking', 'tool': None,
+                       'completed_tools': ['list_tabs', 'workflow_sdk']})
+            on_prompt()
+            raise GrokStalled('Grok timed out: no provider activity for 150 s while writing the workflow. '
+                              'Jet ended the turn; no tool will be retried', reason='idle', stage='thinking',
+                              completed_tools=('list_tabs', 'workflow_sdk'))
+
+        async def cancel(self):
+            pass
+
+        async def close(self):
+            pass
+
+    return StallingProvider
+
+
+class _RouteToGrok:
+    def route(self, *args):
+        return {'id': 'r1', 'decision': 'grok', 'operation': 'collect', 'model': 'fake'}
+
+
+async def test_stalled_turn_reports_that_nothing_was_saved_or_started(tmp_path, monkeypatch):
+    from jet_browser import grok
+
+    seen_stage = []
+    service = Service(tmp_path)
+    monkeypatch.setattr(grok, 'GrokClient', _stalling_provider(
+        lambda: seen_stage.append(service.state()['provider']['stage'])))
+    service.router = _RouteToGrok()
+    await service.chat('Organize my first 100 bookmarks')
+    await service.chat_job
+    reply = service.messages[-1]
+    assert reply['role'] == 'assistant'
+    assert 'while writing the workflow' in reply['text']
+    assert 'No workflow or collection was saved or started' in reply['text']
+    assert seen_stage[0]['stage'] == 'thinking' and seen_stage[0]['completed_tools'] == ['list_tabs', 'workflow_sdk']
+    assert service.state()['provider']['stage'] is None
+    events = [e for e in service.trace.snapshot(service.store.current_id, limit=200)['events']
+              if e['event'] == 'grok.recovery.inspected']
+    assert events and events[-1]['attributes']['saved_workflows'] == 0
+
+
+async def test_stalled_turn_reports_a_saved_but_unstarted_workflow(tmp_path, monkeypatch):
+    from test_workflow_capabilities import definition
+
+    from jet_browser import grok
+
+    service = Service(tmp_path)
+
+    def save():
+        service.workflow_store.save(service.store.current_id, definition())
+
+    monkeypatch.setattr(grok, 'GrokClient', _stalling_provider(save))
+    service.router = _RouteToGrok()
+    await service.chat('Organize my first 100 bookmarks')
+    await service.chat_job
+    text = service.messages[-1]['text']
+    assert '“Bookmarks” was saved (revision 1) but not started' in text
+    assert not service.workflows.running
+    assert service.workflows.summaries(service.store.current_id)[0]['status'] == 'prepared'

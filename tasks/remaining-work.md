@@ -25,7 +25,7 @@ Clean, simple single chat based on the [Orca/T3 source audit](../docs/chat-and-h
 
 | Work | State | Completion dependency |
 |---|---|---|
-| Grok authoring reliability | Open: latest real turn timed out before save/start | Bounded stages, safe activity traces, cancellation and non-replaying recovery |
+| Grok authoring reliability | Partial: idle watchdog, safe stage/activity traces, cancellation tests and saved-state failure reports landed | Smaller authoring (built-in templates) and a real provider rerun |
 | U01 chat projection | Implemented; offline tests | Stable turn IDs and collapsed completed steps |
 | H01–H06/H08, U02–U03 website loop | First slice implemented; feed loop has native/resume evidence, wider acceptance pending | Bounded plans/store/local classifier/runner/MCP/results; further child acceptance remains |
 | H07 bookmark source | Initial adapter implemented and live-tested; partial broader acceptance | Account-switch identity, deleted/rate-limited sources and durable remote-cursor recovery remain |

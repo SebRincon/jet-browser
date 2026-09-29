@@ -156,6 +156,32 @@ class GrokCancelled(GrokError):
     """The caller stopped the active prompt."""
 
 
+class GrokStalled(GrokError):
+    """The provider went quiet, or the whole-turn ceiling passed; the turn was ended.
+
+    ``stage`` and ``completed_tools`` are safe identifiers for diagnosis and
+    recovery; they never contain prompt, page, or reasoning text.
+    """
+
+    def __init__(self, message: str, *, reason: str, stage: str, completed_tools: tuple[str, ...]):
+        super().__init__(message)
+        self.reason = reason
+        self.stage = stage
+        self.completed_tools = completed_tools
+
+
+# Browser tools whose completion changes what a stalled turn is doing. Order matters:
+# the latest milestone reached wins when a stall is described to the user.
+_MILESTONES = (
+    ("run_workflow", "after starting the workflow"),
+    ("start_collection", "after starting the collection"),
+    ("save_workflow", "after saving the workflow"),
+    ("prepare_collection", "after preparing the collection"),
+    ("workflow_sdk", "while writing the workflow"),
+)
+_TERMINAL_TOOL_STATUSES = frozenset({"completed", "failed", "cancelled"})
+
+
 class GrokClient:
     """One CLI process and conversation; calls to ``prompt`` cannot overlap.
 
@@ -164,9 +190,16 @@ class GrokClient:
     """
 
     startup_timeout = 45.0
-    # Whole-turn wall-clock deadline, including remote planning and tool work;
+    # Whole-turn wall-clock ceiling, including remote planning and tool work;
     # streaming does not reset it. Recovery must inspect state, never replay tools.
     prompt_timeout = 300.0
+    # A turn also ends when the provider sends nothing (no reasoning, text, tool or
+    # extension update) for this long while no tool is running. Grok 1.0.41 streams
+    # reasoning chunks while it plans, but not the arguments of a tool call it is
+    # still generating, so this must exceed a bounded tool-argument generation.
+    idle_timeout = 150.0
+    # Content-free activity counters are traced at most this often during a turn.
+    heartbeat_interval = 15.0
     cancel_timeout = 5.0
     shutdown_timeout = 3.0
 
@@ -200,6 +233,20 @@ class GrokClient:
         self._prompt_started: float | None = None
         self._text_characters = 0
         self._text_chunks = 0
+        self._thought_characters = 0
+        self._thought_chunks = 0
+        self._last_activity = time.monotonic()
+        self._stage = "idle"
+        self._stage_tool: str | None = None
+        self._completed_tools: list[str] = []
+        self._completed_ids: set[str] = set()
+
+    @property
+    def stage(self) -> dict:
+        """Safe snapshot of what the active turn is doing; identifiers only."""
+        return {"stage": self._stage, "tool": self._stage_tool,
+                "completed_tools": list(self._completed_tools),
+                "quiet_seconds": round(time.monotonic() - self._last_activity, 1)}
 
     async def start(self) -> None:
         async with self._start_lock:
@@ -299,16 +346,24 @@ class GrokClient:
         self._prompt_started = time.perf_counter()
         self._text_characters = 0
         self._text_chunks = 0
+        self._thought_characters = 0
+        self._thought_chunks = 0
+        self._completed_tools = []
+        self._completed_ids = set()
+        self._stage_tool = None
+        self._stage = "starting"
         self._trace("grok.prompt.start", input_characters=len(text))
         try:
             await self.start()
             if self._cancelled:
                 raise GrokCancelled("Grok turn cancelled")
+            self._last_activity = time.monotonic()
+            self._set_stage("waiting")
             self._status("thinking")
             result = await self._request("session/prompt", {
                 "sessionId": self.session_id,
                 "prompt": [{"type": "text", "text": text}],
-            }, self.prompt_timeout)
+            }, self.prompt_timeout, watch=True)
             stop_reason = result.get("stopReason")
             if self._cancelled or stop_reason == "cancelled":
                 raise GrokCancelled("Grok turn cancelled")
@@ -340,6 +395,8 @@ class GrokClient:
             raise
         finally:
             self._prompt_active = False
+            self._stage = "idle"
+            self._stage_tool = None
             self._prompt_done.set()
 
     async def cancel(self) -> None:
@@ -370,7 +427,7 @@ class GrokClient:
         await self._shutdown(GrokCancelled("Grok client closed"))
         self._status("closed")
 
-    async def _request(self, method: str, params: dict, timeout: float) -> dict:
+    async def _request(self, method: str, params: dict, timeout: float, watch: bool = False) -> dict:
         self._next_id += 1
         request_id = self._next_id
         future = asyncio.get_running_loop().create_future()
@@ -380,7 +437,10 @@ class GrokClient:
         try:
             await self._send({"jsonrpc": "2.0", "id": request_id,
                               "method": method, "params": params})
-            result = await asyncio.wait_for(future, timeout)
+            if watch:
+                result = await self._watch_prompt(future, timeout)
+            else:
+                result = await asyncio.wait_for(future, timeout)
             if not isinstance(result, dict):
                 raise GrokError(f"Grok returned an invalid {method} result")
             self._trace("grok.acp.request.end", method=method, request_id=request_id,
@@ -390,6 +450,11 @@ class GrokClient:
             self._trace("grok.acp.request.error", method=method, request_id=request_id,
                         duration_ms=self._duration(started), error_type="TimeoutError")
             raise GrokError(f"Grok timed out during {method}; no tool will be retried") from exc
+        except GrokStalled as exc:
+            self._trace("grok.acp.request.error", method=method, request_id=request_id,
+                        duration_ms=self._duration(started), error_type="GrokStalled",
+                        reason=exc.reason, stage=exc.stage)
+            raise
         except BaseException as exc:
             self._trace("grok.acp.request.error", method=method, request_id=request_id,
                         duration_ms=self._duration(started), error_type=type(exc).__name__)
@@ -400,6 +465,68 @@ class GrokClient:
                 future.cancel()
             elif not future.cancelled():
                 future.exception()  # Retrieve errors even when stdin failed first.
+
+    async def _watch_prompt(self, future: asyncio.Future, timeout: float) -> Any:
+        """Wait for a prompt result, ending the turn on provider silence or the ceiling.
+
+        Silence is not counted while a tool call is running: Jet bounds its own tools.
+        """
+        started = time.monotonic()
+        deadline = started + timeout
+        last_heartbeat = started
+        while True:
+            now = time.monotonic()
+            wake = min(deadline, now + self.heartbeat_interval)
+            if not self._tool_running():
+                wake = min(wake, self._last_activity + self.idle_timeout)
+            done, _ = await asyncio.wait({future}, timeout=max(0.0, wake - now))
+            if done:
+                return future.result()
+            now = time.monotonic()
+            if now >= deadline:
+                raise self._stalled("deadline", now - started)
+            if not self._tool_running() and now - self._last_activity >= self.idle_timeout:
+                raise self._stalled("idle", now - self._last_activity)
+            if now - last_heartbeat >= self.heartbeat_interval:
+                last_heartbeat = now
+                self._trace("grok.prompt.activity", stage=self._stage, tool_name=self._stage_tool,
+                            quiet_ms=round((now - self._last_activity) * 1000),
+                            thought_chunks=self._thought_chunks, thought_characters=self._thought_characters,
+                            text_characters=self._text_characters, tool_calls=len(self._tool_calls),
+                            completed_tools=len(self._completed_tools))
+
+    def _tool_running(self) -> bool:
+        return any(call.get("status", "pending") not in _TERMINAL_TOOL_STATUSES
+                   for call in self._tool_calls.values())
+
+    def _stalled(self, reason: str, seconds: float) -> GrokStalled:
+        where = self._stage_description()
+        if reason == "idle":
+            message = (f"Grok timed out: no provider activity for {round(seconds)} s {where}. "
+                       "Jet ended the turn; no tool will be retried")
+        else:
+            message = (f"Grok timed out: the turn did not finish within {round(seconds)} s {where}. "
+                       "Jet ended the turn; no tool will be retried")
+        return GrokStalled(message, reason=reason, stage=self._stage,
+                           completed_tools=tuple(self._completed_tools))
+
+    def _stage_description(self) -> str:
+        if self._stage == "tool" and self._stage_tool:
+            return "while running " + self._stage_tool.removeprefix("browser__")
+        done = set(self._completed_tools)
+        for tool, description in _MILESTONES:
+            if tool in done:
+                return description
+        return "after reading the browser" if done else "while planning the request"
+
+    def _set_stage(self, stage: str, tool: str | None = None) -> None:
+        if (stage, tool) == (self._stage, self._stage_tool):
+            return
+        self._stage, self._stage_tool = stage, tool
+        self._trace("grok.prompt.stage", stage=stage, tool_name=tool,
+                    duration_ms=self._duration(self._prompt_started))
+        self._status("running", stage=stage, tool=tool,
+                     completed_tools=list(self._completed_tools))
 
     async def _send(self, message: dict) -> None:
         async with self._write_lock:
@@ -423,10 +550,12 @@ class GrokClient:
                 message = json.loads(line)
                 if not isinstance(message, dict) or message.get("jsonrpc") != "2.0":
                     raise GrokError("Grok emitted an invalid ACP message")
+                # Any well-formed provider message proves the turn is still alive.
+                self._last_activity = time.monotonic()
                 if "method" in message:
                     if "id" in message:
                         await self._agent_request(message)
-                    elif message["method"] in ("session/update", "x.ai/session/update"):
+                    elif message["method"] in ("session/update", "x.ai/session/update", "_x.ai/session/update"):
                         self._update(message.get("params", {}))
                 elif "id" in message:
                     future = self._pending.get(message["id"])
@@ -518,13 +647,35 @@ class GrokClient:
                                 total_characters=self._text_characters, chunks=self._text_chunks)
                     self._chunks.append(text)
                     self.emit({"type": "text", "text": text})
+                    self._set_stage("responding")
+        elif kind == "agent_thought_chunk" and self._prompt_active:
+            # Reasoning text is never kept, shown, or traced; only its volume is,
+            # so a long silent plan can be told apart from a stalled provider.
+            content = update.get("content", {})
+            text = content.get("text") if isinstance(content, dict) else None
+            if isinstance(text, str):
+                self._thought_chunks += 1
+                self._thought_characters += len(text)
+                self._set_stage("thinking")
         elif kind in ("tool_call", "tool_call_update"):
             call_id = update.get("toolCallId")
             if isinstance(call_id, str):
                 call = self._tool_calls.setdefault(call_id, {"toolCallId": call_id})
                 call.update({key: value for key, value in update.items() if value is not None})
                 self._emit_tool(call)
-        # Thought chunks are not added to the assistant answer or persisted.
+                if self._prompt_active:
+                    name, _ = self._trace_identity(call)
+                    short = name.removeprefix("browser__") if name else None
+                    if call.get("status") == "completed" and short and call_id not in self._completed_ids:
+                        self._completed_ids.add(call_id)
+                        self._completed_tools.append(short)
+                    if self._tool_running():
+                        running = next((c for c in reversed(list(self._tool_calls.values()))
+                                        if c.get("status", "pending") not in _TERMINAL_TOOL_STATUSES), call)
+                        running_name, _ = self._trace_identity(running)
+                        self._set_stage("tool", running_name.removeprefix("browser__") if running_name else None)
+                    else:
+                        self._set_stage("waiting")
 
     async def _agent_request(self, message: dict) -> None:
         request_id = message["id"]

@@ -39,6 +39,31 @@ void main() {
         'Pausing collection');
   });
 
+  test('Grok status names the safe stage instead of a generic spinner', () {
+    String label(Map stage) => busyPhaseLabel({
+          'busy': true,
+          'provider': {'status': 'running', 'stage': stage},
+        })!;
+    expect(label({'stage': 'thinking'}), 'Grok is thinking');
+    expect(label({'stage': 'tool', 'tool': 'inspect_collection_source'}),
+        'Grok is checking the page');
+    expect(
+        label({
+          'stage': 'thinking',
+          'completed_tools': ['list_tabs', 'workflow_sdk']
+        }),
+        'Grok is writing the workflow');
+    expect(label({'stage': 'tool', 'tool': 'save_workflow'}),
+        'Saving the workflow');
+    expect(label({'stage': 'responding'}), 'Grok is replying');
+    expect(
+        busyPhaseLabel({
+          'busy': true,
+          'provider': {'status': 'connecting'}
+        }),
+        'Grok is working');
+  });
+
   testWidgets(
       'one hundred completed steps collapse while collection stays accessible',
       (tester) async {

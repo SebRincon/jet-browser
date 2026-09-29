@@ -242,7 +242,15 @@ audits and action arrays stay in the complete saved route record.
 notification. Further permission requests receive no approval. If the CLI does
 not finish within five seconds, it is terminated; all waiting requests are
 resolved. Startup requests have 45-second deadlines and a turn has a five-minute
-deadline. The service must **also stop its local task worker**, because a
+ceiling. A turn also ends after 150 seconds with no provider message while no tool
+call is running (`idle_timeout`). Reasoning chunks, text, tool updates and Grok's
+`_x.ai/session/update` extension all count as activity; reasoning text itself is
+never stored or traced, only chunk and character counts. Grok 1.0.41 does not stream
+the arguments of a tool call it is still generating, so `idle_timeout` must stay
+above a bounded argument generation. Both limits raise `GrokStalled` with a safe
+`stage` and the names of completed tools. The service then reads saved workflow and
+collection state and reports what was actually saved or started. It never replays
+the turn. The UI label follows the same stage metadata. The service must **also stop its local task worker**, because a
 browser operation already dispatched through MCP may outlive the chat request.
 Stopping cannot undo an input already sent to the browser.
 
@@ -264,7 +272,8 @@ uv run --project backend ruff check backend/jet_browser/grok.py backend/tests/te
 
 Tests cover interleaved streaming/response correlation, merged tool updates,
 exact permission identity and option ids, denied client methods, cancellation,
-concurrent-turn rejection, startup timeout, process exit, stderr isolation and
+concurrent-turn rejection, startup timeout, silent-provider and ceiling stalls,
+running-tool idle suspension, process exit, stderr isolation and
 the private permission configuration/child-only environment override. Trace
 tests cover request pairing, first-text timing, counts, denial diagnostics,
 private-content exclusion, per-turn callback replacement, sink failure and

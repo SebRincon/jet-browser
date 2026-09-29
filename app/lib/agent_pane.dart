@@ -830,6 +830,39 @@ Map<String, dynamic>? _liveRoute(Map state) {
   return Map<String, dynamic>.from(routes.last);
 }
 
+/// Label for the provider's safe stage metadata (identifiers only, no content).
+String grokStageLabel(Object? raw) {
+  if (raw is! Map) return 'Grok is working';
+  final stage = '${raw['stage'] ?? ''}';
+  final tool = '${raw['tool'] ?? ''}';
+  final done = (raw['completed_tools'] as List? ?? const []).map((e) => '$e');
+  if (stage == 'tool') {
+    switch (tool) {
+      case 'list_tabs':
+      case 'read_page':
+      case 'inspect_collection_source':
+        return 'Grok is checking the page';
+      case 'workflow_sdk':
+        return 'Grok is reading the workflow guide';
+      case 'save_workflow':
+        return 'Saving the workflow';
+      case 'run_workflow':
+      case 'start_collection':
+        return 'Starting the job';
+      case 'web_search':
+      case 'web_fetch':
+        return 'Grok is searching the web';
+    }
+    return 'Grok is using the browser';
+  }
+  if (stage == 'responding') return 'Grok is replying';
+  if (done.contains('workflow_sdk') && !done.contains('save_workflow')) {
+    return 'Grok is writing the workflow';
+  }
+  if (stage == 'thinking') return 'Grok is thinking';
+  return 'Grok is working';
+}
+
 String? busyPhaseLabel(Map state) {
   for (final raw in state['collections'] as List? ?? const []) {
     if (raw is! Map) continue;
@@ -845,7 +878,7 @@ String? busyPhaseLabel(Map state) {
   if (!active) return null;
   if (provider == 'stopping' || taskStatus == 'stopping') return 'Stopping';
   if (provider == 'connecting' || provider == 'running') {
-    return 'Grok is working';
+    return grokStageLabel((state['provider'] as Map? ?? {})['stage']);
   }
   if (provider == 'routing') return 'Choosing an action';
   final route = _liveRoute(state);

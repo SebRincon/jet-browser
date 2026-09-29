@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from jet_browser.grok import GrokCancelled, GrokClient, GrokError
+from jet_browser.grok import GrokCancelled, GrokClient, GrokError, GrokStalled
 
 GROK_USE_TOOL_META = {
     "x.ai/tool": {
@@ -688,7 +688,7 @@ async def test_trace_request_and_prompt_terminal_events_cover_failures(rig, fail
         )
         assert request_end["request_id"] == process.prompt_id and request_end["duration_ms"] >= 0
         if failure == "timeout":
-            assert request_end["error_type"] == "TimeoutError"
+            assert request_end["error_type"] == "GrokStalled" and request_end["reason"] == "deadline"
         if failure == "cancel":
             assert any(e["event"] == "grok.prompt.cancel_requested" for e in traces)
             assert any(e["event"] == "grok.acp.notification.send" for e in traces)
@@ -745,3 +745,123 @@ async def test_checkpoint_profile_is_narrower_than_general_chat(rig, name, allow
         await task
     finally:
         await client.close()
+
+
+def browser_tool(process, call_id, tool, status):
+    process.update(
+        "tool_call",
+        toolCallId=call_id,
+        title="Use Tool",
+        kind="other",
+        status=status,
+        _meta=GROK_USE_TOOL_META,
+        rawInput={"variant": "UseTool", "tool_name": "browser__" + tool, "tool_input": {}},
+    )
+
+
+async def test_silent_provider_after_sdk_is_stalled_with_stage_and_no_retry(rig):
+    """The 2026-09-28 incident shape: tools succeed, then the provider goes quiet."""
+    client, process, events, _ = rig
+    traces = []
+    client.trace = trace_collector(traces)
+    client.idle_timeout = 0.1
+    client.prompt_timeout = 5
+    task = asyncio.create_task(client.prompt("Organize my bookmarks"))
+    await wait_until(lambda: process.prompt_id is not None)
+    for index, tool in enumerate(("list_tabs", "inspect_collection_source", "workflow_sdk")):
+        browser_tool(process, f"call-{index}", tool, "pending")
+        process.update("tool_call_update", toolCallId=f"call-{index}", status="completed")
+    process.update("agent_thought_chunk", content={"type": "text", "text": "private plan"})
+    with pytest.raises(GrokStalled) as raised:
+        await asyncio.wait_for(task, 2)
+    stalled = raised.value
+    assert stalled.reason == "idle" and stalled.stage == "thinking"
+    assert stalled.completed_tools == ("list_tabs", "inspect_collection_source", "workflow_sdk")
+    assert "while writing the workflow" in str(stalled) and "no tool will be retried" in str(stalled)
+    assert process.returncode is not None and not client._pending
+    assert [m.get("method") for m in process.sent].count("session/prompt") == 1
+    assert any(e.get("type") == "error" and "writing the workflow" in e["message"] for e in events)
+    stages = [(e["stage"], e["tool_name"]) for e in traces if e["event"] == "grok.prompt.stage"]
+    assert ("tool", "workflow_sdk") in stages and stages[-1] == ("thinking", None)
+    error = next(e for e in traces if e["event"] == "grok.acp.request.error")
+    assert error["error_type"] == "GrokStalled" and error["reason"] == "idle"
+    assert "private plan" not in json.dumps(traces) + json.dumps(events)
+    await client.close()
+
+
+async def test_streaming_reasoning_keeps_turn_alive_and_traces_only_volume(rig):
+    client, process, events, _ = rig
+    traces = []
+    client.trace = trace_collector(traces)
+    client.idle_timeout = 0.15
+    client.heartbeat_interval = 0.03
+    client.prompt_timeout = 5
+    task = asyncio.create_task(client.prompt("Question"))
+    await wait_until(lambda: process.prompt_id is not None)
+    for _ in range(8):
+        process.update("agent_thought_chunk", content={"type": "text", "text": "secret-thought"})
+        await asyncio.sleep(0.05)
+    process.update("agent_message_chunk", content={"type": "text", "text": "Answer"})
+    process.finish()
+    assert await asyncio.wait_for(task, 2) == "Answer"
+    beats = [e for e in traces if e["event"] == "grok.prompt.activity"]
+    assert beats and beats[-1]["thought_chunks"] >= 1
+    assert beats[-1]["thought_characters"] == beats[-1]["thought_chunks"] * len("secret-thought")
+    assert "secret-thought" not in json.dumps(traces) + json.dumps(events)
+    await client.close()
+
+
+async def test_running_tool_suspends_idle_limit_but_not_turn_ceiling(rig):
+    client, process, _, _ = rig
+    client.idle_timeout = 0.05
+    client.prompt_timeout = 5
+    task = asyncio.create_task(client.prompt("Open a page"))
+    await wait_until(lambda: process.prompt_id is not None)
+    browser_tool(process, "slow", "run_task", "in_progress")
+    await asyncio.sleep(0.2)
+    assert not task.done() and client.stage["stage"] == "tool" and client.stage["tool"] == "run_task"
+    process.update("tool_call_update", toolCallId="slow", status="completed")
+    process.finish()
+    await asyncio.wait_for(task, 2)
+    await client.close()
+
+
+async def test_tool_that_never_finishes_still_hits_turn_ceiling(rig):
+    client, process, _, _ = rig
+    client.idle_timeout = 0.05
+    client.prompt_timeout = 0.2
+    task = asyncio.create_task(client.prompt("Open another page"))
+    await wait_until(lambda: process.prompt_id is not None)
+    browser_tool(process, "stuck", "run_task", "in_progress")
+    with pytest.raises(GrokStalled) as raised:
+        await asyncio.wait_for(task, 2)
+    assert raised.value.reason == "deadline" and "while running run_task" in str(raised.value)
+    await client.close()
+
+
+async def test_grok_extension_updates_count_as_provider_activity(rig):
+    client, process, _, _ = rig
+    client.idle_timeout = 0.1
+    client.prompt_timeout = 5
+    task = asyncio.create_task(client.prompt("Question"))
+    await wait_until(lambda: process.prompt_id is not None)
+    for _ in range(6):
+        process.receive({"method": "_x.ai/session/update", "params": {
+            "sessionId": "session-1", "update": {"sessionUpdate": "hook_execution", "runs": []}}})
+        await asyncio.sleep(0.04)
+    process.finish()
+    assert await asyncio.wait_for(task, 2) == ""
+    await client.close()
+
+
+async def test_stop_during_silent_turn_is_bounded_and_not_reported_as_stall(rig):
+    client, process, _, _ = rig
+    client.idle_timeout = 10
+    process.auto_cancel = False
+    task = asyncio.create_task(client.prompt("Question"))
+    await wait_until(lambda: process.prompt_id is not None)
+    await client.cancel()
+    with pytest.raises(GrokCancelled):
+        await asyncio.wait_for(task, 1)
+    assert process.returncode is not None
+    await client.close()

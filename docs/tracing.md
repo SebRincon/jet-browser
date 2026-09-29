@@ -127,6 +127,12 @@ does not replace, caller discipline: never place user text in an allowed ID/labe
   `model.load`, `model.inference`, `grok.acp.request` and `grok.prompt` `.end`/`.error`
   callback events with durations also update their dependency metric; SDK spans of
   these names are counted once, not again through their emitted end event.
+- Provider liveness: `grok.prompt.stage` marks stage changes (`waiting`, `thinking`,
+  `responding`, `tool` plus the canonical tool name). While a turn waits,
+  `grok.prompt.activity` is written at most every 15 seconds with `quiet_ms`,
+  reasoning chunk/character counts, text characters and tool counts. After a failed
+  turn, `grok.recovery.inspected` records how many workflows/collections were saved
+  or started, from durable state. None of these fields contains text.
 - Disk failures fail open: app operations continue, in-memory events remain available,
   and `summary.logging_error` increments. It is a cumulative diagnostic-operation
   failure count, not a count of distinct filesystem incidents. No filesystem exception

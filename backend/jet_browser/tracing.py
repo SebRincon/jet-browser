@@ -42,6 +42,9 @@ _NUMBER_FIELDS = frozenset({
     "input_characters", "characters", "total_characters", "chunks", "return_code",
     "text_characters", "text_chunks", "tool_calls", "size_bytes",
     "scroll_top", "scroll_height", "viewport_height",
+    # Provider liveness and failed-turn recovery; counts only, never content.
+    "quiet_ms", "thought_chunks", "thought_characters", "completed_tools",
+    "saved_workflows", "started_workflows", "prepared_collections", "started_collections",
 })
 _BOOL_FIELDS = frozenset({
     "stop_requested", "verified", "allowed", "read_only", "connected", "page_changed",

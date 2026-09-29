@@ -81,6 +81,8 @@ class Service:
         self.grok = None
         self.provider_id = None
         self.provider_status = "ready"
+        # Safe identifiers only (stage, tool name); see GrokClient.stage.
+        self.provider_stage = None
         self.response = None
         self.settings = {"local_model": "qwen4b_semif_shared" if (RESOURCE_ROOT / "python/bin/python3.12").is_file() else "lfm_rlcd"}
         saved = root / ".runtime/settings.json"
@@ -244,7 +246,8 @@ class Service:
                 "settings": self.settings, "task_history": history,
                 "activity": self.activity_log[-40:], "task": task, "models": LOCAL_MODELS,
                 "trace": self.trace.snapshot(self.store.current_id, limit=120),
-                "provider": {"name": "Jet Assistant", "status": self.provider_status, "router_model": ROUTER_MODEL},
+                "provider": {"name": "Jet Assistant", "status": self.provider_status, "router_model": ROUTER_MODEL,
+                             "stage": self.provider_stage},
                 "browser": self.browser_state(),
                 "collections": self.collections.summaries(self.store.current_id),
                 "workflows": self.workflows.summaries(self.store.current_id),
@@ -338,8 +341,12 @@ class Service:
                 self.activity(event.get("title", "Browser tool"), event.get("status", "running"))
             elif kind == "error":
                 self.activity(event.get("message", "Grok error"), "error")
+            elif kind == "status" and event.get("stage"):
+                self.provider_stage = {"stage": event["stage"], "tool": event.get("tool"),
+                                       "completed_tools": list(event.get("completed_tools") or [])[-12:],
+                                       "since": time.time()}
 
-        from .grok import GrokClient
+        from .grok import GrokCancelled, GrokClient, GrokError
         captured = self.trace.capture()
         def trace_callback(event, **attributes):
             captured.run(self.trace.emit, event, **attributes)
@@ -372,12 +379,65 @@ class Service:
         if self.collections.running:
             collection_owner = '\nLocal collection owns browser; answer/status/workspace tools permitted. Pause through control tool before navigation.'
         self.trace.emit('history.context', context_chars=len(context) + len(collections_note) + len(workspace_note) + len(collection_owner), message_count=len(self.messages))
-        answer = await self.grok.prompt(context + collections_note + workspace_note + collection_owner + '\n\nCURRENT USER REQUEST:\n' + text)
+        before = self._saved_jobs()
+        try:
+            answer = await self.grok.prompt(context + collections_note + workspace_note + collection_owner + '\n\nCURRENT USER REQUEST:\n' + text)
+        except GrokCancelled:
+            raise
+        except GrokError as error:
+            # Recovery inspects durable state; it never replays a provider tool call.
+            raise GrokError(self._failed_turn_report(str(error), before)) from error
+        finally:
+            self.provider_stage = None
         if self.response is None:
             self.response = self.message('assistant', '', source='grok')
         if not self.response['text']:
             self.response['text'] = answer
         self.store.save_message(self.response)
+
+    def _saved_jobs(self):
+        sid = self.store.current_id
+        workflows = {row['id']: row for row in self.workflows.summaries(sid)}
+        collections = {row['id']: row for row in self.collection_store.list(sid) if isinstance(row.get('id'), str)}
+        return workflows, collections
+
+    def _failed_turn_report(self, error, before):
+        """Describe what a failed provider turn left behind, from saved state only."""
+        old_workflows, old_collections = before
+        try:
+            workflows, collections = self._saved_jobs()
+        except Exception as exc:  # The original provider failure stays the primary error.
+            self.trace.emit('grok.recovery.inspected', level='warn', error_type=type(exc).__name__)
+            return error + '. Jet could not read saved workflow state; check the job cards before retrying.'
+        saved, started = [], []
+        for wid, row in workflows.items():
+            old = old_workflows.get(wid)
+            if row.get('status') in {'running', 'completed'} and (old is None or old.get('run_id') != row.get('run_id')):
+                started.append(row)
+            elif old is None or old.get('revision') != row.get('revision'):
+                saved.append(row)
+        prepared = [row for cid, row in collections.items() if cid not in old_collections]
+        resumed = [row for cid, row in collections.items()
+                   if row.get('status') == 'running' and (old_collections.get(cid) or {}).get('status') != 'running']
+        self.trace.emit('grok.recovery.inspected', saved_workflows=len(saved), started_workflows=len(started),
+                        prepared_collections=len(prepared), started_collections=len(resumed))
+
+        def title(row):
+            return '“' + str(row.get('title') or 'Workflow')[:80] + '”'
+
+        if started:
+            detail = f'Workflow {title(started[0])} was started and is {started[0].get("status")}; its card shows progress.'
+        elif resumed:
+            detail = 'A collection was started; its card shows progress.'
+        elif saved:
+            row = saved[0]
+            detail = (f'Workflow {title(row)} was saved (revision {row.get("revision")}) but not started. '
+                      'Ask me to start it, or send the request again.')
+        elif prepared:
+            detail = 'A collection was prepared but not started. Ask me to start it, or send the request again.'
+        else:
+            detail = 'No workflow or collection was saved or started. You can send the request again.'
+        return error.rstrip('.') + '. ' + detail
 
     async def stop(self):
         await self.workflow_supervisor.close()

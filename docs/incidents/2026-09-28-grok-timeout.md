@@ -1,6 +1,6 @@
 # Grok authoring timeout — 2026-09-28
 
-Status: diagnosed, unresolved. All times America/Chicago (CDT). This sanitized
+Status: mitigated 2026-09-28 (see Follow-up below); provider root cause unknown. All times America/Chicago (CDT). This sanitized
 record contains no bookmark text, credentials or provider reasoning content.
 
 The user asked to organize the first 100 bookmarks with overlapping tags, summaries,
@@ -34,3 +34,29 @@ Jet traces. Preserve those privacy boundaries while adding safe activity/stage d
 Follow-up acceptance: author/save/start in bounded stages with visible progress;
 test a stalled provider and cancellation; inspect saved state before recovery;
 never replay an already-executed mutation. A longer timeout alone is not a repair.
+
+## Follow-up — 2026-09-28
+
+Grok's own local session log (inspected structurally; no content copied) shows the
+model entered `streaming_reasoning` 0.9 s after `workflow_sdk` returned and changed
+reasoning segments until 20:57:55. It then logged nothing for 3 min 29 s: no text,
+tool call or turn end. Jet's trace had no event after 20:56:50 because reasoning
+chunks were discarded without a count. Grok 1.0.41 also does not stream the
+arguments of a tool call while generating them, so a model writing a large
+`save_workflow` script looks identical to a stall from the client.
+
+Repairs in this change series:
+
+1. `GrokClient` ends a turn after 150 s with no provider message while no tool is
+   running, and keeps the 300 s ceiling. Both raise `GrokStalled` with the stage and
+   completed tool names. Reasoning volume, stage changes and quiet time are traced
+   without content; Grok's `_x.ai/session/update` extension now counts as activity.
+2. After any provider failure, the service reads durable workflow/collection state
+   and tells the user exactly what was saved or started. It never replays the turn.
+3. The chat status names the stage, such as "Grok is writing the workflow".
+
+For this incident's timeline, the new client would have ended the turn at about
+21:00:25 with "no provider activity for 150 s while writing the workflow" and
+reported that nothing was saved or started. Reducing how much the model must write
+is tracked separately (built-in workflow templates). A real provider rerun is still
+needed to confirm the repaired flow end to end.
