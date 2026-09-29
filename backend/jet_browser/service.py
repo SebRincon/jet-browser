@@ -359,7 +359,8 @@ class Service:
             self.provider_id = uuid.uuid4().hex
             command = [sys.executable, str(RESOURCE_ROOT / "backend/jet_browser/mcp.py"),
                        '--provider-id', self.provider_id]
-            self.grok = GrokClient(cwd=RESOURCE_ROOT / "backend", mcp_command=command, emit=emit, trace=trace_callback, review_only=review_only)
+            self.grok = GrokClient(cwd=RESOURCE_ROOT / "backend", mcp_command=command, emit=emit, trace=trace_callback,
+                                   review_only=review_only, grok_home=self.runtime_setup.grok_home())
             await self.grok.start()
         else:
             self.grok.emit = emit

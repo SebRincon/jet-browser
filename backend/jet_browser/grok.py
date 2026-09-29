@@ -215,7 +215,8 @@ class GrokClient:
     shutdown_timeout = 3.0
 
     def __init__(self, cwd: Path, mcp_command: list[str], emit: Callable[[dict], None],
-                 trace: Callable[..., None] | None = None, review_only: bool = False):
+                 trace: Callable[..., None] | None = None, review_only: bool = False,
+                 grok_home: Path | None = None):
         if not mcp_command or not all(isinstance(x, str) and x for x in mcp_command):
             raise ValueError("mcp_command must contain an executable and optional arguments")
         self.cwd = Path(cwd).expanduser().resolve()
@@ -223,6 +224,7 @@ class GrokClient:
         self.emit = emit
         self.trace = trace
         self.review_only = review_only
+        self.grok_home = grok_home
         self.session_id: str | None = None
         self._process: asyncio.subprocess.Process | None = None
         self._readers: list[asyncio.Task] = []
@@ -294,6 +296,9 @@ class GrokClient:
                 # no persistent folder-trust grant or global config is changed.
                 child_env = os.environ.copy()
                 child_env["GROK_FOLDER_TRUST"] = "0"
+                if self.grok_home is not None:
+                    # Jet-owned config/auth/sessions: no global MCP servers or hooks.
+                    child_env["GROK_HOME"] = str(self.grok_home)
                 self._process = await asyncio.create_subprocess_exec(
                     executable, "--no-auto-update", "--permission-mode", "default", "--no-subagents",
                     "--deny", "Bash", "--deny", "Edit", "--deny", "Write",
@@ -335,7 +340,7 @@ class GrokClient:
                 self._trace("grok.provider.error", error_type=type(exc).__name__,
                             duration_ms=self._duration(started))
                 error = exc if isinstance(exc, GrokError) else GrokError(
-                    "Could not start Grok. Check JET_GROK_PATH and run grok login in a terminal."
+                    "Could not start Grok. Sign in to Grok in Jet's setup and try again."
                 )
                 await self._shutdown(error)
                 if isinstance(exc, asyncio.CancelledError):

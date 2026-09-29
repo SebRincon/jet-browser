@@ -908,3 +908,16 @@ async def test_provider_ended_turn_is_an_error_not_a_user_stop(rig):
         await asyncio.wait_for(task, 2)
     assert not isinstance(raised.value, GrokCancelled)
     await client.close()
+
+
+async def test_grok_child_uses_the_jet_owned_home(rig, tmp_path):
+    original, process, events, launches = rig
+    home = tmp_path / "grok-home"
+    client = GrokClient(original.cwd, original.mcp_command, events.append, grok_home=home)
+    client.startup_timeout = 0.1
+    try:
+        await client.start()
+        env = launches[-1][1]["env"]
+        assert env["GROK_HOME"] == str(home) and env["GROK_FOLDER_TRUST"] == "0"
+    finally:
+        await client.close()

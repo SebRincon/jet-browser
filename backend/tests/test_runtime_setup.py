@@ -247,3 +247,35 @@ def test_cached_login_is_owner_only(tmp_path: Path, monkeypatch: pytest.MonkeyPa
     assert runtime.status()["grok"]["authenticated"] is True
     os.chmod(secret, 0o644)
     assert runtime.status()["grok"]["authenticated"] is False
+
+
+def test_packaged_app_owns_its_grok_home_and_ignores_global_login(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    home = tmp_path / "home"
+    (home / ".grok").mkdir(parents=True)
+    global_auth = home / ".grok" / "auth.json"
+    global_auth.write_text("{}", encoding="utf-8")
+    os.chmod(global_auth, 0o600)
+    monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
+    monkeypatch.delenv("JET_GROK_HOME", raising=False)
+    (tmp_path / "res").mkdir()
+    (tmp_path / "res" / "model-downloads.json").write_text('{"schema_version": 1, "models": []}', encoding="utf-8")
+    runtime = RuntimeSetup(tmp_path / "data", tmp_path / "res")
+    assert runtime.packaged
+    jet_home = runtime.grok_home()
+    assert jet_home == tmp_path / "data" / ".runtime" / "grok-home"
+    assert stat.S_IMODE(jet_home.stat().st_mode) == 0o700
+    # The developer's global sign-in does not count for the packaged app.
+    assert runtime.status()["grok"]["authenticated"] is False
+    assert runtime._app_env()["GROK_HOME"] == str(jet_home)
+    own = jet_home / "auth.json"
+    own.write_text("{}", encoding="utf-8")
+    os.chmod(own, 0o600)
+    assert runtime.status()["grok"]["authenticated"] is True
+    monkeypatch.setenv("JET_GROK_HOME", str(tmp_path / "custom"))
+    assert runtime.grok_home() == tmp_path / "custom"
+
+
+def test_development_keeps_the_developer_grok_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("JET_GROK_HOME", raising=False)
+    runtime = RuntimeSetup(tmp_path / "data", tmp_path / "res")
+    assert runtime.grok_home() is None and "GROK_HOME" not in runtime._app_env()

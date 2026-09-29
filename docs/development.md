@@ -126,6 +126,16 @@ launched natively, initialized CEF and passed native form checks (2026-09-28). G
 still rejects it until it is notarized; notarization (which uploads the app to Apple)
 has not been run.
 
+**Self-containment.** End users install nothing: the bundle carries CPython and every
+package, the local engines, the Grok CLI, JetWorkflow (Apple's JavaScriptCore, part of
+macOS) and CEF; model weights and Grok sign-in come from the setup screen. A packaged
+app keeps Grok's config, sign-in and sessions in `<data>/.runtime/grok-home`
+(`GROK_HOME`), so a developer's global `~/.grok` MCP servers, hooks and plugins never
+load into Jet; development builds use `~/.grok` unless `JET_GROK_HOME` is set. A
+2026-09-28 audit ran the packaged service, SemIf tagging/summaries, JetWorkflow,
+headless Chromium and the typing model with `HOME` pointing at an empty folder: all
+passed, and the only file written there was Jet's own `~/.jet-browser` workspace index.
+
 The launcher starts bundled Python before exec into Flutter/CEF; never move that
 spawn into the initialized native browser. The app can be relocated without the
 checkout, uses in-app weight downloads, and needs network access for Grok sign-in.

@@ -88,6 +88,25 @@ class RuntimeSetup:
         self._user_code: str | None = None
         self._login_error: str | None = None
 
+    def grok_home(self) -> Path | None:
+        """Grok's config, sign-in and session directory for this Jet install.
+
+        A packaged app owns its Grok home under its data root, so the user's global
+        ~/.grok MCP servers, hooks, plugins and sessions never load into Jet, and sign-in
+        happens in Jet's setup. Development uses the developer's ~/.grok unless
+        JET_GROK_HOME names another directory.
+        """
+        override = os.environ.get("JET_GROK_HOME")
+        if override:
+            home = Path(override).expanduser()
+        elif self.packaged:
+            home = self.data_root / ".runtime" / "grok-home"
+        else:
+            return None
+        home.mkdir(mode=0o700, parents=True, exist_ok=True)
+        os.chmod(home, 0o700)
+        return home
+
     def status(self) -> dict:
         if self._by_id:
             models = [self._view_manifest(m) for m in self._models]
@@ -260,10 +279,13 @@ class RuntimeSetup:
 
     def _app_env(self) -> dict[str, str]:
         env = {key: os.environ[key] for key in _ENV_KEEP if key in os.environ}
+        home = self.grok_home()
+        if home is not None:
+            env["GROK_HOME"] = str(home)
         return env
 
     def _cached_login(self) -> bool:
-        path = Path.home() / ".grok" / "auth.json"
+        path = (self.grok_home() or Path.home() / ".grok") / "auth.json"
         try:
             st = path.lstat()
         except OSError:

@@ -30,6 +30,10 @@
 
 ### Fixed
 
+- Packaged Jet runs Grok with its own home (`<data>/.runtime/grok-home`): the user's global
+  `~/.grok` MCP servers, hooks and plugins no longer load into Jet's Grok sessions, and
+  sign-in happens in Jet's setup. An empty-HOME audit of the packaged runtime passed.
+
 - An unresponsive X detail tab during truncated-post recovery now blocks that one recovery
   (`detail_unresponsive`, partial evidence kept) instead of pausing the whole run; seen at
   item 51 of the real top-100 run.
