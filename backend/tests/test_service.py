@@ -208,3 +208,28 @@ async def test_direct_and_delegated_tasks_start_the_typing_helper_first(tmp_path
     order.clear()
     await service._tool('run_task', {'goal': 'Enter Solstice in Team name', 'tab_id': 'tab'})
     assert order[:2] == ['ensure', 'submit']
+
+
+async def test_failed_repair_turn_reports_records_it_already_corrected(tmp_path, monkeypatch):
+    from test_workflow_capabilities import ITEM, definition
+
+    from jet_browser import grok, workflow_capabilities
+
+    service = Service(tmp_path)
+    sid = service.store.current_id
+    wid = service.workflow_store.save(sid, definition())["id"]
+    iid = workflow_capabilities._item_id(ITEM["url"])
+    service.workflow_store.update(sid, wid, status="running")
+    service.workflow_store.put_record(sid, wid, {**ITEM, "id": iid, "tags": [], "summary": ""})
+    service.workflow_store.update(sid, wid, status="completed")
+
+    def repair():
+        record = service.workflow_store.get_record(sid, wid, iid)
+        service.workflow_store.patch_record(sid, wid, iid, {"tags": ["web"]}, record["revision"], actor="local")
+
+    monkeypatch.setattr(grok, 'GrokClient', _stalling_provider(repair))
+    await service.chat('Fix the untagged bookmarks')
+    await service.chat_job
+    text = service.messages[-1]['text']
+    assert '1 saved record was corrected before the turn ended' in text
+    assert 'No workflow or collection was saved' not in text

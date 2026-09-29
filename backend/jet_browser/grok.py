@@ -193,7 +193,10 @@ _MILESTONES = (
     ("start_collection", "after starting the collection"),
     ("save_workflow", "after saving the workflow"),
     ("prepare_collection", "after preparing the collection"),
-    ("workflow_sdk", "while writing the workflow"),
+    ("recover_workflow_record", "after repairing saved records"),
+    ("retag_workflow_records", "after repairing saved records"),
+    ("patch_workflow_record", "after repairing saved records"),
+    ("workflow_sdk", "after reading the workflow guide"),
 )
 _TERMINAL_TOOL_STATUSES = frozenset({"completed", "failed", "cancelled"})
 

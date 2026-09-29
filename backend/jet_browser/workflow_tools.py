@@ -590,7 +590,8 @@ async def tool(service, name, args):
         row = store.get(sid, wid)
         if not row:
             raise RuntimeError("workflow not found")
-        if row.get("status") != "paused":
+        # Matches the store: a completed run can still be corrected, a running one cannot.
+        if row.get("status") not in ("paused", "completed"):
             raise RuntimeError("pause the workflow before editing records")
         revision = _int_in(data["expected_revision"], 0, 10**9, "expected_revision")
         updated = store.patch_record(

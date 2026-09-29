@@ -777,10 +777,10 @@ async def test_silent_provider_after_sdk_is_stalled_with_stage_and_no_retry(rig)
     stalled = raised.value
     assert stalled.reason == "idle" and stalled.stage == "thinking"
     assert stalled.completed_tools == ("list_tabs", "inspect_collection_source", "workflow_sdk")
-    assert "while writing the workflow" in str(stalled) and "no tool will be retried" in str(stalled)
+    assert "after reading the workflow guide" in str(stalled) and "no tool will be retried" in str(stalled)
     assert process.returncode is not None and not client._pending
     assert [m.get("method") for m in process.sent].count("session/prompt") == 1
-    assert any(e.get("type") == "error" and "writing the workflow" in e["message"] for e in events)
+    assert any(e.get("type") == "error" and "workflow guide" in e["message"] for e in events)
     stages = [(e["stage"], e["tool_name"]) for e in traces if e["event"] == "grok.prompt.stage"]
     assert ("tool", "workflow_sdk") in stages and stages[-1] == ("thinking", None)
     error = next(e for e in traces if e["event"] == "grok.acp.request.error")

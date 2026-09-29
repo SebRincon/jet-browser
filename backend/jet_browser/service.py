@@ -381,13 +381,14 @@ class Service:
             collection_owner = '\nLocal collection owns browser; answer/status/workspace tools permitted. Pause through control tool before navigation.'
         self.trace.emit('history.context', context_chars=len(context) + len(collections_note) + len(workspace_note) + len(collection_owner), message_count=len(self.messages))
         before = self._saved_jobs()
+        turn_started = time.time()
         try:
             answer = await self.grok.prompt(context + collections_note + workspace_note + collection_owner + '\n\nCURRENT USER REQUEST:\n' + text)
         except GrokCancelled:
             raise
         except GrokError as error:
             # Recovery inspects durable state; it never replays a provider tool call.
-            raise GrokError(self._failed_turn_report(str(error), before)) from error
+            raise GrokError(self._failed_turn_report(str(error), before, turn_started)) from error
         finally:
             self.provider_stage = None
         if self.response is None:
@@ -402,11 +403,21 @@ class Service:
         collections = {row['id']: row for row in self.collection_store.list(sid) if isinstance(row.get('id'), str)}
         return workflows, collections
 
-    def _failed_turn_report(self, error, before):
+    def _repaired_records(self, workflows, since):
+        """Records whose audit trail changed after `since` (tags, summaries or recovered text)."""
+        from .workflow_repair import flagged
+        count = 0
+        for wid in workflows:
+            _total, rows = flagged(self.workflow_store, self.store.current_id, wid, 'all')
+            count += sum(1 for row in rows if any(entry.get('timestamp', 0) >= since for entry in row.get('audit') or []))
+        return count
+
+    def _failed_turn_report(self, error, before, since=None):
         """Describe what a failed provider turn left behind, from saved state only."""
         old_workflows, old_collections = before
         try:
             workflows, collections = self._saved_jobs()
+            repaired = self._repaired_records(workflows, since) if since is not None else 0
         except Exception as exc:  # The original provider failure stays the primary error.
             self.trace.emit('grok.recovery.inspected', level='warn', error_type=type(exc).__name__)
             return error + '. Jet could not read saved workflow state; check the job cards before retrying.'
@@ -421,7 +432,7 @@ class Service:
         resumed = [row for cid, row in collections.items()
                    if row.get('status') == 'running' and (old_collections.get(cid) or {}).get('status') != 'running']
         self.trace.emit('grok.recovery.inspected', saved_workflows=len(saved), started_workflows=len(started),
-                        prepared_collections=len(prepared), started_collections=len(resumed))
+                        prepared_collections=len(prepared), started_collections=len(resumed), repaired_records=repaired)
 
         def title(row):
             return '“' + str(row.get('title') or 'Workflow')[:80] + '”'
@@ -436,8 +447,15 @@ class Service:
                       'Ask me to start it, or send the request again.')
         elif prepared:
             detail = 'A collection was prepared but not started. Ask me to start it, or send the request again.'
+        elif repaired:
+            detail = ''
         else:
             detail = 'No workflow or collection was saved or started. You can send the request again.'
+        if repaired:
+            # A repair turn changes records, not workflows; say so instead of "nothing saved".
+            detail = (detail + ' ' if detail else '') + (
+                f'{repaired} saved record{"s were" if repaired != 1 else " was"} corrected before the turn ended; '
+                'those changes are kept. Ask again to continue the remaining fixes.')
         return error.rstrip('.') + '. ' + detail
 
     async def stop(self):

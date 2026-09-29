@@ -846,6 +846,10 @@ String grokStageLabel(Object? raw) {
         return 'Grok is reading the workflow guide';
       case 'save_workflow':
         return 'Saving the workflow';
+      case 'recover_workflow_record':
+        return 'Opening a cut-off post';
+      case 'retag_workflow_records':
+        return 'Re-tagging locally';
       case 'run_workflow':
       case 'start_collection':
         return 'Starting the job';
@@ -856,6 +860,11 @@ String grokStageLabel(Object? raw) {
     return 'Grok is using the browser';
   }
   if (stage == 'responding') return 'Grok is replying';
+  if (done.contains('recover_workflow_record') ||
+      done.contains('retag_workflow_records') ||
+      done.contains('patch_workflow_record')) {
+    return 'Grok is repairing records';
+  }
   if (done.contains('workflow_sdk') && !done.contains('save_workflow')) {
     return 'Grok is writing the workflow';
   }

@@ -45,5 +45,22 @@
  ],
  "quality_gaps": [
   "23 of 100 records have no tags (local recall; reviews sample 5 per checkpoint). Some posts may fit none of the seven tags; not assessed without reading content."
- ]
+ ],
+ "repair_pass_2026-09-29": {
+  "request": "Some bookmarks have no tags and at least one is still cut off; fix them in the same run.",
+  "build": "dist rebuilt from b0e0e68 with pinned Grok 1.0.41; same isolated profile and X session",
+  "grok_tools": {
+   "workflow_records": 3,
+   "retag_workflow_records": 2,
+   "recover_workflow_record": 1,
+   "patch_workflow_record": "3 refused (bug: tool still required 'paused' for a completed run; fixed)",
+   "control_workflow": "1 refused (pause of a completed run)"
+  },
+  "result": {
+   "untagged": "23 -> 14",
+   "still_truncated": "1 -> 0 (recovered +798 chars of observed text)",
+   "records_retagged_locally": 23
+  },
+  "turn": "ended at the 300 s ceiling after the repairs; the failure message then wrongly said nothing was saved (fixed: it now counts records corrected in the turn)"
+ }
 }

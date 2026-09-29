@@ -44,7 +44,7 @@ _NUMBER_FIELDS = frozenset({
     "scroll_top", "scroll_height", "viewport_height",
     # Provider liveness and failed-turn recovery; counts only, never content.
     "quiet_ms", "thought_chunks", "thought_characters", "completed_tools",
-    "saved_workflows", "started_workflows", "prepared_collections", "started_collections",
+    "saved_workflows", "started_workflows", "prepared_collections", "started_collections", "repaired_records",
 })
 _BOOL_FIELDS = frozenset({
     "stop_requested", "verified", "allowed", "read_only", "connected", "page_changed",

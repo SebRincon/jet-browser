@@ -79,3 +79,15 @@ async def test_repairs_refuse_running_or_non_x_workflows(tmp_path):
     store2, wid2, service2, iid2, _ = world(tmp_path / "feed", source_kind="feed")
     with pytest.raises(ValueError, match="X Bookmarks"):
         await workflow_tools.tool(service2, "recover_workflow_record", {"workflow_id": wid2, "item_id": iid2})
+
+
+async def test_completed_runs_accept_reviewer_patches(tmp_path):
+    store, wid, service, iid, _ = world(tmp_path, status="completed")
+    record = store.get_record("session", wid, iid)
+    patched = await workflow_tools.tool(service, "patch_workflow_record", {
+        "workflow_id": wid, "item_id": iid, "expected_revision": record["revision"], "patch": {"tags": ["mobile"]}})
+    assert patched["tags"] == ["mobile"]
+    store.update("session", wid, status="running")
+    with pytest.raises(RuntimeError, match="pause the workflow"):
+        await workflow_tools.tool(service, "patch_workflow_record", {
+            "workflow_id": wid, "item_id": iid, "expected_revision": patched["revision"], "patch": {"tags": ["web"]}})

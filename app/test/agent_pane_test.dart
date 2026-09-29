@@ -57,6 +57,14 @@ void main() {
         'Saving the workflow');
     expect(label({'stage': 'responding'}), 'Grok is replying');
     expect(
+        label({
+          'stage': 'thinking',
+          'completed_tools': ['workflow_sdk', 'retag_workflow_records']
+        }),
+        'Grok is repairing records');
+    expect(label({'stage': 'tool', 'tool': 'recover_workflow_record'}),
+        'Opening a cut-off post');
+    expect(
         busyPhaseLabel({
           'busy': true,
           'provider': {'status': 'connecting'}

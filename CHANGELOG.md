@@ -39,6 +39,11 @@
 
 ### Fixed
 
+- Found in the live repair of the real run: `patch_workflow_record` refused completed runs; a
+  failed turn that had already repaired records claimed nothing was saved; and the stage text
+  said "writing the workflow" after Grok merely read the guide. Repairs on real data took
+  untagged bookmarks from 23 to 14 and the last cut-off post from 1 to 0.
+
 - Packaged Jet runs Grok with its own home (`<data>/.runtime/grok-home`): the user's global
   `~/.grok` MCP servers, hooks and plugins no longer load into Jet's Grok sessions, and
   sign-in happens in Jet's setup. An empty-HOME audit of the packaged runtime passed.
