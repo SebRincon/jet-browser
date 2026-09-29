@@ -1,0 +1,304 @@
+{
+  "date": "2026-09-28",
+  "platform": "macos-arm64",
+  "backend_tests": {
+    "full_suite": 341,
+    "additional_stop_pause_cases": 2,
+    "real_chromium_dom": true,
+    "ruff": "passed",
+    "additional_recovery_contract_case": 1
+  },
+  "flutter": {
+    "full_suite": 59,
+    "additional_first_run_case": 1,
+    "analyze": "passed",
+    "release_build": "passed"
+  },
+  "portable_runtime": {
+    "relocated_controller_minimal_path": "passed",
+    "lfm_download": "fresh 713749393 byte pinned manifest download",
+    "other_models": "cached weights cloned, every manifest hash verified; missing metadata downloaded",
+    "native_cef": "Initial Keychain block and later semantics crash retained; repaired rerun passed startup, actual DOM read and chat hide/restore. See native-rerun-20260928.json.",
+    "distribution_signing": "local ad hoc only",
+    "first_run_native_setup": "passed: final dist app, empty isolated data directory, minimal PATH; model setup visually observed before Chromium initialization"
+  },
+  "local_model_smokes": [
+    {
+      "mode": "lfm_rlcd",
+      "model": "LFM2.5-350M@9e6c6ccf47cd318696e137d381a7ded8fe4df09f",
+      "answer": {
+        "label": "mobile",
+        "probabilities": null,
+        "probabilities_as_returned": null,
+        "confidence": null,
+        "score": null,
+        "valid": true,
+        "normalization_applied": false
+      },
+      "elapsed_ms": 6898
+    },
+    {
+      "mode": "laya_mlx",
+      "model": "aac6fef/laya-mlx@047678560251f28113ee8f5df4be82102c7bf336",
+      "answer": {
+        "label": "mobile",
+        "probabilities": {
+          "mobile": 0.9806,
+          "food": 0.0194
+        },
+        "probabilities_as_returned": {
+          "mobile": 0.9806,
+          "food": 0.0194
+        },
+        "confidence": 0.8617,
+        "score": null,
+        "normalization_applied": false,
+        "valid": true
+      },
+      "elapsed_ms": 2020
+    },
+    {
+      "mode": "laya_typed",
+      "model": "aac6fef/laya-typed-decisions-mlx@f9e501c2080cc57c13d6887820329758f5351125",
+      "answer": {
+        "label": "mobile",
+        "probabilities": {
+          "mobile": 0.944,
+          "food": 0.056
+        },
+        "probabilities_as_returned": {
+          "mobile": 0.944,
+          "food": 0.056
+        },
+        "confidence": 0.6888,
+        "score": null,
+        "normalization_applied": false,
+        "valid": true
+      },
+      "elapsed_ms": 311
+    },
+    {
+      "mode": "qwen4b_semif_shared",
+      "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+      "answer": {
+        "label": "mobile",
+        "probabilities": {
+          "mobile": 0.9998911030899734,
+          "food": 0.00010889691002655443
+        },
+        "probabilities_as_returned": {
+          "mobile": 0.9998911030899734,
+          "food": 0.00010889691002655443
+        },
+        "confidence": null,
+        "score": null,
+        "normalization_applied": false,
+        "valid": true
+      },
+      "elapsed_ms": 13095,
+      "summary": {
+        "summary": "A developer released an open source mobile application for iOS and Android.",
+        "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+      }
+    }
+  ],
+  "real_grok_workflow": {
+    "fixture": "isolated Chromium, synthetic posts",
+    "wall_seconds": 246.51,
+    "workflows": [
+      {
+        "id": "df6cbbe0b7ee4ff39c3be0a17d4f3060",
+        "session_id": "b0d2d6ba4ff14c92b2f55a61acbdb65e",
+        "title": "Synthetic bookmark tags",
+        "categories": [
+          {
+            "id": "mobile",
+            "name": "Mobile",
+            "description": "Mobile apps, phone UI, iOS, or Android"
+          },
+          {
+            "id": "web",
+            "name": "Web",
+            "description": "Web apps, browsers, frontend, or websites"
+          },
+          {
+            "id": "design",
+            "name": "Design",
+            "description": "Visual design, UX, typography, or layout"
+          },
+          {
+            "id": "research",
+            "name": "Research",
+            "description": "Research notes, papers, studies, or investigations"
+          }
+        ],
+        "capabilities": [
+          "feed.observe",
+          "feed.scroll",
+          "post.recover",
+          "model.decide",
+          "model.classify",
+          "model.summarize",
+          "records.put",
+          "records.list",
+          "records.patch",
+          "run.checkpoint",
+          "run.progress"
+        ],
+        "tab_id": "fixture-tab",
+        "start_url": "https://workflow.test/feed",
+        "model": "qwen4b_semif_shared",
+        "limits": {
+          "max_seconds": 240,
+          "max_calls": 400,
+          "max_items": 3
+        },
+        "revision": 2,
+        "status": "completed",
+        "error": null,
+        "counters": {
+          "calls": 18,
+          "saved": 3,
+          "classified": 3,
+          "scrolls": 0,
+          "elapsed_ms": 12924
+        },
+        "run_id": "18847201-12ed-4ede-bbc5-d421b6912b8f"
+      }
+    ],
+    "messages": [
+      {
+        "role": "assistant",
+        "text": "I'll author a custom workflow against the synthetic feed and start with the workflow SDK and the current tab."
+      },
+      {
+        "role": "assistant",
+        "text": "The fixture feed is open with three visible bookmarks. I'll save a first workflow that stores two of them, then start it."
+      },
+      {
+        "role": "assistant",
+        "text": "The review sample is in. I corrected one summary and I'm updating the same workflow so it can save the third bookmark."
+      },
+      {
+        "role": "assistant",
+        "text": "The synthetic feed workflow is revised and finished with three unique bookmarks.\n\nThe first two were saved and paused for review. I tightened the second summary so it matches the post: a web design toolkit with reusable browser components and color themes. The same workflow then saved the third bookmark. Tags overlap across mobile, web, design, and research, and each record kept its observed URL and posted date."
+      }
+    ],
+    "records": {
+      "items": [
+        {
+          "id": "2a8001f303f2c8c310d9e87b575302011eae3c42ac40216856d18c95042972ae",
+          "url": "https://workflow.test/posts/one",
+          "text": "Today\nFixture Author\n\nA developer released an open source mobile application for iOS and Android with accessible navigation.",
+          "author": null,
+          "published_at": "2026-09-28T10:00:00Z",
+          "captured_at": 1790641923.416971,
+          "truncated": false,
+          "tags": [
+            "mobile"
+          ],
+          "summary": "A developer released an open source mobile application for iOS and Android featuring accessible navigation.",
+          "content_hash": "cba5ea66e43d1c28d2020d82fefa8e4ffb2ea5fcc67490f6b72235496ee38755",
+          "revision": 1,
+          "original_capture": {
+            "id": "2a8001f303f2c8c310d9e87b575302011eae3c42ac40216856d18c95042972ae",
+            "url": "https://workflow.test/posts/one",
+            "text": "Today\nFixture Author\n\nA developer released an open source mobile application for iOS and Android with accessible navigation.",
+            "author": null,
+            "published_at": "2026-09-28T10:00:00Z",
+            "captured_at": 1790641923.416971,
+            "truncated": false,
+            "tags": [
+              "mobile"
+            ],
+            "summary": "A developer released an open source mobile application for iOS and Android featuring accessible navigation."
+          },
+          "audit": []
+        },
+        {
+          "id": "29e649f3dbb82068e2bcfd681f3c2c3ded401fc82188df2f4f847123b83aea6f",
+          "url": "https://workflow.test/posts/two",
+          "text": "Yesterday\n\nA web design toolkit provides reusable browser components and color themes.",
+          "author": null,
+          "published_at": "2026-09-27T10:00:00Z",
+          "captured_at": 1790641923.416971,
+          "truncated": false,
+          "tags": [
+            "web",
+            "design"
+          ],
+          "summary": "A web design toolkit provides reusable browser components and color themes.",
+          "content_hash": "c627f57eedb8121b03fb6e3955baa17df09c98b58ad318dee316adff9b79adff",
+          "revision": 2,
+          "original_capture": {
+            "id": "29e649f3dbb82068e2bcfd681f3c2c3ded401fc82188df2f4f847123b83aea6f",
+            "url": "https://workflow.test/posts/two",
+            "text": "Yesterday\n\nA web design toolkit provides reusable browser components and color themes.",
+            "author": null,
+            "published_at": "2026-09-27T10:00:00Z",
+            "captured_at": 1790641923.416971,
+            "truncated": false,
+            "tags": [
+              "web",
+              "design"
+            ],
+            "summary": "Yesterday, a web design toolkit offering reusable browser components and color themes was mentioned."
+          },
+          "audit": [
+            {
+              "timestamp": 1790641951.688372,
+              "actor": "grok",
+              "previous_tags": [
+                "web",
+                "design"
+              ],
+              "previous_summary": "Yesterday, a web design toolkit offering reusable browser components and color themes was mentioned.",
+              "previous_revision": 1,
+              "kind": "manual_patch"
+            }
+          ]
+        },
+        {
+          "id": "f13a0be717be77208bc132baa6a9ea4b1edb02ab8011a323384b4741c74b0e9d",
+          "url": "https://workflow.test/posts/three",
+          "text": "Earlier\n\nResearchers published a study on evaluating AI agents that operate web browsers.",
+          "author": null,
+          "published_at": "2026-09-26T10:00:00Z",
+          "captured_at": 1790642013.8505862,
+          "truncated": false,
+          "tags": [
+            "web",
+            "research"
+          ],
+          "summary": "Researchers published a study evaluating AI agents that operate web browsers.",
+          "content_hash": "cd26f30e260a3ede971e1b546aad600cef7c71e9696bf689543049088240b8cd",
+          "revision": 1,
+          "original_capture": {
+            "id": "f13a0be717be77208bc132baa6a9ea4b1edb02ab8011a323384b4741c74b0e9d",
+            "url": "https://workflow.test/posts/three",
+            "text": "Earlier\n\nResearchers published a study on evaluating AI agents that operate web browsers.",
+            "author": null,
+            "published_at": "2026-09-26T10:00:00Z",
+            "captured_at": 1790642013.8505862,
+            "truncated": false,
+            "tags": [
+              "web",
+              "research"
+            ],
+            "summary": "Researchers published a study evaluating AI agents that operate web browsers."
+          },
+          "audit": []
+        }
+      ],
+      "total": 3
+    },
+    "passed": true
+  },
+  "limits": [
+    "Synthetic Chromium acceptance is not native CEF acceptance",
+    "Grok fixture did not require scroll or post recovery; separate tests cover those paths",
+    "Cold model probes are not comparative benchmarks",
+    "User bookmark collection not resumed",
+    "No new macOS account or second machine tested"
+  ]
+}

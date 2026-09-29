@@ -1,0 +1,8 @@
+{
+  "grok_build": {
+    "source_revision": "f0e3be1100ef5252488e3be8bb0e91cf68d8c305",
+    "source": "https://github.com/xai-org/grok-build",
+    "binary_version": "1.0.41",
+    "license_sha256": "116f7778b9802e569b7fa3a532b17bd80eb13c67837def01eed093d4ea472f28"
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "date": "2026-09-28",
+  "base_commit": null,
+  "implementation": "Grok Build generated policy, scheduler and Flutter review module; reviewed and integrated with regression tests.",
+  "tests": {
+    "backend": {
+      "passed": 284,
+      "real_chromium_cases": 13
+    },
+    "flutter": {
+      "passed": 50
+    },
+    "ruff": "passed",
+    "flutter_analyze": "passed",
+    "macos_release": "passed; pre-existing CEF helper copy-script warning"
+  },
+  "local_semif_checkpoint": {
+    "fixture": "isolated Chromium feed, synthetic posts only",
+    "actual_model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "wall_ms": 7950.9,
+    "status": "paused",
+    "reason": "supervisor_review",
+    "counters": {
+      "classified": 9,
+      "elapsed_ms": 7947.408291976899,
+      "model_calls": 10,
+      "needs_review": 1,
+      "pages": 10
+    },
+    "scrolls": 8,
+    "local_review_decisions": [
+      "scroll"
+    ],
+    "unique_items": 10,
+    "grok_calls": 0,
+    "supervised": true,
+    "checkpoint": "first_batch",
+    "sample_count": 5,
+    "passed": true
+  },
+  "live_grok_review": {
+    "status": "awaiting_user",
+    "reason": "first_batch",
+    "sample_count": 5,
+    "counters": {
+      "classified": 425,
+      "elapsed_ms": 436189.0733749606,
+      "model_calls": 1097,
+      "needs_review": 677,
+      "pages": 1102
+    },
+    "review_reasons": {
+      "capture_limited": 336,
+      "model_abstained": 336,
+      "empty_excerpt": 5
+    },
+    "coverage": {
+      "url": 1102,
+      "text": 1097,
+      "author": 0,
+      "published_at": 0,
+      "captured_at": 1102
+    },
+    "suggested_categories_count": 0,
+    "native_online": true,
+    "session_preserved": true
+  },
+  "limitations": [
+    "No multi-hour soak",
+    "No historical relabel/backfill",
+    "No automatic expansion of collapsed posts",
+    "Sample review does not establish label accuracy",
+    "No guaranteed remote feed cursor restoration"
+  ],
+  "source_sha256": {
+    "backend/jet_browser/collection_plan.py": "0a9a047082217dd927f74030e1022013cf33b0fdafbe2c544a81443df1fc9232",
+    "backend/jet_browser/collection_store.py": "3157f6adb3aa093782a7fb3750189cf3596eb09627338d2d1eaed69d3c1188fa",
+    "backend/jet_browser/collection_runner.py": "4e80dec1e3994f9fcbd6d416fbd9b37fcdbf0d3c43ee48355af042d278dc82d1",
+    "backend/jet_browser/collection_supervision.py": "ef1b285382fac2a978c72cf21600e33826e168961d7ef4ca330d9e2aadc7a540",
+    "backend/jet_browser/collection_supervision_tools.py": "545f212a2cb31e134577bd331b0fc20523d489adb80df9b71e37dce8cd774617",
+    "backend/jet_browser/supervisor_agent.py": "7bb2950f369c04dc6a58144c276b39d84247afa6b20b3cfed7e125f44dfb0f23",
+    "backend/jet_browser/feed_runner.py": "9f923fa2ec3da229bd0e65f5e54c474d0fa8f096b3ad35361392542eb4fa969c",
+    "backend/jet_browser/feed_collection.py": "646af562aafa5e11246748304e6bdb3082112e5e1c85f7bcb5fcc481055c9347",
+    "backend/jet_browser/collection_tools.py": "bad29cc155a1313fb5a90a3f759cc25eebebb8d0959bde212a32f8c0f6f0cb61",
+    "backend/jet_browser/service.py": "c0d8f748d47d30cb1dcf8a20dc3fa654d386214a7d9350402cfe62bc46fdff57",
+    "backend/jet_browser/mcp.py": "db02aab532d98df5454e0168ba00cee563fd223728675941b9a41d882c48bb7c",
+    "backend/jet_browser/grok.py": "31d0744989469b63e17493a866749c87409d478de533694791eab2c19fe8b21c",
+    "backend/tests/test_collection_supervision.py": "2864d25209d060055a51d58c3f14df8f591829af56e1223554ee4ef55c09c184",
+    "backend/tests/test_supervisor_agent.py": "6b2e0a2d827d3e8f58b2eb635990db166e66fd1d6558fb964b1455ac17772f7d",
+    "backend/tests/test_feed_dom.py": "f43a481f740d3a45a615b606bb7fe94c969ab6684fcb12cfb1e9aae737fae4fa",
+    "backend/tests/test_grok.py": "cb671f2911105064c724b459401e887d5d1af288fab18b91f858788b79f73bea",
+    "app/lib/collection_review.dart": "05ffc66541d1db93bd51ec5515579fd0d1b50667f2898ebdaa88869c1d93e823",
+    "app/lib/collection_view.dart": "d57cdc2505ae25525bf1282d4dededa9fe577c5d0f7b4006d5288daced45a999",
+    "app/lib/agent_pane.dart": "27d932bbc1d061a43f99174b3aec319fe2aafa3e3f24113931a5c61cd91c1514",
+    "app/test/collection_review_test.dart": "b4bbbe315d4cccc5ff8a521145c99c5c9ef0541773485675411ff7f5eb0b8ce3",
+    "app/test/collection_view_test.dart": "9db846215ba851febc9ca8d505f2a035dacc7bcf3b635143dafeec83ce5118f5",
+    "scripts/probe_background_feed.py": "b1aa8b3b6cc1a4269030984b4cff8915079c876fca390365386b589ebe81b167"
+  },
+  "review_artifact": {
+    "errors": 0,
+    "warnings": [
+      "Unborn git HEAD: base_commit empty; replay durability reduced"
+    ]
+  },
+  "final_reply_routing": "Pending-checkpoint chat replies go directly to the supervising Grok agent; regression passed."
+}

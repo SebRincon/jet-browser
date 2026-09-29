@@ -1,0 +1,23 @@
+library;
+
+export 'src/animated_collapse.dart';
+export 'src/assistant_message_footer.dart';
+export 'src/chat_session_tab.dart';
+export 'src/chat_ui_config.dart';
+export 'src/chrome_icon_button.dart';
+export 'src/collapsible_steps_widget.dart';
+export 'src/compact_config_selector.dart';
+export 'src/dot_matrix_loader.dart';
+export 'src/message_bubble.dart';
+export 'src/message_list.dart';
+export 'src/press_scale.dart';
+export 'src/prompt_input.dart';
+export 'src/styled_message_text.dart';
+export 'src/text_shimmer.dart';
+export 'src/theme/vten_theme.dart';
+export 'src/theme/vscode_2026_colors.g.dart';
+export 'src/theme/vscode_color_scheme.dart';
+export 'src/tool_call_action_wrapper.dart';
+export 'src/tool_call_expansion_control.dart';
+export 'src/turn_activity_indicator.dart';
+export 'src/user_message_bubble.dart';

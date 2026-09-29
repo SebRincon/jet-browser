@@ -1,0 +1,5 @@
+#!/bin/bash
+set -euo pipefail
+JET_ROOT="$(cd "$(dirname "$0")" && pwd)"
+cd "$JET_ROOT/backend"
+exec .venv/bin/python -m jet_browser.cli "$@"

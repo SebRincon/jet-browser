@@ -1,0 +1,40 @@
+{
+  "date": "2026-09-28",
+  "initial_retry": "Keychain passed, native demo loaded, then Flutter semantics crash",
+  "crash_report": "Jet Browser-2026-09-28-200944.ips",
+  "crash_frame": "flutter::AccessibilityBridge::CreateRemoveReparentedNodesUpdate; null AXNode parent",
+  "fix": "Removed unconditional Dart ensureSemantics handle so the macOS engine owns accessibility enable/disable and complete tree rebuilds",
+  "flutter_engine": "3.41.6 / 425cfb54d0",
+  "tests": {
+    "full_flutter_suite": 60,
+    "additional_native_semantics_lifecycle_regression": "passed in 7-test shell suite",
+    "flutter_analyze": "passed",
+    "release_build": "passed"
+  },
+  "native_rerun": {
+    "packaged": true,
+    "models_ready": true,
+    "browser": {
+      "online": true,
+      "tabs": [
+        {
+          "id": "tab-65537",
+          "url": "http://127.0.0.1:9168/fixture",
+          "title": "Juniper workshop \u2014 Jet Browser demo"
+        }
+      ],
+      "active_tab_id": "tab-65537"
+    },
+    "observed_heading": "Juniper workshop",
+    "document_ready": "complete",
+    "accessibility_controls_observed": true,
+    "chat_hide_restore": "passed",
+    "native_ax_tree_errors": 0,
+    "left_running": true
+  },
+  "remaining": [
+    "Native long-duration/background collection and clean-account testing remain separate",
+    "Existing real bookmark job not resumed",
+    "Local ad hoc signature, not public notarized release"
+  ]
+}

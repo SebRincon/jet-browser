@@ -1,0 +1,3 @@
+# Preserve imported CEF helper bytes and source hashes; only their existing EOF blank is exempt.
+vendor/flutter_cef_browser/macos/Helper/Info.plist whitespace=-blank-at-eof
+vendor/flutter_cef_browser/macos/Helper/main.mm whitespace=-blank-at-eof

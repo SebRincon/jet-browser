@@ -1,0 +1,121 @@
+{
+  "source": "/Users/sebastian/Developer/Projects/vten",
+  "commit": "cc497919140469d58c71849f44210e35c3206766",
+  "license": "Upstream LICENSE is an unspecified placeholder and is copied unchanged.",
+  "verbatim": [
+    {
+      "path": "lib/src/chat_ui_config.dart",
+      "source": "lib/widgets/vten/chat_ui_config.dart",
+      "sha256": "64618d08873712d68348a6deb0c81d59fe8d7ba81deaed320e5341faef2c56f7"
+    },
+    {
+      "path": "lib/src/tool_call_expansion_control.dart",
+      "source": "lib/widgets/vten/features/chat/widgets/tool_call_expansion_control.dart",
+      "sha256": "ffc5457ff90480f691fbd282b8a3ff93930acf4cb18e049870e05f43b07e40e5"
+    },
+    {
+      "path": "lib/src/animated_collapse.dart",
+      "source": "lib/widgets/vten/common_widgets/animated_collapse.dart",
+      "sha256": "5a47d15c523cc967d1695a066f9c6a81924d301ce19b61d16f12ecaa24ba04a3"
+    },
+    {
+      "path": "lib/src/press_scale.dart",
+      "source": "lib/widgets/vten/common_widgets/press_scale.dart",
+      "sha256": "fb55db60ae697f7ba4e7e36bdccf037f9fc1e687a8a363c7be047cfc857847b2"
+    },
+    {
+      "path": "lib/src/text_shimmer.dart",
+      "source": "lib/widgets/vten/common_widgets/text_shimmer.dart",
+      "sha256": "c2cf432d436a689917f57e322e47243cf9f89680b90acb4a436256d36a48ffe2"
+    },
+    {
+      "path": "lib/src/dot_matrix_loader.dart",
+      "source": "lib/widgets/vten/common_widgets/dot_matrix_loader.dart",
+      "sha256": "60c17a9c518b99367647b85b7abcbaf65288e73cb2fcf378a40a7d3d4bd76a18"
+    },
+    {
+      "path": "lib/src/styled_message_text.dart",
+      "source": "lib/widgets/vten/features/chat/widgets/styled_message_text.dart",
+      "sha256": "830288263635fcf4b380296a72f5875d51590dc736755a738fc597c1593e7f0d"
+    },
+    {
+      "path": "lib/src/chrome_icon_button.dart",
+      "source": "lib/widgets/vten/common/chrome_icon_button.dart",
+      "sha256": "f8318e4feef244f8a81e736d25a9a9c7b5b71febd4858cbbda760e84dd790c4d"
+    },
+    {
+      "path": "lib/src/theme/vscode_2026_colors.g.dart",
+      "source": "vten_ide/lib/theme/vscode_2026_colors.g.dart",
+      "sha256": "be4ecf47b48ab8f88d1bdd59cc3bce28c984fe0e57075d58efb1cd1523041c5e"
+    },
+    {
+      "path": "lib/src/theme/vscode_color_scheme.dart",
+      "source": "vten_ide/lib/theme/vscode_color_scheme.dart",
+      "sha256": "8e39a0562c6c02e9c309bfee7eaf44430e5d840613a8f714d11b37396a03b414"
+    }
+  ],
+  "import_rewrite_only": [
+    {
+      "path": "lib/src/collapsible_steps_widget.dart",
+      "source": "lib/widgets/vten/features/chat/widgets/collapsible_steps_widget.dart",
+      "sha256": "f2c9bbf741aa42bd40daf3dc87e23e069dfba795644eb0d13787d28f5b122598",
+      "diff": "vten_ai imports rewritten to sibling animated_collapse.dart and press_scale.dart"
+    }
+  ],
+  "adapted_extracts": [
+    {
+      "path": "lib/src/chat_session_tab.dart",
+      "source": "vten_ide/lib/app/editor/tab_views/chat_session_tab.dart",
+      "sha256": "050ecfc6d008073b2cf1778432e9b3e5c19e03e8fe373dc1b30cb4056bf700f8",
+      "diff": "Host supplies MessageList and EnhancedPromptInput. TurnActivityIndicator is mounted in the 8px inset."
+    },
+    {
+      "path": "lib/src/user_message_bubble.dart",
+      "source": "lib/widgets/vten/features/chat/widgets/message_bubble.dart",
+      "sha256": "22c9448da124f860c16d4a4568c1a4ed27a7953abc30b6b3d8b080abc8ac055e",
+      "diff": "UserMessageBubble visual kept. Full-message dialog replaced by in-pane expansion."
+    },
+    {
+      "path": "lib/src/assistant_message_footer.dart",
+      "source": "lib/widgets/vten/features/chat/widgets/message_bubble.dart",
+      "sha256": "22c9448da124f860c16d4a4568c1a4ed27a7953abc30b6b3d8b080abc8ac055e",
+      "diff": "AssistantMessageFooter kept. Semantics label added on the icon button."
+    },
+    {
+      "path": "lib/src/message_bubble.dart",
+      "source": "lib/widgets/vten/features/chat/widgets/message_bubble.dart",
+      "sha256": "22c9448da124f860c16d4a4568c1a4ed27a7953abc30b6b3d8b080abc8ac055e",
+      "diff": "Assistant column spacing, planning shimmer, collapsed steps, and copy footer. IDE tool dispatch removed."
+    },
+    {
+      "path": "lib/src/message_list.dart",
+      "source": "lib/widgets/vten/features/chat/widgets/message_list.dart",
+      "sha256": "641ec842c6d92b289845ce5f529bbfc69a75a202413e842a966b7412d573595d",
+      "diff": "Reverse list, 672px column, 8px padding, hidden scrollbar, Latest button, stable group keys, per-session offsets. Pinned prompt uses the source geometry and tap-to-row behavior. Stale session callbacks are dropped. Codex review omitted."
+    },
+    {
+      "path": "lib/src/prompt_input.dart",
+      "source": "lib/widgets/vten/features/chat/widgets/prompt_input.dart",
+      "sha256": "78705e9d0e2c3319f7e47e1f743df59a547309925c1019cd5395185461377113",
+      "diff": "Input card, 13px field, stop square, footer chip. Enter sends; Shift+Enter is a newline; Meta/Ctrl+Enter still sends. IME composition Enter is not consumed. Focus ring tracks the focus node."
+    },
+    {
+      "path": "lib/src/tool_call_action_wrapper.dart",
+      "source": "lib/widgets/vten/features/chat/widgets/tool_call_action_wrapper.dart",
+      "sha256": "ea37fa941e583a4460c0373aa723b1ac657610f4158792003fa52dc4b9f26415",
+      "diff": "ChatToolSummary replaces ToolCall. Failure badge added on the vten compact row."
+    },
+    {
+      "path": "lib/src/turn_activity_indicator.dart",
+      "source": "lib/widgets/vten/features/chat/widgets/turn_activity_indicator.dart",
+      "sha256": "839598717b4d8f230d6ff4c6c98111b436eb24e2750c2332d67ac9e03f3ba76b",
+      "diff": "busy flag replaces the session provider."
+    },
+    {
+      "path": "lib/src/compact_config_selector.dart",
+      "source": "lib/widgets/vten/features/chat/widgets/compact_config_selector.dart",
+      "sha256": "e6440eccc26f1de5eebd9d5dc9365f961e34c3de4b34c4ad8f772881dfc92a1c",
+      "diff": "Model chip only. Mode and effort popovers omitted."
+    }
+  ]
+}

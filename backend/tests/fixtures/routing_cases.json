@@ -1,0 +1,284 @@
+[
+  {
+    "id": "wiki_mechanism",
+    "prompt": "Take me to Wikipedia's article about the Antikythera mechanism.",
+    "expected_operation": "search",
+    "expected_decision": "local",
+    "recent_requests": [],
+    "notes": "Named article lookup; no summary requested."
+  },
+  {
+    "id": "wiki_organism",
+    "prompt": "I'd like to open the wiki page for the axolotl.",
+    "expected_operation": "search",
+    "expected_decision": "local",
+    "recent_requests": [],
+    "notes": "Informal wording still requests navigation to a named article."
+  },
+  {
+    "id": "wiki_same_site_followup",
+    "prompt": "Now look up stromatolites there.",
+    "expected_operation": "search",
+    "expected_decision": "local",
+    "recent_requests": ["Open Wikipedia's article about trilobites."],
+    "browser": {
+      "active_tab_id": "wiki-tab",
+      "tabs": [{"id": "wiki-tab", "title": "Trilobite - Wikipedia", "url": "https://en.wikipedia.org/wiki/Trilobite"}]
+    },
+    "notes": "History resolves the source site only; the current topic is stromatolites."
+  },
+  {
+    "id": "official_download_site",
+    "prompt": "Find the official Blender download site.",
+    "expected_operation": "search",
+    "expected_decision": "local",
+    "recent_requests": [],
+    "notes": "Website discovery without a supplied URL; not permission to download or install."
+  },
+  {
+    "id": "documentation_discovery",
+    "prompt": "Take me to Mozilla's WebAssembly documentation.",
+    "expected_operation": "search",
+    "expected_decision": "local",
+    "recent_requests": [],
+    "notes": "Find a named documentation site; do not invent its destination URL."
+  },
+  {
+    "id": "literal_url_path",
+    "prompt": "Go to https://www.rfc-editor.org/rfc/rfc9110.html",
+    "expected_operation": "open_url",
+    "expected_decision": "local",
+    "recent_requests": [],
+    "notes": "One exact HTTP URL with a path."
+  },
+  {
+    "id": "literal_bare_domain",
+    "prompt": "Open archive.org for me.",
+    "expected_operation": "open_url",
+    "expected_decision": "local",
+    "recent_requests": [],
+    "notes": "Bare domain supplied by the user."
+  },
+  {
+    "id": "literal_www_domain",
+    "prompt": "Could you open www.openstreetmap.org?",
+    "expected_operation": "open_url",
+    "expected_decision": "local",
+    "recent_requests": [],
+    "notes": "Polite question form still requests opening the supplied domain."
+  },
+  {
+    "id": "form_named_fields",
+    "prompt": "Enter Oriole Labs in Organization, choose Afternoon in Session, then open Preview.",
+    "expected_operation": "page_task",
+    "expected_decision": "local",
+    "recent_requests": [],
+    "notes": "One explicit form goal with field labels, values, and a preview action."
+  },
+  {
+    "id": "form_checkbox",
+    "prompt": "Untick Send me product updates on this form.",
+    "expected_operation": "page_task",
+    "expected_decision": "local",
+    "recent_requests": [],
+    "notes": "Current-page interaction; the executor must identify the actual observed control."
+  },
+  {
+    "id": "form_edit_followup",
+    "prompt": "Change the Team name to Northstar and preview it again.",
+    "expected_operation": "page_task",
+    "expected_decision": "local",
+    "recent_requests": ["Enter Cedar Crew in Team name and open Preview."],
+    "notes": "Current request supplies the replacement value; history must not restore the earlier value."
+  },
+  {
+    "id": "first_search_result",
+    "prompt": "Open the first result.",
+    "expected_operation": "page_task",
+    "expected_decision": "local",
+    "recent_requests": ["Find the official Krita documentation."],
+    "browser": {
+      "active_tab_id": "results-tab",
+      "tabs": [{"id": "results-tab", "title": "Krita documentation - Search", "url": "https://www.google.com/search?q=Krita+documentation"}]
+    },
+    "notes": "Act on the currently observed results; do not repeat the search or invent the first link."
+  },
+  {
+    "id": "result_link_followup",
+    "prompt": "Click the documentation link in that results list.",
+    "expected_operation": "page_task",
+    "expected_decision": "local",
+    "recent_requests": ["Find the official Godot website and documentation."],
+    "browser": {
+      "active_tab_id": "results-tab",
+      "tabs": [{"id": "results-tab", "title": "Godot documentation - Search", "url": "https://www.google.com/search?q=Godot+documentation"}]
+    },
+    "notes": "Existing-page link selection rather than new site discovery."
+  },
+  {
+    "id": "history_back",
+    "prompt": "Take me back one page.",
+    "expected_operation": "back",
+    "expected_decision": "local",
+    "recent_requests": [],
+    "notes": "Browser history action."
+  },
+  {
+    "id": "history_forward",
+    "prompt": "Go forward once in this tab.",
+    "expected_operation": "forward",
+    "expected_decision": "local",
+    "recent_requests": [],
+    "notes": "Browser history action in the current tab."
+  },
+  {
+    "id": "refresh_current",
+    "prompt": "Can you refresh this tab?",
+    "expected_operation": "reload",
+    "expected_decision": "local",
+    "recent_requests": [],
+    "notes": "Reload request, not an informational question about refreshing."
+  },
+  {
+    "id": "blank_tab",
+    "prompt": "Open a fresh blank tab.",
+    "expected_operation": "new_tab",
+    "expected_decision": "local",
+    "recent_requests": [],
+    "notes": "No destination or search is requested."
+  },
+  {
+    "id": "close_current_tab",
+    "prompt": "I'm done with this tab; close it.",
+    "expected_operation": "close_tab",
+    "expected_decision": "local",
+    "recent_requests": [],
+    "notes": "Current tab supplies a clear referent; no other tabs should close."
+  },
+  {
+    "id": "close_named_tab",
+    "prompt": "Close the tab titled Route planner.",
+    "expected_operation": "close_tab",
+    "expected_decision": "local",
+    "recent_requests": [],
+    "browser": {
+      "active_tab_id": "calendar-tab",
+      "tabs": [
+        {"id": "calendar-tab", "title": "Calendar", "url": "https://example.org/calendar"},
+        {"id": "route-tab", "title": "Route planner", "url": "https://example.org/routes"}
+      ]
+    },
+    "notes": "Select the named observed tab rather than the active tab."
+  },
+  {
+    "id": "switch_named_tab",
+    "prompt": "Switch to the already open Calendar tab.",
+    "expected_operation": "switch_tab",
+    "expected_decision": "local",
+    "recent_requests": [],
+    "browser": {
+      "active_tab_id": "route-tab",
+      "tabs": [
+        {"id": "calendar-tab", "title": "Calendar", "url": "https://example.org/calendar"},
+        {"id": "route-tab", "title": "Route planner", "url": "https://example.org/routes"}
+      ]
+    },
+    "notes": "Switch an existing observed tab, not search for a calendar site."
+  },
+  {
+    "id": "list_open_tabs",
+    "prompt": "Which browser tabs do I have open right now?",
+    "expected_operation": "list_tabs",
+    "expected_decision": "local",
+    "recent_requests": [],
+    "notes": "An informational request fully answerable by the app's finite tab listing."
+  },
+  {
+    "id": "summarize_article",
+    "prompt": "Give me a short summary of this article, including its main caveat.",
+    "expected_operation": "summarize",
+    "expected_decision": "grok",
+    "recent_requests": [],
+    "notes": "Requires reading and synthesizing page content, not only navigation."
+  },
+  {
+    "id": "compare_databases",
+    "prompt": "Compare SQLite and DuckDB for analyzing a large CSV on my laptop.",
+    "expected_operation": "explain",
+    "expected_decision": "grok",
+    "recent_requests": [],
+    "notes": "A comparison task for the main chat agent."
+  },
+  {
+    "id": "research_with_sources",
+    "prompt": "Research how sodium-ion batteries compare with LFP batteries, and cite your sources.",
+    "expected_operation": "explain",
+    "expected_decision": "grok",
+    "recent_requests": [],
+    "notes": "Multi-source research and synthesis; not a request merely to open a search page."
+  },
+  {
+    "id": "write_invitation",
+    "prompt": "Draft a friendly invitation to a neighborhood repair workshop.",
+    "expected_operation": "explain",
+    "expected_decision": "grok",
+    "recent_requests": [],
+    "notes": "Text composition without any browser action."
+  },
+  {
+    "id": "factual_question",
+    "prompt": "Why does the Moon show roughly the same face to Earth?",
+    "expected_operation": "explain",
+    "expected_decision": "grok",
+    "recent_requests": [],
+    "notes": "Factual explanation; no navigation is requested."
+  },
+  {
+    "id": "recall_prior_field_value",
+    "prompt": "What did we name the team earlier?",
+    "expected_operation": "explain",
+    "expected_decision": "grok",
+    "recent_requests": ["Enter Peregrine in Team name and open Preview."],
+    "notes": "Recall the saved conversation/result without replaying the earlier form task."
+  },
+  {
+    "id": "ambiguous_repeat_without_history",
+    "prompt": "Do that again.",
+    "expected_operation": "explain",
+    "expected_decision": "grok",
+    "recent_requests": [],
+    "notes": "No referent is available. Clarify rather than invent or repeat a browser action; explain is the existing clarification fallback."
+  },
+  {
+    "id": "ambiguous_other_result",
+    "prompt": "Open the other one.",
+    "expected_operation": "explain",
+    "expected_decision": "grok",
+    "recent_requests": ["Find official websites for both Stellarium and Celestia."],
+    "notes": "No selected/opened result or unique contrast is recorded. History alone cannot identify the requested target."
+  },
+  {
+    "id": "ambiguous_yes_without_proposal",
+    "prompt": "Yes, do it.",
+    "expected_operation": "explain",
+    "expected_decision": "grok",
+    "recent_requests": ["What browser automation can you help with?"],
+    "notes": "There is no recorded concrete action proposal to approve; clarification is required."
+  },
+  {
+    "id": "compound_navigation_and_research",
+    "prompt": "Open a new tab and explain the tradeoffs between Firefox and Chromium privacy settings.",
+    "expected_operation": "explain",
+    "expected_decision": "grok",
+    "recent_requests": [],
+    "notes": "Main agent must preserve the complete request and may delegate the tab action. Routing only the first clause would lose the requested explanation."
+  },
+  {
+    "id": "negated_browser_action",
+    "prompt": "Don't close any tabs; tell me what a browser tab actually isolates from other tabs.",
+    "expected_operation": "explain",
+    "expected_decision": "grok",
+    "recent_requests": [],
+    "notes": "Explicitly negates the close action. Browser-action keywords are not authorization."
+  }
+]

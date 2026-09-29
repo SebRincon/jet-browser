@@ -1,0 +1,98 @@
+platform :osx, '12.0'
+
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  settings = File.expand_path(
+    File.join('..', 'Flutter', 'ephemeral', 'Flutter-Generated.xcconfig'),
+    __FILE__,
+  )
+  raise "Run flutter pub get before pod install" unless File.exist?(settings)
+
+  File.foreach(settings) do |line|
+    match = line.match(/FLUTTER_ROOT\=(.*)/)
+    return match[1].strip if match
+  end
+  raise 'FLUTTER_ROOT not found'
+end
+
+require File.expand_path(
+  File.join('packages', 'flutter_tools', 'bin', 'podhelper'),
+  flutter_root,
+)
+
+flutter_macos_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+  flutter_install_all_macos_pods File.dirname(File.realpath(__FILE__))
+
+  script_phase :name => 'Copy CEF Helpers', :execution_position => :after_compile, :script => <<-SCRIPT
+set -e
+HELPERS_SRC="${BUILT_PRODUCTS_DIR}/flutter_cef_browser/webview_cef_helpers"
+HELPERS_DST="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Frameworks"
+
+if [ ! -d "${HELPERS_SRC}" ]; then
+  echo "error: CEF helper bundles missing at ${HELPERS_SRC}"
+  exit 1
+fi
+
+mkdir -p "${HELPERS_DST}"
+cp -R "${HELPERS_SRC}/"*.app "${HELPERS_DST}/"
+SIGN_IDENTITY="${EXPANDED_CODE_SIGN_IDENTITY}"
+if [ -z "${SIGN_IDENTITY}" ]; then SIGN_IDENTITY="-"; fi
+
+for HELPER_APP in \
+  "${HELPERS_DST}/webview_cef Helper.app" \
+  "${HELPERS_DST}/webview_cef Helper (GPU).app" \
+  "${HELPERS_DST}/webview_cef Helper (Renderer).app" \
+  "${HELPERS_DST}/webview_cef Helper (Plugin).app"; do
+  if [ ! -d "${HELPER_APP}" ]; then continue; fi
+  HELPER_PLIST="${HELPER_APP}/Contents/Info.plist"
+  HELPER_EXE="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "${HELPER_PLIST}")"
+  /usr/bin/codesign --force --sign "${SIGN_IDENTITY}" --timestamp=none \
+    "${HELPER_APP}/Contents/MacOS/${HELPER_EXE}"
+  /usr/bin/codesign --force --sign "${SIGN_IDENTITY}" --timestamp=none "${HELPER_APP}"
+done
+SCRIPT
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_macos_build_settings(target)
+    target.build_configurations.each do |config|
+      config.build_settings['EXCLUDED_ARCHS[sdk=macosx*]'] = 'x86_64'
+    end
+  end
+
+  Dir.glob(File.join(installer.sandbox.root, 'Target Support Files', '**', '*.xcconfig')).each do |path|
+    content = File.read(path)
+    modified = false
+
+    if content =~ /(?<!-framework ")Embedded Framework/ ||
+       content.include?('-framework "Chromium"') ||
+       content.include?('-framework "Chromium "')
+      content.gsub!(/(?<!\")Embedded Framework(?!\")/, '')
+      content.gsub!(/-framework "Chromium"\s*/, '')
+      content.gsub!(/-framework "Chromium "\s*/, '')
+      content.gsub!(/  +/, ' ')
+      modified = true
+    end
+
+    if content.include?('flutter_cef_browser') &&
+       !content.include?('-framework "Chromium Embedded Framework"')
+      content.gsub!(/OTHER_LDFLAGS = (.*)/,
+                    'OTHER_LDFLAGS = \1 -framework "Chromium Embedded Framework"')
+      modified = true
+    end
+
+    File.write(path, content) if modified
+  end
+end

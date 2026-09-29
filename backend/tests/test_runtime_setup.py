@@ -1,0 +1,249 @@
+from __future__ import annotations
+
+import asyncio
+import hashlib
+import os
+import stat
+import sys
+from pathlib import Path
+
+import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from jet_browser.runtime_setup import RuntimeSetup, redirect_host_allowed
+
+REV = "ab" * 20
+
+
+def _file(name: str, payload: bytes) -> dict:
+    return {
+        "path": name,
+        "url": f"https://huggingface.co/org/model/resolve/{REV}/{name}",
+        "size": len(payload),
+        "sha256": hashlib.sha256(payload).hexdigest(),
+    }
+
+
+def _manifest(*models: dict) -> dict:
+    return {"schema_version": 1, "models": list(models)}
+
+
+def _model(mid: str, files: list[dict], directory: str | None = None) -> dict:
+    total = sum(item["size"] for item in files)
+    return {
+        "id": mid,
+        "title": mid,
+        "description": "purpose",
+        "directory": directory or mid,
+        "repo": "org/model",
+        "revision": REV,
+        "bytes": total,
+        "files": files,
+    }
+
+
+def _setup(tmp_path: Path, manifest: dict | None) -> RuntimeSetup:
+    runtime = RuntimeSetup(tmp_path / "data", tmp_path / "res", manifest=manifest)
+    runtime._disk_free = lambda path: 10**12  # noqa: SLF001
+    return runtime
+
+
+def test_hash_file_streams(tmp_path: Path) -> None:
+    path = tmp_path / "blob.bin"
+    payload = b"abc" * 1000
+    path.write_bytes(payload)
+    assert RuntimeSetup.hash_file(path) == hashlib.sha256(payload).hexdigest()
+
+
+def test_parse_login_output_strips_ansi_and_ignores_other_secrets() -> None:
+    text = (
+        "\x1b[31mtoken SUPERSECRETVALUE\n"
+        "https://evil.example/code\n"
+        "Your code: ABCD-1234\n"
+        "https://accounts.x.ai/i/flow/device\n"
+    )
+    url, code = RuntimeSetup.parse_login_output(text)
+    assert url == "https://accounts.x.ai/i/flow/device"
+    assert code == "ABCD-1234"
+
+
+def test_redirect_hosts() -> None:
+    assert redirect_host_allowed("https://cdn-lfs.huggingface.co/repo/a?sig=1")
+    assert redirect_host_allowed("https://us.cloudfront.net/signed")
+    assert redirect_host_allowed("https://cas-bridge.xethub.hf.co/x")
+    assert not redirect_host_allowed("http://huggingface.co/org/model/resolve/x")
+    assert not redirect_host_allowed("https://user:pw@huggingface.co/x")
+    assert not redirect_host_allowed("https://example.com/huggingface.co")
+
+
+def test_dev_models_without_manifest_are_development(tmp_path: Path) -> None:
+    for mid in ("qwen4b", "qwen08b"):
+        directory = tmp_path / "data" / "models" / mid
+        directory.mkdir(parents=True)
+        (directory / "config.json").write_text("{}", encoding="utf-8")
+        (directory / "weights.safetensors").write_bytes(b"weights")
+    runtime = RuntimeSetup(tmp_path / "data", tmp_path / "res")
+    status = runtime.status()
+    assert status["packaged"] is False
+    assert status["ready"] is True
+    row = next(item for item in status["models"] if item["id"] == "qwen4b")
+    assert row["status"] == "installed"
+    assert row["verification"] == "development"
+
+
+def test_files_without_receipt_are_not_installed(tmp_path: Path) -> None:
+    payload = b"weights"
+    manifest = _manifest(_model("qwen4b", [_file("weights.safetensors", payload)]))
+    runtime = _setup(tmp_path, manifest)
+    directory = tmp_path / "data" / "models" / "qwen4b"
+    directory.mkdir(parents=True)
+    (directory / "config.json").write_text("{}", encoding="utf-8")
+    (directory / "weights.safetensors").write_bytes(payload)
+    row = runtime.status()["models"][0]
+    assert row["status"] == "available"
+    assert "verification" not in row
+
+
+def test_unknown_model_and_traversal(tmp_path: Path) -> None:
+    bad = _model(
+        "qwen4b",
+        [
+            {
+                "path": "../outside.bin",
+                "url": f"https://huggingface.co/org/model/resolve/{REV}/../outside.bin",
+                "size": 1,
+                "sha256": hashlib.sha256(b"x").hexdigest(),
+            }
+        ],
+    )
+    runtime = _setup(tmp_path, _manifest(bad))
+
+    async def forbidden(self, url, destination, expected_size):
+        raise AssertionError("network")
+
+    runtime._download_file = forbidden.__get__(runtime, RuntimeSetup)  # noqa: SLF001
+
+    with pytest.raises(ValueError):
+        asyncio.run(runtime.install("missing-model"))
+    with pytest.raises(ValueError):
+        asyncio.run(runtime.install("qwen4b"))
+
+
+def test_install_verifies_hash_writes_receipt_and_rejects_competition(tmp_path: Path) -> None:
+    payload = b"safe-weights"
+    other = b"other"
+    manifest = _manifest(
+        _model("qwen4b", [_file("model.safetensors", payload)]),
+        _model("qwen08b", [_file("model.safetensors", other)]),
+    )
+    runtime = _setup(tmp_path, manifest)
+    calls = []
+
+    async def fake_download(self, url, destination, expected_size):
+        calls.append(url)
+        assert url.startswith("https://huggingface.co/")
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(payload)
+
+    runtime._download_file = fake_download.__get__(runtime, RuntimeSetup)  # noqa: SLF001
+
+    async def run():
+        status = await runtime.install("qwen4b")
+        assert status["downloading"] == "qwen4b"
+        assert runtime._task is not None  # noqa: SLF001
+        await runtime._task  # noqa: SLF001
+        done = runtime.status()
+        row = done["models"][0]
+        assert row["status"] == "installed"
+        assert row["verification"] == "verified"
+        receipt = tmp_path / "data" / "models" / "qwen4b" / ".jet-install.json"
+        assert receipt.is_file()
+        assert stat.S_IMODE(receipt.stat().st_mode) == 0o600
+        again = await runtime.install("qwen4b")
+        assert again["models"][0]["status"] == "installed"
+        assert calls == [
+            f"https://huggingface.co/org/model/resolve/{REV}/model.safetensors"
+        ]
+
+    asyncio.run(run())
+
+
+def test_hash_mismatch_fails_without_receipt(tmp_path: Path) -> None:
+    payload = b"expected"
+    manifest = _manifest(_model("qwen4b", [_file("model.safetensors", payload)]))
+    runtime = _setup(tmp_path, manifest)
+
+    async def fake_download(self, url, destination, expected_size):
+        destination.write_bytes(b"tampered")
+
+    runtime._download_file = fake_download.__get__(runtime, RuntimeSetup)  # noqa: SLF001
+
+    async def run():
+        await runtime.install("qwen4b")
+        await runtime._task  # noqa: SLF001
+        row = runtime.status()["models"][0]
+        assert row["status"] == "failed"
+        assert "https://" not in row.get("error", "")
+        assert not (tmp_path / "data" / "models" / "qwen4b" / ".jet-install.json").exists()
+
+    asyncio.run(run())
+
+
+def test_cancel_leaves_partial_and_blocks_second_download(tmp_path: Path) -> None:
+    payload = b"12345678"
+    manifest = _manifest(
+        _model("qwen4b", [_file("model.safetensors", payload)]),
+        _model("lfm350m", [_file("model.safetensors", payload)]),
+    )
+    runtime = _setup(tmp_path, manifest)
+    started = asyncio.Event()
+
+    async def hang(self, url, destination, expected_size):
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(b"part")
+        started.set()
+        await asyncio.sleep(3600)
+
+    runtime._download_file = hang.__get__(runtime, RuntimeSetup)  # noqa: SLF001
+
+    async def run():
+        await runtime.install("qwen4b")
+        await started.wait()
+        with pytest.raises(RuntimeError):
+            await runtime.install("lfm350m")
+        status = await runtime.cancel()
+        row = next(item for item in status["models"] if item["id"] == "qwen4b")
+        assert row["status"] == "cancelled"
+        assert (tmp_path / "data" / "models" / "qwen4b" / "model.safetensors.part").is_file()
+        await runtime.close()
+
+    asyncio.run(run())
+
+
+def test_disk_space_refusal(tmp_path: Path) -> None:
+    payload = b"1234"
+    runtime = _setup(tmp_path, _manifest(_model("qwen4b", [_file("model.safetensors", payload)])))
+    runtime._disk_free = lambda path: 0  # noqa: SLF001
+
+    async def forbidden(self, url, destination, expected_size):
+        raise AssertionError("network")
+
+    runtime._download_file = forbidden.__get__(runtime, RuntimeSetup)  # noqa: SLF001
+    with pytest.raises(RuntimeError, match="disk"):
+        asyncio.run(runtime.install("qwen4b"))
+
+
+def test_cached_login_is_owner_only(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    home = tmp_path / "home"
+    auth = home / ".grok"
+    auth.mkdir(parents=True)
+    secret = auth / "auth.json"
+    secret.write_text("{\"token\":\"nope\"}", encoding="utf-8")
+    os.chmod(secret, 0o600)
+    monkeypatch.setenv("HOME", str(home))
+    monkeypatch.setattr(Path, "home", staticmethod(lambda: home))
+    runtime = RuntimeSetup(tmp_path / "data", tmp_path / "res")
+    assert runtime.status()["grok"]["authenticated"] is True
+    os.chmod(secret, 0o644)
+    assert runtime.status()["grok"]["authenticated"] is False

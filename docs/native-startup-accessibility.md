@@ -1,0 +1,11 @@
+# Native rerun and accessibility startup repair
+
+The 2026-09-28 retry passed macOS Keychain and loaded Jet's native demo page, then crashed in Flutter's `AccessibilityBridge::CreateRemoveReparentedNodesUpdate` while dereferencing an AXNode parent. The crash report is `Jet Browser-2026-09-28-200944.ips`; no source cookies or credentials are copied into this record.
+
+Jet unconditionally held a Dart `ensureSemantics()` handle. Flutter's macOS engine creates/destroys its native accessibility bridge when native semantics is enabled/disabled, and discards updates while it is disabled. Keeping Dart semantics alive independently can therefore send incremental updates to a newly created native bridge that has no complete tree. Jet now lets the native engine own this lifecycle. OS accessibility is not disabled. The duplicate Flutter/CEF class warning remains, but the verified rerun no longer reports malformed AXTree updates or crashes.
+
+References: [Flutter 3.41.6 macOS bridge lifecycle](https://github.com/flutter/flutter/blob/3.41.6/engine/src/flutter/shell/platform/darwin/macos/framework/Source/FlutterViewController.mm), [same null-parent crash tracked upstream](https://github.com/flutter/flutter/issues/175041), and [proposed upstream defensive guard](https://github.com/flutter/flutter/pull/190903). The upstream guard is not shipped by this change; Jet removes its incorrect lifecycle override.
+
+Verification: 60 existing Flutter tests passed; a new platform-semantics detach/rebuild regression passed in the seven-test shell suite; analyzer and release build passed. The packaged app was reopened using its bundled runtime, prepared local models and isolated profile. Native Chromium reached the demo; authenticated `read_page` independently returned the expected heading and complete document. Native UI inspection exposed the address bar, tab controls and chat; Hide chat and restore both worked. The app remained online with no new AXTree errors and was left open for the user.
+
+This is startup/UI acceptance, not a claim of archive-scale native background workflow acceptance. See [machine-readable evidence](native-rerun-20260928.json). The existing real bookmark job remains unchanged.

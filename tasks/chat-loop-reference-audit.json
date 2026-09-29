@@ -1,0 +1,130 @@
+{
+  "date": "2026-09-28",
+  "scope": "Research and plan extension only; no code imported and no desktop tools used",
+  "repositories": {
+    "orca": {
+      "url": "https://github.com/stablyai/orca",
+      "revision": "aedb9305cd1b3de859b5eafc1ee0d77fa0df8963",
+      "license": "MIT; license text read"
+    },
+    "t3": {
+      "url": "https://github.com/pingdotgg/t3code",
+      "revision": "d15210cd3da79f9a1a495a6309d912d76362a046",
+      "license": "MIT; license text read"
+    }
+  },
+  "files": [
+    {
+      "project": "orca",
+      "path": "src/renderer/src/components/native-chat/NativeChatComposer.tsx",
+      "blob_sha": "60735d705e27b2215acc745329301543da52e5d6",
+      "url": "https://github.com/stablyai/orca/blob/aedb9305cd1b3de859b5eafc1ee0d77fa0df8963/src/renderer/src/components/native-chat/NativeChatComposer.tsx",
+      "review": "targeted source inspection; not a running-app test"
+    },
+    {
+      "project": "orca",
+      "path": "src/renderer/src/components/native-chat/NativeChatMessageList.tsx",
+      "blob_sha": "d8ea96d2f0cd3d0124ab68fe5e930e151faf83f1",
+      "url": "https://github.com/stablyai/orca/blob/aedb9305cd1b3de859b5eafc1ee0d77fa0df8963/src/renderer/src/components/native-chat/NativeChatMessageList.tsx",
+      "review": "targeted source inspection; not a running-app test"
+    },
+    {
+      "project": "orca",
+      "path": "src/renderer/src/components/native-chat/NativeChatToolRun.tsx",
+      "blob_sha": "141ae739886235c8e27591733f8a2ca0454bbfa6",
+      "url": "https://github.com/stablyai/orca/blob/aedb9305cd1b3de859b5eafc1ee0d77fa0df8963/src/renderer/src/components/native-chat/NativeChatToolRun.tsx",
+      "review": "targeted source inspection; not a running-app test"
+    },
+    {
+      "project": "orca",
+      "path": "src/renderer/src/components/native-chat/NativeChatStructuredSession.tsx",
+      "blob_sha": "8d20c65bd48a6831999c22e288a13e9774ed11ae",
+      "url": "https://github.com/stablyai/orca/blob/aedb9305cd1b3de859b5eafc1ee0d77fa0df8963/src/renderer/src/components/native-chat/NativeChatStructuredSession.tsx",
+      "review": "targeted source inspection; not a running-app test"
+    },
+    {
+      "project": "orca",
+      "path": "src/main/native-chat/transcript-line-decoders-grok.ts",
+      "blob_sha": "76386453970e58f64dfd508b9f4c1799eabab7d1",
+      "url": "https://github.com/stablyai/orca/blob/aedb9305cd1b3de859b5eafc1ee0d77fa0df8963/src/main/native-chat/transcript-line-decoders-grok.ts",
+      "review": "targeted source inspection; not a running-app test"
+    },
+    {
+      "project": "t3",
+      "path": "apps/web/src/components/chat/ComposerSurface.tsx",
+      "blob_sha": "83e94895eddca294eb09e6cf624eb85121cd9abd",
+      "url": "https://github.com/pingdotgg/t3code/blob/d15210cd3da79f9a1a495a6309d912d76362a046/apps/web/src/components/chat/ComposerSurface.tsx",
+      "review": "targeted source inspection; not a running-app test"
+    },
+    {
+      "project": "t3",
+      "path": "apps/web/src/components/chat/ComposerPrimaryActions.tsx",
+      "blob_sha": "76ea907b84cd15321d323d240c434171d9c2cc7c",
+      "url": "https://github.com/pingdotgg/t3code/blob/d15210cd3da79f9a1a495a6309d912d76362a046/apps/web/src/components/chat/ComposerPrimaryActions.tsx",
+      "review": "targeted source inspection; not a running-app test"
+    },
+    {
+      "project": "t3",
+      "path": "apps/web/src/components/chat/timelineScrollAnchoring.ts",
+      "blob_sha": "dabcd19dc4b5866bc8053cc2bd5e6eaac15d3456",
+      "url": "https://github.com/pingdotgg/t3code/blob/d15210cd3da79f9a1a495a6309d912d76362a046/apps/web/src/components/chat/timelineScrollAnchoring.ts",
+      "review": "targeted source inspection; not a running-app test"
+    },
+    {
+      "project": "t3",
+      "path": "apps/web/src/components/chat/ProposedPlanCard.tsx",
+      "blob_sha": "63dfa7dd134f00be6a1bca8c3bc0fa7e9bf07ac7",
+      "url": "https://github.com/pingdotgg/t3code/blob/d15210cd3da79f9a1a495a6309d912d76362a046/apps/web/src/components/chat/ProposedPlanCard.tsx",
+      "review": "targeted source inspection; not a running-app test"
+    },
+    {
+      "project": "t3",
+      "path": "apps/web/src/components/chat/MessagesTimeline.logic.ts",
+      "blob_sha": "21508a9663aef03c06e3fb64245867aed30513e7",
+      "url": "https://github.com/pingdotgg/t3code/blob/d15210cd3da79f9a1a495a6309d912d76362a046/apps/web/src/components/chat/MessagesTimeline.logic.ts",
+      "review": "targeted source inspection; not a running-app test"
+    },
+    {
+      "project": "t3",
+      "path": "apps/web/src/components/chat/AssistantCitationSource.tsx",
+      "blob_sha": "c0b5ad3a1933c8172c9045f59a8c3e82a9fda873",
+      "url": "https://github.com/pingdotgg/t3code/blob/d15210cd3da79f9a1a495a6309d912d76362a046/apps/web/src/components/chat/AssistantCitationSource.tsx",
+      "review": "targeted source inspection; not a running-app test"
+    },
+    {
+      "project": "orca",
+      "path": "src/renderer/src/components/native-chat/native-chat-autoscroll.ts",
+      "blob_sha": "137d0ead61c7ab80f69c8f5607b633b964b64014",
+      "url": "https://github.com/stablyai/orca/blob/aedb9305cd1b3de859b5eafc1ee0d77fa0df8963/src/renderer/src/components/native-chat/native-chat-autoscroll.ts",
+      "review": "targeted source inspection; not a running-app test"
+    },
+    {
+      "project": "orca",
+      "path": "src/renderer/src/components/native-chat/NativeChatTaskList.tsx",
+      "blob_sha": "3ddaa8959e8d91b1cc9cee85e966d0aad8761436",
+      "url": "https://github.com/stablyai/orca/blob/aedb9305cd1b3de859b5eafc1ee0d77fa0df8963/src/renderer/src/components/native-chat/NativeChatTaskList.tsx",
+      "review": "targeted source inspection; not a running-app test"
+    },
+    {
+      "project": "t3",
+      "path": "apps/web/src/components/chat/ComposerPendingUserInputPanel.tsx",
+      "blob_sha": "a2052c0c73fd3a169175d6a7bb3b0766fe56754a",
+      "url": "https://github.com/pingdotgg/t3code/blob/d15210cd3da79f9a1a495a6309d912d76362a046/apps/web/src/components/chat/ComposerPendingUserInputPanel.tsx",
+      "review": "targeted source inspection; not a running-app test"
+    },
+    {
+      "project": "t3",
+      "path": "LICENSE",
+      "blob_sha": "55ee675bb1de9e580b69f3dd68684df2a4dffba7",
+      "url": "https://github.com/pingdotgg/t3code/blob/d15210cd3da79f9a1a495a6309d912d76362a046/LICENSE",
+      "review": "targeted source inspection; not a running-app test"
+    },
+    {
+      "project": "orca",
+      "path": "LICENSE",
+      "blob_sha": "fbf46fc17dacb1f65e03e2b6290eb53ba94b149d",
+      "url": "https://github.com/stablyai/orca/blob/aedb9305cd1b3de859b5eafc1ee0d77fa0df8963/LICENSE",
+      "review": "targeted source inspection; not a running-app test"
+    }
+  ]
+}

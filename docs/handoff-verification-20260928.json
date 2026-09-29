@@ -1,0 +1,53 @@
+{
+  "date": "2026-09-28",
+  "scope": "Initial source baseline and documentation handoff; no paid model calls or live user browser actions",
+  "backend": {
+    "passed": 345,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 17.06,
+    "command": "JET_TEST_CHROMIUM=<headless-shell-1228> backend/.venv/bin/python -m pytest backend/tests -q",
+    "python": "3.14.7 development environment; packaged runtime remains CPython 3.12.13",
+    "browser": "Chromium headless-shell build 1228; temporary profiles and intercepted synthetic pages"
+  },
+  "flutter": {
+    "app_tests_passed": 61,
+    "vendored_chat_tests_passed": 9,
+    "app_analyzer": "passed",
+    "vendored_chat_analyzer": "passed"
+  },
+  "backend_ruff": "passed",
+  "new_regression": {
+    "name": "test_delayed_progress_cannot_overwrite_a_completed_result",
+    "before_fix": "failed: completed status overwritten by delayed running progress",
+    "after_fix": "passed in full suite"
+  },
+  "retained_initial_outcomes": [
+    "Without browser variable: 327 passed, 17 skipped before new regression",
+    "Regular installed Google Chrome: 327 passed, 17 fixture-loading errors; unsupported harness binary in this run",
+    "Headless-shell before task fix: 343 passed, 1 task-diagnostic status failure",
+    "Ruff found formatting/import issues in three workflow test files; fixed before final checks"
+  ],
+  "secret_scan": {
+    "tool": "gitleaks staged scan, redacted",
+    "result": "passed",
+    "false_positives": "105 verified SHA256 source fingerprints; exact manifest paths and hash-row syntax allowed in .gitleaks.toml"
+  },
+  "documentation": {
+    "new_guide_local_links_checked": 42,
+    "missing_links": 0
+  },
+  "not_run": [
+    "New native release build/repackaging",
+    "Native user workflow",
+    "Real model benchmarks",
+    "Paid Grok authoring retry"
+  ],
+  "known_open": [
+    "Grok 300-second authoring timeout",
+    "Real top-100 bookmark task incomplete",
+    "Native background endurance and held-out accuracy",
+    "Reproducible fresh-clone CEF setup",
+    "Full model-engine transitive locking, public signing/notarization and license review"
+  ]
+}

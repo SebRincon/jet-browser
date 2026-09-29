@@ -1,0 +1,62 @@
+generated_at: "2026-05-13T00:25:19Z"
+source_distribution: "/Users/sebastian/Developer/cef_7727/chromium_git/chromium/src/cef/binary_distrib/cef_binary_147.0.11+g04f1d22+chromium-147.0.7727.138_macosarm64"
+cef:
+  version: "147.0.11+g04f1d22+chromium-147.0.7727.138"
+  commit_hash: "04f1d2223ba2e742534a4f655ed63e4ae7c73545"
+  branch: "unknown"
+chromium:
+  version: "147.0.7727.138"
+  tag: "147.0.7727.138"
+  revision: "022a5605792996d967e05acda7091c2bd9b915db"
+source:
+  chromium_source_root: "/Users/sebastian/Developer/cef_7727/chromium_git/chromium/src"
+  cef_revision: "04f1d2223ba2e742534a4f655ed63e4ae7c73545"
+target:
+  os: "macos"
+  arch: "arm64"
+artifacts:
+  framework: "/Users/sebastian/Developer/webview_cef/flutter_cef_browser/macos/Frameworks/Chromium Embedded Framework.framework"
+  framework_binary_sha256: "72f77a751e3a9d0a5314a08ee2d1f5df80214701b8f074c37af40c9e6531d3f9"
+  wrapper: "/Users/sebastian/Developer/webview_cef/flutter_cef_browser/macos/Frameworks/libcef_dll_wrapper.a"
+  wrapper_sha256: "cd15103afd358d175ff69aad6ac7a091dbd0d723e277d61a4bfdbe715caeeaa8"
+  include: "/Users/sebastian/Developer/webview_cef/flutter_cef_browser/macos/Frameworks/include"
+gn_args_raw: |
+  is_official_build=true
+  is_debug=false
+  symbol_level=1
+  blink_symbol_level=0
+  v8_symbol_level=0
+  dcheck_always_on=false
+  proprietary_codecs=true
+  ffmpeg_branding=Chrome
+  enable_platform_hevc=true
+  enable_hevc_parser_and_hw_decoder=true
+  media_use_ffmpeg=true
+  media_use_libvpx=true
+  rtc_use_h264=true
+  enable_platform_ac3_eac3_audio=true
+  enable_nacl=false
+  enable_vr=false
+  enable_print_preview=true
+  enable_basic_printing=true
+  use_system_xcode=true
+  enable_dsyms=true
+  use_chrome_runtime=true
+  branding_file_path="//chrome/app/theme/astoic/BRANDING"
+  enable_widevine=true
+  ignore_missing_widevine_signing_cert=true
+  bundle_widevine_cdm=false
+codecs:
+  h264: "untested"
+  aac: "untested"
+  mp3: "untested"
+  hevc: "untested"
+  widevine: "unsupported"
+signing:
+  hardened_runtime: false
+  notarized: false
+  helper_apps_signed: false
+validation:
+  can_play_type_log: ""
+  playback_probe_log: ""
+  clean_machine_log: ""

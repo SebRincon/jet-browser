@@ -1,0 +1,80 @@
+{
+  "date": "2026-09-28T23:21:54.005669+00:00",
+  "base_commit": null,
+  "implementation": "Grok Build generated post recovery, bookmark organizer, Swift JavaScriptCore helper and tab UI modules; root reviewed, integrated, corrected and tested them.",
+  "tests": {
+    "backend": {
+      "passed": 310,
+      "seconds": 14.58,
+      "isolated_chromium_enabled": true
+    },
+    "flutter": {
+      "passed": 56
+    },
+    "ruff": "passed",
+    "flutter_analyze": "passed",
+    "macos_release": "passed; pre-existing CEF copy-helper build-phase warning"
+  },
+  "bundled_runtime": {
+    "relative_path": "app/build/macos/Build/Products/Release/Jet Browser.app/Contents/Helpers/JetWorkflow",
+    "sha256": "a63dbc027b9c98e1f653e05166acd7cd02030c1b59908fb7cf5d936b7e8e8ff3",
+    "clean_path": "/usr/bin:/bin",
+    "result": {
+      "type": "done",
+      "result": [
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined",
+        5
+      ]
+    },
+    "external_interpreter_required": false
+  },
+  "widget_renders": {
+    "app/build/test-artifacts/tab-agent-1024.png": "24f954a12b26bd5eca8525d02e7e061e41affbce057bb73262f9c1e58252711f",
+    "app/build/test-artifacts/tab-agent-320.png": "4c51809c44f6dd1964a7246689874e05aa1e1c07b9e99ded407f68e1d353ecf7"
+  },
+  "live_state": {
+    "collection_saved": 50,
+    "status": "paused",
+    "reason": "item_budget",
+    "browser_restarted": false,
+    "live_background_recovery_run": false,
+    "top_100_finished": false
+  },
+  "limitations": [
+    "Running native app and service were intentionally not restarted; newly built background capability is not active there yet.",
+    "Real Chromium fixtures and native-dispatch widget tests passed; hidden CEF native-view execution/endurance remains unverified.",
+    "Agent browser jobs remain serialized; manual browsing on other tabs is supported by the new build.",
+    "Foreground pointer/keyboard/screenshot tasks are not background-enabled.",
+    "Grok workflow-authoring/lifecycle tools and fully self-contained controller/model packaging are unfinished.",
+    "Operator-only multi-tag enrichment is not native collection multitag support; no held-out accuracy claim."
+  ],
+  "source_sha256": {
+    "app/lib/browser_host.dart": "159702f24057912f07c7af7b00cb5f92f2eae16bd53c7e1b03a761dbfeea4359",
+    "app/lib/main.dart": "391786e4c871d6d8a98a7b1e876a00fbe0e59ced40d046e555c27cf88ef44899",
+    "app/lib/tab_agent_state.dart": "c18a96a38c01cfb1e3e49b188fd456ac1c2b32c1f96a226272698f3e88156b08",
+    "app/lib/tab_agent_badge.dart": "449f3557cb7be0cca6f9c407e8e4269a4d5f3a54e1a3f4a32cd21fac3077bce5",
+    "app/test/browser_host_test.dart": "990645ef0ed5d77ac2b230a5ea507f4980bc6d9a28ec15ae6514f164f481f2d6",
+    "app/test/tab_agent_test.dart": "5970bcac39e3bc9d7c9016bb09e5f8bb67bc68e303d11210f1322e5652f8ba76",
+    "app/macos/Runner.xcodeproj/project.pbxproj": "6a3c191192bd98d54c54b938de94c883d5f2891734276df384fa66bdcd4de4c2",
+    "backend/jet_browser/bridge.py": "13d287a97e88ba35cb5acbd27492c82fd98f923a7f6561d9c43e021e0b5dbb9e",
+    "backend/jet_browser/site_collection.py": "f1a7c4b575b3028001a916b06aba33e5475230850058b6b0d445c97c623a032d",
+    "backend/jet_browser/collection_runner.py": "b5b448d459e2115dcfdc73ff8da99ac2ee725620397258e0de425361062d19a2",
+    "backend/jet_browser/post_recovery.py": "4636b5f9b6c1662e6da1599614687e47ec0e6a4b0a42b11f9608c8c3872ad99f",
+    "backend/jet_browser/collection_repair_tools.py": "6fa64e29be8ef231aed920e6aa35d9c3f9bc12956eaedae18bdf5516a2f893ac",
+    "backend/jet_browser/collection_store.py": "11352d3605533ebc0614438f344dafa1dcec647d9c19436ee11c5a3d5e250d6b",
+    "backend/jet_browser/supervisor_agent.py": "7a979f98997a4860eb0e9479f2d9610f49c0d9988dea4b032c04c08dcb315975",
+    "backend/jet_browser/bookmark_organizer.py": "97fa9afaf97ca22f2bb287ce7ada1521ad8ad7ea7d8c0408cbbf18f2c9ff5307",
+    "backend/jet_browser/workflow_runtime.py": "9c7cfce8272b5ffe5b0141833e59da1cdc51a34b71dde219a6d2d6b3ed030135",
+    "backend/tests/test_collection_runner.py": "b4d7ca6f53b18f9d8c9d535e8bc174094cda4f2325eef268cf1b42d1f90b992d",
+    "backend/tests/test_feed_dom.py": "30ab6dc36226ac6f517057d11f647589febbb77fdb955acf7cb84d5ba415ad1b",
+    "backend/tests/test_post_recovery.py": "659438fda93364debc2c13eb4e69d52c6d8d7601f3da75f56cae0f8b94dc4699",
+    "backend/tests/test_collection_repair.py": "886b8cac68702862faf3302ce527b667ce6ecd1657de1b94d8b22cef7e67253f",
+    "backend/tests/test_workflow_runtime.py": "da5b77f9b07ba0165acf48f82e47bc75a54d3462ca976389477bff86dc8f251e",
+    "native/JetWorkflow/main.swift": "47c66afaf82ddf01420a1bb76a4c0552c1c7b1a23f378f0511bd57ced2db7eea",
+    "scripts/build_workflow_runtime.sh": "88c10440d79429598062e572acd341758d541bea68464580e941266415e74f28",
+    "scripts/organize_bookmarks.py": "49455a0b3e0889128fc4ae7aea1d009bcf9b455478294bcd20dc914d037b498e"
+  }
+}

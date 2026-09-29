@@ -1,0 +1,32 @@
+{
+  "date": "2026-09-28",
+  "backend_tests": 215,
+  "flutter_app_tests": 40,
+  "backend_lint": "passed",
+  "flutter_analyze": "passed",
+  "native_new_collection_acceptance": "not_run",
+  "provider_collection_planning_live": "not_run",
+  "desktop_takeover": false,
+  "model_diagnostic": "collection-model-diagnostic-20260928.json",
+  "review_fixes": [
+    "atomic checkpoint after classification failure",
+    "immediate Stop before coroutine start",
+    "actual bridge tab string contract",
+    "nullable model confidence",
+    "UI heartbeat/control race",
+    "stale session results",
+    "native view stays hidden during collection workspace"
+  ],
+  "limitations": [
+    "bookmark source not implemented",
+    "excerpt classification only",
+    "20 synthetic cases not held-out",
+    "no new live native collection evidence"
+  ],
+  "macos_release_build": "passed, 349.9MB; existing CEF copy-phase warning",
+  "real_router_diagnostic": {
+    "correct": 8,
+    "total": 8,
+    "artifact": "collection-route-diagnostic-20260928.json"
+  }
+}

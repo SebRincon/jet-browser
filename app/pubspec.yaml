@@ -1,0 +1,22 @@
+name: jet_browser
+description: Standalone native browser and local agent workspace.
+publish_to: none
+version: 0.1.0+1
+environment:
+  sdk: '>=3.6.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  markdown_widget: 2.3.2+8
+  shadcn_flutter:
+    path: ../vendor/shadcn_flutter
+  vten_chat:
+    path: ../vendor/vten_chat
+  flutter_cef_browser:
+    path: ../vendor/flutter_cef_browser
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+flutter:
+  uses-material-design: true

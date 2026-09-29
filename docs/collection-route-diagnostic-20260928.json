@@ -1,0 +1,315 @@
+{
+  "kind": "8 synthetic routing diagnostics; no browser actions or Grok calls",
+  "rows": [
+    {
+      "prompt": "Categorize the pages on this website into pricing, docs, support, and company.",
+      "expected_decision": "grok",
+      "route": {
+        "id": "884fb70b6abc4dbfbb239eba3bf0ccd7",
+        "created_at": 1790622651.3037739,
+        "model": "qwen4b_semif_shared",
+        "decision": "grok",
+        "operation": "collect",
+        "reason": "Collect and categorize information across pages of the current website into a saved local collection.",
+        "status": "selected",
+        "elapsed_ms": 7371,
+        "audit": [
+          {
+            "question": "Classify the CURRENT USER REQUEST by its requested action. Historical requests only resolve references; do not repeat them.",
+            "answer": "collect",
+            "probabilities": {
+              "search": 0.05106666850593932,
+              "open_url": 0.0017474053047188615,
+              "page_task": 0.03509757376770469,
+              "back": 0.0006428344869999886,
+              "forward": 0.00030365351060722325,
+              "reload": 4.656677405151686e-05,
+              "new_tab": 0.00011170788379193194,
+              "close_tab": 8.699818737240608e-05,
+              "switch_tab": 0.00038989882548613535,
+              "list_tabs": 8.699818737240608e-05,
+              "summarize": 0.0015420797689742864,
+              "explain": 0.003699257059118905,
+              "collect": 0.9051783577378624
+            },
+            "confidence": null,
+            "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+            "inference_ms": 265.2198749128729
+          }
+        ],
+        "grok_calls": 0
+      },
+      "correct": true,
+      "wall_ms": 7370.79
+    },
+    {
+      "prompt": "Collect information from the linked pages in this website section.",
+      "expected_decision": "grok",
+      "route": {
+        "id": "266b9031cec74dd98c36c9ba5c107622",
+        "created_at": 1790622651.467536,
+        "model": "qwen4b_semif_shared",
+        "decision": "grok",
+        "operation": "collect",
+        "reason": "Collect and categorize information across pages of the current website into a saved local collection.",
+        "status": "selected",
+        "elapsed_ms": 164,
+        "audit": [
+          {
+            "question": "Classify the CURRENT USER REQUEST by its requested action. Historical requests only resolve references; do not repeat them.",
+            "answer": "collect",
+            "probabilities": {
+              "search": 0.013831275362329278,
+              "open_url": 0.00041766832533592443,
+              "page_task": 0.01567288828076473,
+              "back": 9.319440032113132e-05,
+              "forward": 8.22437696216272e-05,
+              "reload": 1.4291824171380083e-05,
+              "new_tab": 4.135476445712135e-05,
+              "close_tab": 2.0794481468590912e-05,
+              "switch_tab": 8.22437696216272e-05,
+              "list_tabs": 1.342592631802783e-05,
+              "summarize": 3.6495451540525106e-05,
+              "explain": 4.6861087371530025e-05,
+              "collect": 0.9696472625566785
+            },
+            "confidence": null,
+            "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+            "inference_ms": 158.5460000205785
+          }
+        ],
+        "grok_calls": 0
+      },
+      "correct": true,
+      "wall_ms": 163.73
+    },
+    {
+      "prompt": "Go through my Twitter bookmarks and organize them into topics.",
+      "expected_decision": "grok",
+      "route": {
+        "id": "81165d20fe114460bc4571a7f97b3a10",
+        "created_at": 1790622651.6324852,
+        "model": "qwen4b_semif_shared",
+        "decision": "grok",
+        "operation": "collect",
+        "reason": "Collect and categorize information across pages of the current website into a saved local collection.",
+        "status": "selected",
+        "elapsed_ms": 165,
+        "audit": [
+          {
+            "question": "Classify the CURRENT USER REQUEST by its requested action. Historical requests only resolve references; do not repeat them.",
+            "answer": "collect",
+            "probabilities": {
+              "search": 0.045146082356665805,
+              "open_url": 0.0013632935589398057,
+              "page_task": 0.031028418383150673,
+              "back": 0.0007297184578488586,
+              "forward": 0.0003905901441648546,
+              "reload": 6.376208824365718e-05,
+              "new_tab": 0.0002090678385311184,
+              "close_tab": 0.00016282219636308106,
+              "switch_tab": 0.0007297184578488586,
+              "list_tabs": 0.0003041919101355617,
+              "summarize": 0.004199239790267816,
+              "explain": 0.008889790705757572,
+              "collect": 0.9067833041120823
+            },
+            "confidence": null,
+            "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+            "inference_ms": 160.01558396965265
+          }
+        ],
+        "grok_calls": 0
+      },
+      "correct": true,
+      "wall_ms": 164.94
+    },
+    {
+      "prompt": "Find every pricing page on this site and save them as a collection.",
+      "expected_decision": "grok",
+      "route": {
+        "id": "e1a1785abc7f4cc6893453b7630e8368",
+        "created_at": 1790622651.800926,
+        "model": "qwen4b_semif_shared",
+        "decision": "grok",
+        "operation": "collect",
+        "reason": "Collect and categorize information across pages of the current website into a saved local collection.",
+        "status": "selected",
+        "elapsed_ms": 168,
+        "audit": [
+          {
+            "question": "Classify the CURRENT USER REQUEST by its requested action. Historical requests only resolve references; do not repeat them.",
+            "answer": "collect",
+            "probabilities": {
+              "search": 0.0045866796467506216,
+              "open_url": 0.00015694754681022335,
+              "page_task": 0.0045866796467506216,
+              "back": 4.496622501656822e-05,
+              "forward": 4.496622501656822e-05,
+              "reload": 1.0033320989217198e-05,
+              "new_tab": 2.406868583747466e-05,
+              "close_tab": 1.1369242158054389e-05,
+              "switch_tab": 5.09534083177791e-05,
+              "list_tabs": 7.340534445949683e-06,
+              "summarize": 1.1369242158054389e-05,
+              "explain": 1.7609026726903155e-05,
+              "collect": 0.990447017249022
+            },
+            "confidence": null,
+            "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+            "inference_ms": 163.23112486861646
+          }
+        ],
+        "grok_calls": 0
+      },
+      "correct": true,
+      "wall_ms": 168.43
+    },
+    {
+      "prompt": "Open YouTube",
+      "expected_decision": "local",
+      "route": {
+        "id": "6d753dc919f148baaad0f57c4aaf1971",
+        "created_at": 1790622651.800964,
+        "model": "qwen4b_semif_shared",
+        "decision": "local",
+        "operation": "open_url",
+        "reason": "Open a literal URL or domain supplied by the user.",
+        "status": "selected",
+        "elapsed_ms": 0,
+        "audit": [
+          {
+            "rule": "homepage_request",
+            "answer": "youtube"
+          }
+        ],
+        "grok_calls": 0
+      },
+      "correct": true,
+      "wall_ms": 0.02
+    },
+    {
+      "prompt": "Go back",
+      "expected_decision": "local",
+      "route": {
+        "id": "e10abb15cf5344a7a21709261d544c98",
+        "created_at": 1790622651.9627059,
+        "model": "qwen4b_semif_shared",
+        "decision": "local",
+        "operation": "back",
+        "reason": "Go back to the previous page.",
+        "status": "selected",
+        "elapsed_ms": 162,
+        "audit": [
+          {
+            "question": "Classify the CURRENT USER REQUEST by its requested action. Historical requests only resolve references; do not repeat them.",
+            "answer": "back",
+            "probabilities": {
+              "search": 0.000803808913697115,
+              "open_url": 0.00012326808930967904,
+              "page_task": 0.00015827935974016235,
+              "back": 0.9988516732681871,
+              "forward": 2.1420781980944582e-05,
+              "reload": 5.087881681779187e-06,
+              "new_tab": 5.087881681779187e-06,
+              "close_tab": 6.954309722858938e-06,
+              "switch_tab": 1.668252178076148e-05,
+              "list_tabs": 1.001863305199872e-06,
+              "summarize": 1.992443094450545e-06,
+              "explain": 1.4577025076868284e-06,
+              "collect": 3.2849833104801975e-06
+            },
+            "confidence": null,
+            "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+            "inference_ms": 157.1520830038935
+          }
+        ],
+        "grok_calls": 0
+      },
+      "correct": true,
+      "wall_ms": 161.74
+    },
+    {
+      "prompt": "List the open browser tabs",
+      "expected_decision": "local",
+      "route": {
+        "id": "a8a7e5bf8e354a8194401bbdb8e95dbe",
+        "created_at": 1790622652.129015,
+        "model": "qwen4b_semif_shared",
+        "decision": "local",
+        "operation": "list_tabs",
+        "reason": "List the open browser tabs.",
+        "status": "selected",
+        "elapsed_ms": 166,
+        "audit": [
+          {
+            "question": "Classify the CURRENT USER REQUEST by its requested action. Historical requests only resolve references; do not repeat them.",
+            "answer": "list_tabs",
+            "probabilities": {
+              "search": 0.0002609133048328137,
+              "open_url": 4.5339933879486127e-05,
+              "page_task": 8.47061481805942e-05,
+              "back": 2.14170682681584e-05,
+              "forward": 1.2990108545796621e-05,
+              "reload": 2.120576926391114e-06,
+              "new_tab": 6.136092793509546e-06,
+              "close_tab": 4.5339933879486127e-05,
+              "switch_tab": 0.0008036695576529192,
+              "list_tabs": 0.9986785027352992,
+              "summarize": 1.66796295383355e-05,
+              "explain": 1.8900496409092613e-05,
+              "collect": 3.284413794179001e-06
+            },
+            "confidence": null,
+            "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+            "inference_ms": 161.62766586057842
+          }
+        ],
+        "grok_calls": 0
+      },
+      "correct": true,
+      "wall_ms": 166.3
+    },
+    {
+      "prompt": "Find Elon Musk's Wikipedia page",
+      "expected_decision": "local",
+      "route": {
+        "id": "bf2e86ea16a24f029ac5d9b362c0ad4e",
+        "created_at": 1790622652.292937,
+        "model": "qwen4b_semif_shared",
+        "decision": "local",
+        "operation": "search",
+        "reason": "Find or open a named website, Wikipedia article, or YouTube video, channel, or playlist.",
+        "status": "selected",
+        "elapsed_ms": 164,
+        "audit": [
+          {
+            "question": "Classify the CURRENT USER REQUEST by its requested action. Historical requests only resolve references; do not repeat them.",
+            "answer": "search",
+            "probabilities": {
+              "search": 0.9986282323880243,
+              "open_url": 0.0004874256902767902,
+              "page_task": 0.0003796075092766843,
+              "back": 1.4718980459176496e-05,
+              "forward": 1.2989454664426444e-05,
+              "reload": 5.414810305935229e-06,
+              "new_tab": 2.749867574038037e-05,
+              "close_tab": 7.878502506921914e-06,
+              "switch_tab": 1.5668273139713633e-05,
+              "list_tabs": 3.085265911497888e-06,
+              "summarize": 2.011846094699814e-05,
+              "explain": 0.0003796075092766843,
+              "collect": 1.7754479470495008e-05
+            },
+            "confidence": null,
+            "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+            "inference_ms": 158.88404194265604
+          }
+        ],
+        "grok_calls": 0
+      },
+      "correct": true,
+      "wall_ms": 163.91
+    }
+  ]
+}

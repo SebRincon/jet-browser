@@ -1,0 +1,10 @@
+Presentation sources were copied from /Users/sebastian/Developer/Projects/vten
+at cc497919140469d58c71849f44210e35c3206766.
+
+The upstream LICENSE file is an unspecified placeholder ("TODO: Add your license
+here.") and is copied unchanged. This package does not invent a license.
+
+Verbatim files keep their source bytes except collapsible_steps_widget.dart,
+whose two vten_ai imports were rewritten to sibling imports. Adapted files
+record their source path and the focused diff in a header comment and in
+EXTRACTION.json.

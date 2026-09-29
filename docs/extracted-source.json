@@ -1,0 +1,117 @@
+[
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-ultrafast/jev_ultrafast/__init__.py",
+    "destination": "backend/jev_ultrafast/__init__.py",
+    "sha256": "60f025b8d24465e2c0f7a3547d43b8020fd8843de7b6cb3f892ef63f5548cf63"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-ultrafast/jev_ultrafast/agent.py",
+    "destination": "backend/jev_ultrafast/agent.py",
+    "sha256": "7876dc8d7036dfb8029fbf481db18d18a3b9a44157a5da88bb8253edb1eef410"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-ultrafast/jev_ultrafast/browser.py",
+    "destination": "backend/jev_ultrafast/browser.py",
+    "sha256": "b9ff3774c5ceb643c20a1141a331d524d86c9238fd64d189856683eb6bcb0e93"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-ultrafast/jev_ultrafast/model.py",
+    "destination": "backend/jev_ultrafast/model.py",
+    "sha256": "e9e0d79cc6733d7bc0be3a3a89184b157211ffdf24d162ccbd800168259718ca"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-ultrafast/jev_ultrafast/questions.py",
+    "destination": "backend/jev_ultrafast/questions.py",
+    "sha256": "66a7054b85040b949e1757311257ea0c5a843c635f9a40c99f6d15ad660fb422"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-ultrafast/jev_ultrafast/local_models.py",
+    "destination": "backend/jev_ultrafast/local_models.py",
+    "sha256": "1f0b2e114b1302b0bea0eeb23251df7b389595566379bad939dc93ef6d485e95"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-ultrafast/jev_ultrafast/native_worker.py",
+    "destination": "backend/jev_ultrafast/native_worker.py",
+    "sha256": "c1e4147974d2004d9bdc5b1e5a8178788fa8453bc586c388bf55d051e03858d8"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-ultrafast/jev_ultrafast/local_readout.py",
+    "destination": "backend/jev_ultrafast/local_readout.py",
+    "sha256": "10e529d11c6435d8523189851469eca8a4c2e51c888e68362c83f0107ae34842"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-ultrafast/jev_ultrafast/policy_profiles.py",
+    "destination": "backend/jev_ultrafast/policy_profiles.py",
+    "sha256": "265e2f93aa179566565dcae8bd570e434fcf7e6427e89d7b746444ceb17c8756"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-ultrafast/jev_ultrafast/anchored_policy.py",
+    "destination": "backend/jev_ultrafast/anchored_policy.py",
+    "sha256": "d6c6cee5828ed7de01b54ca9e1f98e9b7bc6d02ab900fe146de6df577d7bcb91"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-ultrafast/jev_ultrafast/control_intents.py",
+    "destination": "backend/jev_ultrafast/control_intents.py",
+    "sha256": "103d59bb95bf00ac0cb49220cc68c2e061a53a6941e79cf3033503464b07e434"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-ultrafast/jev_ultrafast/instruction_parts.py",
+    "destination": "backend/jev_ultrafast/instruction_parts.py",
+    "sha256": "365192a4c2a1b18e5a3d83b5197060714aaa5555be74cb3ec03f626a8ca8fbe3"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-ultrafast/jev_ultrafast/request_cache.py",
+    "destination": "backend/jev_ultrafast/request_cache.py",
+    "sha256": "20c8c60b0d412f39197a7b6af15576ace610c880282131d7a8877ab2fa361480"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-ultrafast/jev_ultrafast/semantic_policy.py",
+    "destination": "backend/jev_ultrafast/semantic_policy.py",
+    "sha256": "44d2e9928d84283f039e967dec832a3914b19523ab136a77ef49d5e77f820742"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-ultrafast/jev_ultrafast/typing_examples.py",
+    "destination": "backend/jev_ultrafast/typing_examples.py",
+    "sha256": "89c1d9b60774d6817a23f71838a73cb378a0c6b8b76bd15140187494fad38929"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-ultrafast/jev_ultrafast/snapshot.js",
+    "destination": "backend/jev_ultrafast/snapshot.js",
+    "sha256": "97bf44e52b3ec2f353b47b6d4adc02b9a8151d4bf212b0d784ec2904724fa902"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-use-cases/runtime.py",
+    "destination": "vendor/local-engines/runtime.py",
+    "sha256": "a5cca1fa076f40f8b7e8dc2528e521d1fbbf267c6a71db1d0268a606c20eb6c7"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-use-cases/contracts.py",
+    "destination": "vendor/local-engines/contracts.py",
+    "sha256": "5732cd43a0349f246dcec2ab853d8fae8935d2617da32ed535200153ee352afc"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/run.py",
+    "destination": "vendor/local-engines/run.py",
+    "sha256": "9901903d6d5d56ffd1028eb3376076a357ca3ed966f8731e29c388f04f139a39"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/laya_runtime.py",
+    "destination": "vendor/local-engines/laya_runtime.py",
+    "sha256": "a6a9be5453407f79e162fa39abd1edf5167e65f2616040e5eabc4577933e8f59"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/upstream/LICENSE-CODE",
+    "destination": "vendor/local-engines/LICENSE-LFM-CODE",
+    "sha256": "de146682eff5da167d12c415f2c99489b82e7470f42cd244d96d73b616c10db9"
+  },
+  {
+    "source": "/Users/sebastian/Developer/oui/lfm-rlcd/jev-ultrafast/LICENSE",
+    "destination": "backend/jev_ultrafast/LICENSE",
+    "sha256": "5afa3d97bf1e6f998d587fa101e3fe0d0c416840b7fe77bcd6ae97690a334631"
+  },
+  {
+    "source": "/Users/sebastian/Developer/semif/LICENSE",
+    "destination": "vendor/local-engines/LICENSE-SemIf",
+    "sha256": "f765f2140f8507a8f0d81ec0fd2c4bd72fe6a066841ef27883ff876a76bf61be"
+  }
+]

@@ -1,0 +1,80 @@
+{
+  "date": "2026-09-28",
+  "status": "development verification; not held-out accuracy or full archive coverage",
+  "root_cause": {
+    "old_adapter": "linked pages",
+    "observed_pages": 2,
+    "scrolls": 0,
+    "end_view": "Likes",
+    "false_fit": "bookmarks request accepted by website crawler"
+  },
+  "checks": {
+    "backend_including_real_chromium": 242,
+    "real_dom_cases": 9,
+    "flutter": 41,
+    "ruff": "passed",
+    "flutter_analyze": "passed",
+    "macos_release": "built 349.9 MB; existing CEF copy-phase warning"
+  },
+  "live": {
+    "passes": 4,
+    "unique_saved_posts": 35,
+    "total_saved": 35,
+    "classified": 29,
+    "needs_review": 6,
+    "local_model_calls": 35,
+    "scrolls": 24,
+    "local_loop_total_ms": 42257.893706904724,
+    "median_item_inference_ms": 100.39862501434982,
+    "actual_models": [
+      "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+    ],
+    "status": "paused",
+    "reason": "scroll_budget",
+    "source": "observed X Bookmarks in Jet-owned native tab",
+    "first_pass": {
+      "items": 14,
+      "scrolls": 6,
+      "elapsed_ms": 10831.004250096157
+    },
+    "grok_resume_passes": {
+      "count": 2,
+      "each_provider_prompts": 1,
+      "first_total_chat_ms": 49725.628,
+      "second_total_chat_ms": 51282.176,
+      "final_trace_collection_items": 8,
+      "final_trace_scrolls": 6,
+      "logging_error": 0,
+      "post_text_tools_used": false
+    },
+    "last_ui_endpoint_pass": {
+      "new_items": 5,
+      "scrolls": 6,
+      "elapsed_ms": 9948.48341587931,
+      "grok_calls": 0
+    }
+  },
+  "limitations": [
+    "Classification labels have not been human-scored on this live sample.",
+    "Observed posts only; no archive-end or account-total proof.",
+    "Resume deduplicates saved permalinks and starts from current view; no durable remote cursor or account-switch identity pin.",
+    "X DOM selectors and English Bookmarks identity may change. Collapsed long posts require review.",
+    "Frontend release built and widget-tested; existing running native window retained, new labels load on next restart."
+  ],
+  "source_sha256": {
+    "backend/jet_browser/collection_plan.py": "406276364a533379c4d05957311e4e31ef353463f714e7e0bac5465e3802beb3",
+    "backend/jet_browser/collection_store.py": "3aaa4eae4433addf0f21ff73acc24fcd4b6ffcf9dfdf66f9e54e2f86e479b3d1",
+    "backend/jet_browser/feed_collection.py": "48c3d08934327408a48e9e95450dff7e94a0ad5d52d3203320df267a109af602",
+    "backend/jet_browser/feed_runner.py": "060db7819878230e73c55206f2fff969407ef940f5e5dbca779bc6bee8595315",
+    "backend/jet_browser/collection_tools.py": "828ec01aec8d7d0e583e3567f1f9dc1e34f62fe13140264d8919d303d2d0b24b",
+    "backend/jet_browser/collection_runner.py": "25bbb2354bf67ab9e941202299b07fe6289accd201c9c0508d3f45d1969bc401",
+    "backend/jet_browser/service.py": "011a84072af2ffa00c5b41262a0a06c98781217d67565aa7ab26e7c1e002bee0",
+    "backend/jet_browser/grok.py": "22762efd38bac81fc9e34f71eaa9cd573e378002681a85eac23cf4d1e5c95599",
+    "backend/jet_browser/mcp.py": "e1fb25cfd5e58433ab11f4d1868d6d341cbdcb4112efb6500a275be3f5205e26",
+    "backend/jet_browser/tracing.py": "6054077f91baf326f21881e2e73da8d5d229e4839aeb23b729a296d2634a24b8",
+    "backend/tests/test_feed_dom.py": "b4b50fed52de8cf91f18c1b5d7d2bd76676754bddfd83fa6a32863bfff5cff33",
+    "backend/tests/test_feed_loop.py": "8237f3a168db54b2ab71ecb20908a99806a850a33aa7725b469f818089875e64",
+    "backend/tests/test_feed_tools.py": "326af4a047deb0007d6e3a52e0a1099bca407094a8bff04dcf51a3fa9f54d6ad",
+    "app/lib/collection_view.dart": "464a4b8d1e8f615d1b0f7aa8f995a0eb78ed7052a23468384cb84eeb04035ce3"
+  }
+}

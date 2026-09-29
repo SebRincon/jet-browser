@@ -1,0 +1,215 @@
+{
+  "date": "2026-09-28",
+  "git_head": null,
+  "source_sha256": {
+    "backend/jet_browser/collection_plan.py": "724a7c64ba4748f957ab9dc4ce648ee1429720f2ee0a4a5932e20ab6bafe2485",
+    "backend/jet_browser/collection_store.py": "26de74e353b3913802cd99069363cbc90d4e717ae64336f588bfda9d6d16d616",
+    "backend/jet_browser/collection_runner.py": "7115dd27ce93b14776baee9e1f669faabbbea751665cf30595a848a8055746ef",
+    "backend/jet_browser/collection_tools.py": "28a4002b4812d80f227651b8967525f7f85059f5cbed5c99eea6488b3aae90ba",
+    "backend/jet_browser/feed_collection.py": "102c9e9b59d2e7043607bec6f6fdd39289a18a9fcdf786bd613a9eb34605c330",
+    "backend/jet_browser/feed_runner.py": "19e4602037a314f7684030775d3371519f2ed9a4561d50d379c50e67727c0e6b",
+    "backend/jet_browser/feed_review.py": "c6bbdd8454dd0caa14315a3c3e99044518ed7fb7e97ea869c761c6fdf1d8672c",
+    "backend/jet_browser/workspace.py": "7a60dd5e09b3b37ee3b00f9117907ad76cd79da8b62503e62b004e8b2b78d4da",
+    "backend/jet_browser/service.py": "5b80b60a27032ae03caa1c76fdebb936f0ed0828dab9b4c6b49106701a1d1a45",
+    "backend/jet_browser/mcp.py": "2649aad5244ea5bbbef33a7f1afe1fee297efd19c75cdf6242c81ad580317df5",
+    "backend/jet_browser/grok.py": "684a3dcac49ed8bef59293e7b6ebd3acbd0842726dcf0f46e51c290613165912",
+    "backend/jet_browser/tracing.py": "26c7be0ac01f8e079776b484b2d6187e11cf74b1a1107ca5cd9b491288c06358",
+    "app/lib/agent_pane.dart": "55a762ea1cd7fe7c3e5012510d91345d357eefd46d8c249faa5d1a82baacf20e",
+    "app/lib/collection_view.dart": "85784d9f12573cddf45a69f8817e8d91dd70a7a2e07ade208506441f87087b7b",
+    "app/lib/main.dart": "5ecae86783c2aa0de2595f984d9b5fa0422bf237b97a4864fe7726462a8e92a8",
+    "app/lib/workspace_view.dart": "b32b3ff8e5b712e1295ff4c0f98c296d054a82512fb98eba7b8c24e34ad46e88",
+    "backend/tests/test_agent_workspace.py": "9eaedeb7ae358bddea38303a1e271f99cb92643efb8f76efa21685ab24a401f0",
+    "backend/tests/test_long_feed_jobs.py": "8b087b9dbe28c19f6134a690cb6fedfe3bc125ec4151b44f0fd5ae21e37d176e",
+    "backend/tests/test_feed_dom.py": "73c23a7ccf9397fcefe707dd561cf3817f0ddc2923a365a352ca7271c69d182b",
+    "backend/tests/test_feed_tools.py": "82abdd9df69898a8608e222d413308ef824bf90754e504d6f6c97d9a2d211458",
+    "app/test/workspace_view_test.dart": "364588e1d91394843a878fdfde05c32482c1a64abecdbf7f5b25c1e3caa0b654",
+    "app/test/agent_pane_test.dart": "ed728af86f760f7bfdd37aac32eb0d64e6cbbf0a88196786fa3ce2fb56598344",
+    "scripts/probe_background_feed.py": "b03d131ec147d93e07519c73c790a504f3c1c5dacc3f81bc911fe5255884d10d"
+  },
+  "automated": {
+    "backend_passed": 267,
+    "real_dom_tests": 11,
+    "flutter_passed": 46,
+    "ruff": "passed",
+    "flutter_analyze": "passed",
+    "macos_release": "built, 349.9 MB"
+  },
+  "local_browser_integration": {
+    "fixture": "isolated Chromium feed, synthetic posts only",
+    "actual_model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "wall_ms": 10069.7,
+    "status": "paused",
+    "reason": "scroll_budget",
+    "counters": {
+      "classified": 14,
+      "elapsed_ms": 10067.619333043694,
+      "model_calls": 15,
+      "needs_review": 1,
+      "pages": 15
+    },
+    "scrolls": 14,
+    "local_review_decisions": [
+      "scroll",
+      "scroll"
+    ],
+    "unique_items": 15,
+    "grok_calls": 0,
+    "passed": true
+  },
+  "local_progress_diagnostic": [
+    {
+      "adapter": "qwen4b_semif_shared",
+      "case": "ready",
+      "expected": "continue_scroll",
+      "action": "continue_scroll",
+      "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+      "inference_ms": 1158.389125019312,
+      "reason": null,
+      "wall_ms": 15225.9
+    },
+    {
+      "adapter": "qwen4b_semif_shared",
+      "case": "ready_after_batch",
+      "expected": "continue_scroll",
+      "action": "continue_scroll",
+      "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+      "inference_ms": 113.2237499114126,
+      "reason": null,
+      "wall_ms": 117.2
+    },
+    {
+      "adapter": "qwen4b_semif_shared",
+      "case": "loading",
+      "expected": "wait",
+      "action": "wait",
+      "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+      "inference_ms": 121.09245802275836,
+      "reason": null,
+      "wall_ms": 128.5
+    },
+    {
+      "adapter": "qwen4b_semif_shared",
+      "case": "rate_limit",
+      "expected": "needs_attention",
+      "action": "needs_attention",
+      "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+      "inference_ms": 122.33708403073251,
+      "reason": null,
+      "wall_ms": 126.1
+    },
+    {
+      "adapter": "qwen4b_semif_shared",
+      "case": "login",
+      "expected": "needs_attention",
+      "action": "needs_attention",
+      "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+      "inference_ms": 123.05050017312169,
+      "reason": null,
+      "wall_ms": 127.0
+    },
+    {
+      "adapter": "qwen4b_semif_shared",
+      "case": "error",
+      "expected": "needs_attention",
+      "action": "needs_attention",
+      "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+      "inference_ms": 133.4575000219047,
+      "reason": null,
+      "wall_ms": 137.3
+    },
+    {
+      "adapter": "lfm_rlcd",
+      "case": "ready",
+      "expected": "continue_scroll",
+      "action": "wait",
+      "model": "LFM2.5-350M@9e6c6ccf47cd318696e137d381a7ded8fe4df09f",
+      "inference_ms": 492.4528750125319,
+      "reason": null,
+      "wall_ms": 8823.8
+    },
+    {
+      "adapter": "lfm_rlcd",
+      "case": "ready_after_batch",
+      "expected": "continue_scroll",
+      "action": "wait",
+      "model": "LFM2.5-350M@9e6c6ccf47cd318696e137d381a7ded8fe4df09f",
+      "inference_ms": 29.0947079192847,
+      "reason": null,
+      "wall_ms": 31.6
+    },
+    {
+      "adapter": "lfm_rlcd",
+      "case": "loading",
+      "expected": "wait",
+      "action": "wait",
+      "model": "LFM2.5-350M@9e6c6ccf47cd318696e137d381a7ded8fe4df09f",
+      "inference_ms": 24.43149988539517,
+      "reason": null,
+      "wall_ms": 26.4
+    },
+    {
+      "adapter": "lfm_rlcd",
+      "case": "rate_limit",
+      "expected": "needs_attention",
+      "action": "wait",
+      "model": "LFM2.5-350M@9e6c6ccf47cd318696e137d381a7ded8fe4df09f",
+      "inference_ms": 267.30525004677474,
+      "reason": null,
+      "wall_ms": 269.5
+    },
+    {
+      "adapter": "lfm_rlcd",
+      "case": "login",
+      "expected": "needs_attention",
+      "action": "wait",
+      "model": "LFM2.5-350M@9e6c6ccf47cd318696e137d381a7ded8fe4df09f",
+      "inference_ms": 22.471709176898003,
+      "reason": null,
+      "wall_ms": 26.3
+    },
+    {
+      "adapter": "lfm_rlcd",
+      "case": "error",
+      "expected": "needs_attention",
+      "action": "wait",
+      "model": "LFM2.5-350M@9e6c6ccf47cd318696e137d381a7ded8fe4df09f",
+      "inference_ms": 97.51125006005168,
+      "reason": null,
+      "wall_ms": 99.8
+    }
+  ],
+  "grok_workspace_integration": {
+    "provider": "Grok Build ACP",
+    "saved_artifacts": 1,
+    "saved_scratch_files": 1,
+    "preview_http_status": 200,
+    "native_page_contains_expected_cards": true,
+    "isolated_test_conversation": true
+  },
+  "existing_collection": {
+    "preserved_items": 50,
+    "status": "paused",
+    "max_seconds": 1800,
+    "max_items": 5000,
+    "max_scrolls": 2000
+  },
+  "limitations": [
+    "Curated diagnostic, not held-out accuracy calibration",
+    "LFM 350M matched 1/6 current progress cases; explicit choice retained; new feeds default to SemIf",
+    "No whole-archive completeness or hour-scale endurance claim",
+    "Static HTML previews and explicit restart resume",
+    "Workspace list currently shows newest 100 files"
+  ],
+  "quiet_chat_acceptance": {
+    "artifact_saved": true,
+    "collapsed_progress_messages": 1,
+    "visible_answers": [
+      "Saved `loop-checks.md` in this conversation\u2019s workspace."
+    ]
+  },
+  "handoff": {
+    "native_online": true,
+    "user_navigation_in_progress": false,
+    "preserved_current_user_session": true
+  }
+}
