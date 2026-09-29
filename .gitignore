@@ -8,7 +8,7 @@
 *.p12
 *.mobileprovision
 artifacts/
-models/
+/models/
 __pycache__/
 *.pyc
 .pytest_cache/
@@ -24,6 +24,7 @@ app/macos/Runner.xcodeproj/xcuserdata/
 vendor/**/.dart_tool/
 vendor/**/build/
 vendor/**/Frameworks/
+vendor/**/Frameworks.previous/
 vendor/**/third/
 vendor/**/.venv/
 .clankstamp/
