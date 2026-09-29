@@ -50,6 +50,27 @@ Review sharing follows the existing user preference: at most five 400-character 
 - Completes at `limits.max_items` or a proven end of feed. After `max_idle_scrolls` scrolls reveal nothing new, a local `model.decide` chooses whether to keep scrolling; the run pauses after twice that many.
 - Local model failures on three items pause for review; failed item ids are skipped on later slices.
 
+## Tag accuracy (synthetic calibration)
+
+`scripts/eval_tagging.py` runs the real `model.classify` path over 90 synthetic
+bookmark-style posts with seven overlapping tags (`backend/tests/fixtures/tagging/`,
+30 development / 30 calibration / 30 held-out, gold tags fixed before any run). With
+SemIf 4B on 2026-09-28 ([evidence](evidence/tagging-semif-20260928.json)):
+
+| Split | Exact match | Micro F1 | Macro F1 | False-positive tags | Missed tags |
+|---|---:|---:|---:|---:|---:|
+| Development | 0.533 | 0.791 | 0.790 | 2 | 17 |
+| Calibration | 0.500 | 0.771 | 0.774 | 10 | 12 |
+| Held-out (scored once) | 0.467 | 0.788 | 0.785 | 5 | 16 of 55 |
+
+A single yes-probability threshold chosen on calibration (0.55) scored 0.787 micro F1
+on held-out, so the shipped decision (the model's own yes/no) stays. Precision is high;
+recall is the weakness, worst for design (held-out recall 0.33) and research (0.57). The
+prompt-injection post received no tags. Prompt changes must be tuned on development and
+then scored on a new held-out set, because this one has now been used. These are
+synthetic posts written for Jet, not the user's bookmarks, and not a claim about real
+archive accuracy; checkpoint review remains the safeguard.
+
 ## Packaging and data
 
 `native/JetLauncher` starts bundled CPython before exec into Flutter/CEF; the initialized CEF process never forks the controller. The bundle includes Python 3.12.13, pinned local-engine packages, Grok CLI, licenses and the native JavaScript helper. It uses a minimal system PATH. Model downloads are pinned by revision, file size and SHA256 in `model-downloads.json`; no downloaded Python/model repository code is executed.

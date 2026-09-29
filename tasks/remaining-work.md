@@ -28,6 +28,7 @@ Clean, simple single chat based on the [Orca/T3 source audit](../docs/chat-and-h
 | Grok authoring reliability | Implemented offline: idle watchdog, stage/activity traces, saved-state failure reports, `tagged_feed` template, local slice continuation | A real, user-authorized provider rerun of the bookmark request |
 | U01 chat projection | Implemented; offline tests | Stable turn IDs and collapsed completed steps |
 | H01–H06/H08, U02–U03 website loop | First slice implemented; feed loop has native/resume evidence, wider acceptance pending | Bounded plans/store/local classifier/runner/MCP/results; further child acceptance remains |
+| Tag calibration | Baseline measured 2026-09-28 on synthetic held-out tags (SemIf micro F1 0.788; threshold gave no gain) | Improve design/research recall on development, then score a new held-out set; real-archive spot checks with user permission |
 | H07 bookmark source | Initial adapter implemented and live-tested; partial broader acceptance | Account-switch identity, deleted/rate-limited sources and durable remote-cursor recovery remain |
 | B01–B05 plus B33–B34 experiment foundation | Not started | Honest outcomes and isolation |
 | B06–B10 extraction, find, evidence, GitHub, references | Not started | Foundation |

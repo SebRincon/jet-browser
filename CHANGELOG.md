@@ -24,6 +24,9 @@
   unpinned Grok CLI or CEF and bundles the CEF license and Chromium credits.
 - `scripts/sign_release.sh`: inside-out Developer ID signing with the hardened runtime and
   per-component entitlements, optional notarization and stapling; `--list` dry run.
+- Tag calibration harness (`scripts/eval_tagging.py`) and a 90-post synthetic corpus with
+  fixed development/calibration/held-out splits; SemIf 4B baseline recorded in
+  `docs/evidence/tagging-semif-20260928.json`.
 
 ### Fixed
 

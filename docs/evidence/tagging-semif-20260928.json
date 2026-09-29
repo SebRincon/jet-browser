@@ -1,0 +1,2282 @@
+{
+ "kind": "synthetic overlapping-tag diagnostic; not user data and not a whole-browser benchmark",
+ "corpus": "backend/tests/fixtures/tagging/bookmarks-tags-v1.json",
+ "model": "qwen4b_semif_shared",
+ "model_identity": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+ "shipped_decision": {
+  "development": {
+   "items": 30,
+   "exact_match": 0.533,
+   "micro_precision": 0.947,
+   "micro_recall": 0.679,
+   "micro_f1": 0.791,
+   "macro_f1": 0.79,
+   "false_positive_tags": 2,
+   "missed_tags": 17,
+   "per_tag": {
+    "mobile": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "web": {
+     "precision": 0.833,
+     "recall": 0.833,
+     "f1": 0.833
+    },
+    "desktop": {
+     "precision": 1.0,
+     "recall": 0.571,
+     "f1": 0.727
+    },
+    "design": {
+     "precision": 1.0,
+     "recall": 0.667,
+     "f1": 0.8
+    },
+    "research": {
+     "precision": 1.0,
+     "recall": 0.5,
+     "f1": 0.667
+    },
+    "tools": {
+     "precision": 0.875,
+     "recall": 0.583,
+     "f1": 0.7
+    },
+    "open_source": {
+     "precision": 1.0,
+     "recall": 0.667,
+     "f1": 0.8
+    }
+   }
+  },
+  "calibration": {
+   "items": 30,
+   "exact_match": 0.5,
+   "micro_precision": 0.787,
+   "micro_recall": 0.755,
+   "micro_f1": 0.771,
+   "macro_f1": 0.774,
+   "false_positive_tags": 10,
+   "missed_tags": 12,
+   "per_tag": {
+    "mobile": {
+     "precision": 0.7,
+     "recall": 1.0,
+     "f1": 0.824
+    },
+    "web": {
+     "precision": 0.6,
+     "recall": 0.857,
+     "f1": 0.706
+    },
+    "desktop": {
+     "precision": 0.833,
+     "recall": 1.0,
+     "f1": 0.909
+    },
+    "design": {
+     "precision": 0.833,
+     "recall": 0.833,
+     "f1": 0.833
+    },
+    "research": {
+     "precision": 1.0,
+     "recall": 0.5,
+     "f1": 0.667
+    },
+    "tools": {
+     "precision": 0.833,
+     "recall": 0.5,
+     "f1": 0.625
+    },
+    "open_source": {
+     "precision": 1.0,
+     "recall": 0.75,
+     "f1": 0.857
+    }
+   }
+  },
+  "held_out": {
+   "items": 30,
+   "exact_match": 0.467,
+   "micro_precision": 0.886,
+   "micro_recall": 0.709,
+   "micro_f1": 0.788,
+   "macro_f1": 0.785,
+   "false_positive_tags": 5,
+   "missed_tags": 16,
+   "per_tag": {
+    "mobile": {
+     "precision": 1.0,
+     "recall": 0.75,
+     "f1": 0.857
+    },
+    "web": {
+     "precision": 0.667,
+     "recall": 0.857,
+     "f1": 0.75
+    },
+    "desktop": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "design": {
+     "precision": 0.75,
+     "recall": 0.333,
+     "f1": 0.462
+    },
+    "research": {
+     "precision": 1.0,
+     "recall": 0.571,
+     "f1": 0.727
+    },
+    "tools": {
+     "precision": 0.889,
+     "recall": 0.8,
+     "f1": 0.842
+    },
+    "open_source": {
+     "precision": 1.0,
+     "recall": 0.75,
+     "f1": 0.857
+    }
+   }
+  }
+ },
+ "calibration_threshold_sweep_micro_f1": {
+  "0.05": 0.584,
+  "0.1": 0.667,
+  "0.15": 0.724,
+  "0.2": 0.738,
+  "0.25": 0.755,
+  "0.3": 0.762,
+  "0.35": 0.777,
+  "0.4": 0.765,
+  "0.45": 0.763,
+  "0.5": 0.771,
+  "0.55": 0.787,
+  "0.6": 0.764,
+  "0.65": 0.773,
+  "0.7": 0.776,
+  "0.75": 0.675,
+  "0.8": 0.639,
+  "0.85": 0.6,
+  "0.9": 0.469,
+  "0.95": 0.393
+ },
+ "selected_threshold": 0.55,
+ "held_out_with_selected_threshold": {
+  "items": 30,
+  "exact_match": 0.5,
+  "micro_precision": 0.949,
+  "micro_recall": 0.673,
+  "micro_f1": 0.787,
+  "macro_f1": 0.784,
+  "false_positive_tags": 2,
+  "missed_tags": 18,
+  "per_tag": {
+   "mobile": {
+    "precision": 1.0,
+    "recall": 0.625,
+    "f1": 0.769
+   },
+   "web": {
+    "precision": 0.857,
+    "recall": 0.857,
+    "f1": 0.857
+   },
+   "desktop": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0
+   },
+   "design": {
+    "precision": 1.0,
+    "recall": 0.333,
+    "f1": 0.5
+   },
+   "research": {
+    "precision": 1.0,
+    "recall": 0.571,
+    "f1": 0.727
+   },
+   "tools": {
+    "precision": 0.875,
+    "recall": 0.7,
+    "f1": 0.778
+   },
+   "open_source": {
+    "precision": 1.0,
+    "recall": 0.75,
+    "f1": 0.857
+   }
+  }
+ },
+ "warm_median_ms": 634.1,
+ "rows": [
+  {
+   "id": "dev-01",
+   "split": "development",
+   "gold": [
+    "mobile",
+    "open_source"
+   ],
+   "tags": [
+    "mobile",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.974,
+    "web": 0.2018,
+    "desktop": 0.018,
+    "design": 0.1645,
+    "research": 0.0159,
+    "tools": 0.3775,
+    "open_source": 0.9933
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 10400.4
+  },
+  {
+   "id": "dev-02",
+   "split": "development",
+   "gold": [
+    "research"
+   ],
+   "tags": [
+    "research"
+   ],
+   "yes": {
+    "mobile": 0.0331,
+    "web": 0.0675,
+    "desktop": 0.0141,
+    "design": 0.0159,
+    "research": 0.7549,
+    "tools": 0.0601,
+    "open_source": 0.0759
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 1765.0
+  },
+  {
+   "id": "dev-03",
+   "split": "development",
+   "gold": [
+    "design",
+    "tools"
+   ],
+   "tags": [
+    "design"
+   ],
+   "yes": {
+    "mobile": 0.1824,
+    "web": 0.148,
+    "desktop": 0.0373,
+    "design": 0.7058,
+    "research": 0.0025,
+    "tools": 0.2689,
+    "open_source": 0.0331
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 1775.8
+  },
+  {
+   "id": "dev-04",
+   "split": "development",
+   "gold": [
+    "desktop",
+    "open_source",
+    "tools",
+    "web"
+   ],
+   "tags": [
+    "web",
+    "desktop",
+    "tools"
+   ],
+   "yes": {
+    "mobile": 0.0086,
+    "web": 0.5312,
+    "desktop": 0.9968,
+    "design": 0.0953,
+    "research": 0.0059,
+    "tools": 0.5312,
+    "open_source": 0.1645
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 1077.3
+  },
+  {
+   "id": "dev-05",
+   "split": "development",
+   "gold": [
+    "web"
+   ],
+   "tags": [
+    "web"
+   ],
+   "yes": {
+    "mobile": 0.2451,
+    "web": 0.9959,
+    "desktop": 0.133,
+    "design": 0.4378,
+    "research": 0.0601,
+    "tools": 0.2689,
+    "open_source": 0.0331
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 680.6
+  },
+  {
+   "id": "dev-06",
+   "split": "development",
+   "gold": [],
+   "tags": [],
+   "yes": {
+    "mobile": 0.0203,
+    "web": 0.0141,
+    "desktop": 0.023,
+    "design": 0.0421,
+    "research": 0.0052,
+    "tools": 0.0203,
+    "open_source": 0.0086
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 673.5
+  },
+  {
+   "id": "dev-07",
+   "split": "development",
+   "gold": [
+    "open_source",
+    "tools"
+   ],
+   "tags": [
+    "tools",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.0601,
+    "web": 0.2942,
+    "desktop": 0.0851,
+    "design": 0.0203,
+    "research": 0.0059,
+    "tools": 0.9526,
+    "open_source": 0.9241
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 673.1
+  },
+  {
+   "id": "dev-08",
+   "split": "development",
+   "gold": [
+    "mobile",
+    "research"
+   ],
+   "tags": [
+    "mobile",
+    "research"
+   ],
+   "yes": {
+    "mobile": 0.9627,
+    "web": 0.023,
+    "desktop": 0.0141,
+    "design": 0.018,
+    "research": 0.7982,
+    "tools": 0.1067,
+    "open_source": 0.0086
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 697.1
+  },
+  {
+   "id": "dev-09",
+   "split": "development",
+   "gold": [
+    "design"
+   ],
+   "tags": [
+    "web",
+    "design"
+   ],
+   "yes": {
+    "mobile": 0.0675,
+    "web": 0.7982,
+    "desktop": 0.0474,
+    "design": 0.9579,
+    "research": 0.0293,
+    "tools": 0.0534,
+    "open_source": 0.0293
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 723.7
+  },
+  {
+   "id": "dev-10",
+   "split": "development",
+   "gold": [
+    "desktop",
+    "tools"
+   ],
+   "tags": [],
+   "yes": {
+    "mobile": 0.023,
+    "web": 0.026,
+    "desktop": 0.3208,
+    "design": 0.0474,
+    "research": 0.0032,
+    "tools": 0.4073,
+    "open_source": 0.0097
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 700.4
+  },
+  {
+   "id": "dev-11",
+   "split": "development",
+   "gold": [
+    "web"
+   ],
+   "tags": [
+    "web",
+    "tools"
+   ],
+   "yes": {
+    "mobile": 0.2689,
+    "web": 0.9797,
+    "desktop": 0.0331,
+    "design": 0.1192,
+    "research": 0.133,
+    "tools": 0.7773,
+    "open_source": 0.1824
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 695.4
+  },
+  {
+   "id": "dev-12",
+   "split": "development",
+   "gold": [
+    "mobile"
+   ],
+   "tags": [
+    "mobile"
+   ],
+   "yes": {
+    "mobile": 0.9876,
+    "web": 0.0076,
+    "desktop": 0.0293,
+    "design": 0.0203,
+    "research": 0.0059,
+    "tools": 0.2451,
+    "open_source": 0.0067
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 679.7
+  },
+  {
+   "id": "dev-13",
+   "split": "development",
+   "gold": [
+    "research",
+    "tools"
+   ],
+   "tags": [],
+   "yes": {
+    "mobile": 0.0293,
+    "web": 0.023,
+    "desktop": 0.0141,
+    "design": 0.0124,
+    "research": 0.133,
+    "tools": 0.2451,
+    "open_source": 0.023
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 661.1
+  },
+  {
+   "id": "dev-14",
+   "split": "development",
+   "gold": [
+    "design",
+    "open_source"
+   ],
+   "tags": [
+    "design",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.0373,
+    "web": 0.2451,
+    "desktop": 0.0141,
+    "design": 0.8808,
+    "research": 0.0036,
+    "tools": 0.2451,
+    "open_source": 0.9968
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 659.4
+  },
+  {
+   "id": "dev-15",
+   "split": "development",
+   "gold": [
+    "desktop",
+    "mobile",
+    "tools"
+   ],
+   "tags": [
+    "mobile",
+    "desktop",
+    "tools"
+   ],
+   "yes": {
+    "mobile": 0.9149,
+    "web": 0.1067,
+    "desktop": 0.9399,
+    "design": 0.2018,
+    "research": 0.0041,
+    "tools": 0.8933,
+    "open_source": 0.0086
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 634.1
+  },
+  {
+   "id": "dev-16",
+   "split": "development",
+   "gold": [
+    "desktop",
+    "open_source"
+   ],
+   "tags": [
+    "desktop",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.0159,
+    "web": 0.0759,
+    "desktop": 0.7549,
+    "design": 0.0086,
+    "research": 0.0675,
+    "tools": 0.1067,
+    "open_source": 0.7549
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 630.5
+  },
+  {
+   "id": "dev-17",
+   "split": "development",
+   "gold": [],
+   "tags": [],
+   "yes": {
+    "mobile": 0.0293,
+    "web": 0.0293,
+    "desktop": 0.0159,
+    "design": 0.0293,
+    "research": 0.0028,
+    "tools": 0.0076,
+    "open_source": 0.0086
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 591.3
+  },
+  {
+   "id": "dev-18",
+   "split": "development",
+   "gold": [
+    "design",
+    "web"
+   ],
+   "tags": [],
+   "yes": {
+    "mobile": 0.0331,
+    "web": 0.3208,
+    "desktop": 0.018,
+    "design": 0.1067,
+    "research": 0.0421,
+    "tools": 0.1824,
+    "open_source": 0.0534
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 583.1
+  },
+  {
+   "id": "dev-19",
+   "split": "development",
+   "gold": [
+    "research"
+   ],
+   "tags": [],
+   "yes": {
+    "mobile": 0.023,
+    "web": 0.023,
+    "desktop": 0.0293,
+    "design": 0.0124,
+    "research": 0.4378,
+    "tools": 0.0293,
+    "open_source": 0.0203
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 576.4
+  },
+  {
+   "id": "dev-20",
+   "split": "development",
+   "gold": [
+    "desktop",
+    "open_source",
+    "tools"
+   ],
+   "tags": [],
+   "yes": {
+    "mobile": 0.1192,
+    "web": 0.1067,
+    "desktop": 0.4073,
+    "design": 0.0601,
+    "research": 0.0086,
+    "tools": 0.4688,
+    "open_source": 0.0759
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 639.9
+  },
+  {
+   "id": "dev-21",
+   "split": "development",
+   "gold": [
+    "mobile"
+   ],
+   "tags": [
+    "mobile"
+   ],
+   "yes": {
+    "mobile": 0.9975,
+    "web": 0.0159,
+    "desktop": 0.023,
+    "design": 0.026,
+    "research": 0.133,
+    "tools": 0.2018,
+    "open_source": 0.0373
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 632.4
+  },
+  {
+   "id": "dev-22",
+   "split": "development",
+   "gold": [
+    "design",
+    "tools",
+    "web"
+   ],
+   "tags": [
+    "web",
+    "design",
+    "tools"
+   ],
+   "yes": {
+    "mobile": 0.1824,
+    "web": 0.9526,
+    "desktop": 0.0675,
+    "design": 0.5927,
+    "research": 0.0331,
+    "tools": 0.9241,
+    "open_source": 0.0601
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 640.3
+  },
+  {
+   "id": "dev-23",
+   "split": "development",
+   "gold": [
+    "tools"
+   ],
+   "tags": [],
+   "yes": {
+    "mobile": 0.0851,
+    "web": 0.2018,
+    "desktop": 0.011,
+    "design": 0.0124,
+    "research": 0.0331,
+    "tools": 0.1645,
+    "open_source": 0.3208
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 625.1
+  },
+  {
+   "id": "dev-24",
+   "split": "development",
+   "gold": [
+    "research"
+   ],
+   "tags": [
+    "research"
+   ],
+   "yes": {
+    "mobile": 0.2227,
+    "web": 0.0331,
+    "desktop": 0.0159,
+    "design": 0.0141,
+    "research": 0.7773,
+    "tools": 0.026,
+    "open_source": 0.0059
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 627.5
+  },
+  {
+   "id": "dev-25",
+   "split": "development",
+   "gold": [
+    "desktop",
+    "open_source",
+    "tools"
+   ],
+   "tags": [
+    "desktop",
+    "tools",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.0097,
+    "web": 0.026,
+    "desktop": 0.9924,
+    "design": 0.0421,
+    "research": 0.0046,
+    "tools": 0.9047,
+    "open_source": 0.5622
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 657.0
+  },
+  {
+   "id": "dev-26",
+   "split": "development",
+   "gold": [
+    "design",
+    "mobile"
+   ],
+   "tags": [
+    "mobile"
+   ],
+   "yes": {
+    "mobile": 0.9526,
+    "web": 0.0159,
+    "desktop": 0.0203,
+    "design": 0.4378,
+    "research": 0.0141,
+    "tools": 0.0953,
+    "open_source": 0.0474
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 685.7
+  },
+  {
+   "id": "dev-27",
+   "split": "development",
+   "gold": [
+    "open_source",
+    "tools",
+    "web"
+   ],
+   "tags": [
+    "web",
+    "tools"
+   ],
+   "yes": {
+    "mobile": 0.1645,
+    "web": 0.9988,
+    "desktop": 0.0534,
+    "design": 0.148,
+    "research": 0.0086,
+    "tools": 0.9325,
+    "open_source": 0.0953
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 702.1
+  },
+  {
+   "id": "dev-28",
+   "split": "development",
+   "gold": [],
+   "tags": [],
+   "yes": {
+    "mobile": 0.023,
+    "web": 0.011,
+    "desktop": 0.0097,
+    "design": 0.0141,
+    "research": 0.0017,
+    "tools": 0.0032,
+    "open_source": 0.0159
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 689.3
+  },
+  {
+   "id": "dev-29",
+   "split": "development",
+   "gold": [
+    "mobile",
+    "research"
+   ],
+   "tags": [
+    "mobile"
+   ],
+   "yes": {
+    "mobile": 0.8176,
+    "web": 0.0331,
+    "desktop": 0.0203,
+    "design": 0.0331,
+    "research": 0.2018,
+    "tools": 0.0953,
+    "open_source": 0.0067
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 703.3
+  },
+  {
+   "id": "dev-30",
+   "split": "development",
+   "gold": [
+    "desktop",
+    "open_source",
+    "tools"
+   ],
+   "tags": [
+    "tools",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.0953,
+    "web": 0.4073,
+    "desktop": 0.3208,
+    "design": 0.2018,
+    "research": 0.0097,
+    "tools": 0.852,
+    "open_source": 0.9914
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 689.2
+  },
+  {
+   "id": "cal-01",
+   "split": "calibration",
+   "gold": [
+    "mobile",
+    "open_source"
+   ],
+   "tags": [
+    "mobile",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.9941,
+    "web": 0.0851,
+    "desktop": 0.0124,
+    "design": 0.0331,
+    "research": 0.0046,
+    "tools": 0.2451,
+    "open_source": 0.982
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 681.3
+  },
+  {
+   "id": "cal-02",
+   "split": "calibration",
+   "gold": [
+    "research"
+   ],
+   "tags": [
+    "research"
+   ],
+   "yes": {
+    "mobile": 0.011,
+    "web": 0.0086,
+    "desktop": 0.0141,
+    "design": 0.0124,
+    "research": 0.7058,
+    "tools": 0.0141,
+    "open_source": 0.0293
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 683.9
+  },
+  {
+   "id": "cal-03",
+   "split": "calibration",
+   "gold": [
+    "design"
+   ],
+   "tags": [
+    "mobile",
+    "web",
+    "design"
+   ],
+   "yes": {
+    "mobile": 0.6514,
+    "web": 0.5622,
+    "desktop": 0.148,
+    "design": 0.7058,
+    "research": 0.0534,
+    "tools": 0.1824,
+    "open_source": 0.0675
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 633.3
+  },
+  {
+   "id": "cal-04",
+   "split": "calibration",
+   "gold": [
+    "desktop",
+    "web"
+   ],
+   "tags": [
+    "desktop"
+   ],
+   "yes": {
+    "mobile": 0.023,
+    "web": 0.026,
+    "desktop": 0.9669,
+    "design": 0.0534,
+    "research": 0.0474,
+    "tools": 0.2227,
+    "open_source": 0.011
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 639.8
+  },
+  {
+   "id": "cal-05",
+   "split": "calibration",
+   "gold": [
+    "web"
+   ],
+   "tags": [
+    "web"
+   ],
+   "yes": {
+    "mobile": 0.4073,
+    "web": 0.9978,
+    "desktop": 0.148,
+    "design": 0.4378,
+    "research": 0.011,
+    "tools": 0.4378,
+    "open_source": 0.0141
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 638.9
+  },
+  {
+   "id": "cal-06",
+   "split": "calibration",
+   "gold": [],
+   "tags": [],
+   "yes": {
+    "mobile": 0.018,
+    "web": 0.018,
+    "desktop": 0.0052,
+    "design": 0.0076,
+    "research": 0.0046,
+    "tools": 0.0331,
+    "open_source": 0.0041
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 602.7
+  },
+  {
+   "id": "cal-07",
+   "split": "calibration",
+   "gold": [
+    "open_source",
+    "tools"
+   ],
+   "tags": [
+    "tools",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.023,
+    "web": 0.0601,
+    "desktop": 0.1824,
+    "design": 0.0124,
+    "research": 0.0097,
+    "tools": 0.9325,
+    "open_source": 0.9914
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 564.9
+  },
+  {
+   "id": "cal-08",
+   "split": "calibration",
+   "gold": [
+    "research"
+   ],
+   "tags": [
+    "mobile",
+    "web"
+   ],
+   "yes": {
+    "mobile": 0.7773,
+    "web": 0.7058,
+    "desktop": 0.1067,
+    "design": 0.0203,
+    "research": 0.2451,
+    "tools": 0.2227,
+    "open_source": 0.0067
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 547.2
+  },
+  {
+   "id": "cal-09",
+   "split": "calibration",
+   "gold": [
+    "design",
+    "web"
+   ],
+   "tags": [
+    "web"
+   ],
+   "yes": {
+    "mobile": 0.0851,
+    "web": 0.7773,
+    "desktop": 0.0331,
+    "design": 0.4378,
+    "research": 0.0159,
+    "tools": 0.0759,
+    "open_source": 0.0293
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 498.1
+  },
+  {
+   "id": "cal-10",
+   "split": "calibration",
+   "gold": [
+    "desktop",
+    "tools"
+   ],
+   "tags": [
+    "desktop"
+   ],
+   "yes": {
+    "mobile": 0.0421,
+    "web": 0.0097,
+    "desktop": 0.7058,
+    "design": 0.2451,
+    "research": 0.0067,
+    "tools": 0.2227,
+    "open_source": 0.0076
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 532.5
+  },
+  {
+   "id": "cal-11",
+   "split": "calibration",
+   "gold": [
+    "open_source",
+    "web"
+   ],
+   "tags": [
+    "web",
+    "tools"
+   ],
+   "yes": {
+    "mobile": 0.2942,
+    "web": 0.9859,
+    "desktop": 0.0759,
+    "design": 0.0601,
+    "research": 0.148,
+    "tools": 0.6225,
+    "open_source": 0.2018
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 513.8
+  },
+  {
+   "id": "cal-12",
+   "split": "calibration",
+   "gold": [
+    "mobile"
+   ],
+   "tags": [
+    "mobile"
+   ],
+   "yes": {
+    "mobile": 0.9669,
+    "web": 0.0675,
+    "desktop": 0.0076,
+    "design": 0.018,
+    "research": 0.0293,
+    "tools": 0.2227,
+    "open_source": 0.0141
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 567.7
+  },
+  {
+   "id": "cal-13",
+   "split": "calibration",
+   "gold": [
+    "research",
+    "tools"
+   ],
+   "tags": [],
+   "yes": {
+    "mobile": 0.026,
+    "web": 0.148,
+    "desktop": 0.026,
+    "design": 0.011,
+    "research": 0.3775,
+    "tools": 0.1645,
+    "open_source": 0.1067
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 695.2
+  },
+  {
+   "id": "cal-14",
+   "split": "calibration",
+   "gold": [
+    "design",
+    "open_source"
+   ],
+   "tags": [
+    "web",
+    "design",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.1824,
+    "web": 0.6514,
+    "desktop": 0.0474,
+    "design": 0.5927,
+    "research": 0.0059,
+    "tools": 0.2227,
+    "open_source": 0.9526
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 752.0
+  },
+  {
+   "id": "cal-15",
+   "split": "calibration",
+   "gold": [
+    "desktop",
+    "mobile",
+    "tools"
+   ],
+   "tags": [
+    "mobile",
+    "desktop",
+    "tools"
+   ],
+   "yes": {
+    "mobile": 0.9241,
+    "web": 0.148,
+    "desktop": 0.8808,
+    "design": 0.0373,
+    "research": 0.0059,
+    "tools": 0.7311,
+    "open_source": 0.0331
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 761.1
+  },
+  {
+   "id": "cal-16",
+   "split": "calibration",
+   "gold": [
+    "design",
+    "desktop",
+    "open_source"
+   ],
+   "tags": [
+    "desktop",
+    "design",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.0534,
+    "web": 0.1067,
+    "desktop": 0.9627,
+    "design": 0.852,
+    "research": 0.0124,
+    "tools": 0.2018,
+    "open_source": 0.9859
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 805.0
+  },
+  {
+   "id": "cal-17",
+   "split": "calibration",
+   "gold": [],
+   "tags": [],
+   "yes": {
+    "mobile": 0.026,
+    "web": 0.0534,
+    "desktop": 0.0293,
+    "design": 0.018,
+    "research": 0.0052,
+    "tools": 0.0203,
+    "open_source": 0.0124
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 774.5
+  },
+  {
+   "id": "cal-18",
+   "split": "calibration",
+   "gold": [
+    "tools",
+    "web"
+   ],
+   "tags": [
+    "web"
+   ],
+   "yes": {
+    "mobile": 0.3486,
+    "web": 0.7549,
+    "desktop": 0.0675,
+    "design": 0.0474,
+    "research": 0.0159,
+    "tools": 0.2451,
+    "open_source": 0.023
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 659.3
+  },
+  {
+   "id": "cal-19",
+   "split": "calibration",
+   "gold": [
+    "research"
+   ],
+   "tags": [
+    "research"
+   ],
+   "yes": {
+    "mobile": 0.0067,
+    "web": 0.0097,
+    "desktop": 0.0041,
+    "design": 0.0076,
+    "research": 0.5927,
+    "tools": 0.0036,
+    "open_source": 0.0067
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 637.6
+  },
+  {
+   "id": "cal-20",
+   "split": "calibration",
+   "gold": [
+    "tools"
+   ],
+   "tags": [
+    "desktop",
+    "tools"
+   ],
+   "yes": {
+    "mobile": 0.0331,
+    "web": 0.0601,
+    "desktop": 0.7982,
+    "design": 0.0953,
+    "research": 0.0097,
+    "tools": 0.7311,
+    "open_source": 0.0474
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 580.2
+  },
+  {
+   "id": "cal-21",
+   "split": "calibration",
+   "gold": [
+    "mobile"
+   ],
+   "tags": [
+    "mobile",
+    "design"
+   ],
+   "yes": {
+    "mobile": 0.9975,
+    "web": 0.0331,
+    "desktop": 0.023,
+    "design": 0.5312,
+    "research": 0.011,
+    "tools": 0.3486,
+    "open_source": 0.0421
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 524.1
+  },
+  {
+   "id": "cal-22",
+   "split": "calibration",
+   "gold": [
+    "design",
+    "tools"
+   ],
+   "tags": [
+    "mobile",
+    "web",
+    "design"
+   ],
+   "yes": {
+    "mobile": 0.5622,
+    "web": 0.5312,
+    "desktop": 0.0675,
+    "design": 0.7311,
+    "research": 0.0141,
+    "tools": 0.0953,
+    "open_source": 0.0159
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 527.2
+  },
+  {
+   "id": "cal-23",
+   "split": "calibration",
+   "gold": [
+    "tools",
+    "web"
+   ],
+   "tags": [
+    "web"
+   ],
+   "yes": {
+    "mobile": 0.0331,
+    "web": 0.9149,
+    "desktop": 0.0052,
+    "design": 0.0331,
+    "research": 0.023,
+    "tools": 0.4378,
+    "open_source": 0.0159
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 548.1
+  },
+  {
+   "id": "cal-24",
+   "split": "calibration",
+   "gold": [
+    "mobile",
+    "research"
+   ],
+   "tags": [
+    "mobile"
+   ],
+   "yes": {
+    "mobile": 0.867,
+    "web": 0.0601,
+    "desktop": 0.011,
+    "design": 0.1824,
+    "research": 0.2451,
+    "tools": 0.0293,
+    "open_source": 0.0076
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 557.4
+  },
+  {
+   "id": "cal-25",
+   "split": "calibration",
+   "gold": [
+    "desktop",
+    "open_source",
+    "tools"
+   ],
+   "tags": [
+    "desktop",
+    "tools",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.0534,
+    "web": 0.1067,
+    "desktop": 0.9876,
+    "design": 0.2227,
+    "research": 0.0046,
+    "tools": 0.867,
+    "open_source": 0.7773
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 543.6
+  },
+  {
+   "id": "cal-26",
+   "split": "calibration",
+   "gold": [
+    "design",
+    "mobile"
+   ],
+   "tags": [
+    "mobile",
+    "design"
+   ],
+   "yes": {
+    "mobile": 0.8355,
+    "web": 0.2227,
+    "desktop": 0.1067,
+    "design": 0.7058,
+    "research": 0.0097,
+    "tools": 0.0759,
+    "open_source": 0.0067
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 532.8
+  },
+  {
+   "id": "cal-27",
+   "split": "calibration",
+   "gold": [
+    "open_source",
+    "web"
+   ],
+   "tags": [
+    "web"
+   ],
+   "yes": {
+    "mobile": 0.2018,
+    "web": 0.852,
+    "desktop": 0.023,
+    "design": 0.2018,
+    "research": 0.0474,
+    "tools": 0.133,
+    "open_source": 0.0293
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 516.1
+  },
+  {
+   "id": "cal-28",
+   "split": "calibration",
+   "gold": [],
+   "tags": [],
+   "yes": {
+    "mobile": 0.0203,
+    "web": 0.0373,
+    "desktop": 0.0086,
+    "design": 0.0124,
+    "research": 0.0052,
+    "tools": 0.0097,
+    "open_source": 0.0036
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 520.7
+  },
+  {
+   "id": "cal-29",
+   "split": "calibration",
+   "gold": [
+    "mobile",
+    "research"
+   ],
+   "tags": [
+    "mobile",
+    "research"
+   ],
+   "yes": {
+    "mobile": 0.6514,
+    "web": 0.0203,
+    "desktop": 0.0141,
+    "design": 0.0759,
+    "research": 0.5622,
+    "tools": 0.0851,
+    "open_source": 0.026
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 545.2
+  },
+  {
+   "id": "cal-30",
+   "split": "calibration",
+   "gold": [
+    "open_source",
+    "tools"
+   ],
+   "tags": [
+    "tools",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.0373,
+    "web": 0.0331,
+    "desktop": 0.4688,
+    "design": 0.0953,
+    "research": 0.018,
+    "tools": 0.8355,
+    "open_source": 0.8808
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 546.2
+  },
+  {
+   "id": "hel-01",
+   "split": "held_out",
+   "gold": [
+    "mobile",
+    "open_source"
+   ],
+   "tags": [
+    "mobile",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.977,
+    "web": 0.2451,
+    "desktop": 0.026,
+    "design": 0.0203,
+    "research": 0.0059,
+    "tools": 0.0851,
+    "open_source": 0.9903
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 608.0
+  },
+  {
+   "id": "hel-02",
+   "split": "held_out",
+   "gold": [
+    "open_source",
+    "research"
+   ],
+   "tags": [
+    "research",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.0203,
+    "web": 0.0159,
+    "desktop": 0.011,
+    "design": 0.0097,
+    "research": 0.5622,
+    "tools": 0.148,
+    "open_source": 0.9149
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 521.1
+  },
+  {
+   "id": "hel-03",
+   "split": "held_out",
+   "gold": [
+    "design"
+   ],
+   "tags": [
+    "web",
+    "design"
+   ],
+   "yes": {
+    "mobile": 0.133,
+    "web": 0.5312,
+    "desktop": 0.0675,
+    "design": 0.9579,
+    "research": 0.026,
+    "tools": 0.2451,
+    "open_source": 0.011
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 512.5
+  },
+  {
+   "id": "hel-04",
+   "split": "held_out",
+   "gold": [
+    "desktop",
+    "tools"
+   ],
+   "tags": [
+    "desktop"
+   ],
+   "yes": {
+    "mobile": 0.0124,
+    "web": 0.0293,
+    "desktop": 0.9954,
+    "design": 0.0373,
+    "research": 0.0373,
+    "tools": 0.0953,
+    "open_source": 0.0474
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 545.0
+  },
+  {
+   "id": "hel-05",
+   "split": "held_out",
+   "gold": [
+    "web"
+   ],
+   "tags": [
+    "web"
+   ],
+   "yes": {
+    "mobile": 0.0534,
+    "web": 0.989,
+    "desktop": 0.2451,
+    "design": 0.3208,
+    "research": 0.0953,
+    "tools": 0.2942,
+    "open_source": 0.0474
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 565.3
+  },
+  {
+   "id": "hel-06",
+   "split": "held_out",
+   "gold": [],
+   "tags": [],
+   "yes": {
+    "mobile": 0.0141,
+    "web": 0.018,
+    "desktop": 0.0141,
+    "design": 0.0373,
+    "research": 0.0025,
+    "tools": 0.0059,
+    "open_source": 0.011
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 565.8
+  },
+  {
+   "id": "hel-07",
+   "split": "held_out",
+   "gold": [
+    "open_source",
+    "tools"
+   ],
+   "tags": [
+    "tools",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.0331,
+    "web": 0.1192,
+    "desktop": 0.0675,
+    "design": 0.0159,
+    "research": 0.0028,
+    "tools": 0.9859,
+    "open_source": 0.9149
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 573.2
+  },
+  {
+   "id": "hel-08",
+   "split": "held_out",
+   "gold": [
+    "mobile",
+    "research"
+   ],
+   "tags": [
+    "research"
+   ],
+   "yes": {
+    "mobile": 0.4378,
+    "web": 0.0331,
+    "desktop": 0.0331,
+    "design": 0.023,
+    "research": 0.5622,
+    "tools": 0.0421,
+    "open_source": 0.0203
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 594.2
+  },
+  {
+   "id": "hel-09",
+   "split": "held_out",
+   "gold": [
+    "design",
+    "web"
+   ],
+   "tags": [
+    "web"
+   ],
+   "yes": {
+    "mobile": 0.0851,
+    "web": 0.5622,
+    "desktop": 0.0474,
+    "design": 0.2689,
+    "research": 0.0331,
+    "tools": 0.0759,
+    "open_source": 0.0534
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 601.3
+  },
+  {
+   "id": "hel-10",
+   "split": "held_out",
+   "gold": [
+    "desktop",
+    "tools"
+   ],
+   "tags": [
+    "desktop",
+    "tools"
+   ],
+   "yes": {
+    "mobile": 0.026,
+    "web": 0.023,
+    "desktop": 0.852,
+    "design": 0.0675,
+    "research": 0.0067,
+    "tools": 0.7549,
+    "open_source": 0.0474
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 562.1
+  },
+  {
+   "id": "hel-11",
+   "split": "held_out",
+   "gold": [
+    "web"
+   ],
+   "tags": [
+    "web"
+   ],
+   "yes": {
+    "mobile": 0.1824,
+    "web": 0.9859,
+    "desktop": 0.0421,
+    "design": 0.0759,
+    "research": 0.0086,
+    "tools": 0.3208,
+    "open_source": 0.1067
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 565.5
+  },
+  {
+   "id": "hel-12",
+   "split": "held_out",
+   "gold": [
+    "design",
+    "mobile"
+   ],
+   "tags": [
+    "mobile"
+   ],
+   "yes": {
+    "mobile": 0.7773,
+    "web": 0.1645,
+    "desktop": 0.0203,
+    "design": 0.0953,
+    "research": 0.0601,
+    "tools": 0.023,
+    "open_source": 0.0052
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 581.5
+  },
+  {
+   "id": "hel-13",
+   "split": "held_out",
+   "gold": [
+    "research",
+    "tools"
+   ],
+   "tags": [],
+   "yes": {
+    "mobile": 0.0293,
+    "web": 0.3486,
+    "desktop": 0.0159,
+    "design": 0.011,
+    "research": 0.2689,
+    "tools": 0.2018,
+    "open_source": 0.0097
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 634.8
+  },
+  {
+   "id": "hel-14",
+   "split": "held_out",
+   "gold": [
+    "design",
+    "open_source"
+   ],
+   "tags": [
+    "design",
+    "tools"
+   ],
+   "yes": {
+    "mobile": 0.0159,
+    "web": 0.0953,
+    "desktop": 0.0159,
+    "design": 0.5622,
+    "research": 0.0041,
+    "tools": 0.6225,
+    "open_source": 0.2942
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 687.3
+  },
+  {
+   "id": "hel-15",
+   "split": "held_out",
+   "gold": [
+    "desktop",
+    "mobile",
+    "tools",
+    "web"
+   ],
+   "tags": [
+    "desktop",
+    "tools"
+   ],
+   "yes": {
+    "mobile": 0.4073,
+    "web": 0.0601,
+    "desktop": 0.8933,
+    "design": 0.0601,
+    "research": 0.0028,
+    "tools": 0.8933,
+    "open_source": 0.0036
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 729.9
+  },
+  {
+   "id": "hel-16",
+   "split": "held_out",
+   "gold": [
+    "desktop",
+    "open_source"
+   ],
+   "tags": [
+    "desktop",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.0097,
+    "web": 0.148,
+    "desktop": 0.977,
+    "design": 0.1067,
+    "research": 0.011,
+    "tools": 0.0759,
+    "open_source": 0.9399
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 653.8
+  },
+  {
+   "id": "hel-17",
+   "split": "held_out",
+   "gold": [],
+   "tags": [],
+   "yes": {
+    "mobile": 0.0159,
+    "web": 0.0124,
+    "desktop": 0.0076,
+    "design": 0.0097,
+    "research": 0.0019,
+    "tools": 0.0028,
+    "open_source": 0.011
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 679.8
+  },
+  {
+   "id": "hel-18",
+   "split": "held_out",
+   "gold": [
+    "research",
+    "web"
+   ],
+   "tags": [
+    "web"
+   ],
+   "yes": {
+    "mobile": 0.1824,
+    "web": 0.5927,
+    "desktop": 0.026,
+    "design": 0.0331,
+    "research": 0.023,
+    "tools": 0.0675,
+    "open_source": 0.0097
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 705.3
+  },
+  {
+   "id": "hel-19",
+   "split": "held_out",
+   "gold": [
+    "research"
+   ],
+   "tags": [
+    "research"
+   ],
+   "yes": {
+    "mobile": 0.3775,
+    "web": 0.2227,
+    "desktop": 0.018,
+    "design": 0.0159,
+    "research": 0.6792,
+    "tools": 0.0851,
+    "open_source": 0.018
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 607.0
+  },
+  {
+   "id": "hel-20",
+   "split": "held_out",
+   "gold": [
+    "tools"
+   ],
+   "tags": [
+    "tools"
+   ],
+   "yes": {
+    "mobile": 0.1645,
+    "web": 0.148,
+    "desktop": 0.133,
+    "design": 0.023,
+    "research": 0.0097,
+    "tools": 0.5312,
+    "open_source": 0.0675
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 666.5
+  },
+  {
+   "id": "hel-21",
+   "split": "held_out",
+   "gold": [
+    "mobile"
+   ],
+   "tags": [
+    "mobile",
+    "web",
+    "design"
+   ],
+   "yes": {
+    "mobile": 0.9669,
+    "web": 0.5,
+    "desktop": 0.0293,
+    "design": 0.5312,
+    "research": 0.133,
+    "tools": 0.2451,
+    "open_source": 0.023
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 614.5
+  },
+  {
+   "id": "hel-22",
+   "split": "held_out",
+   "gold": [
+    "design"
+   ],
+   "tags": [],
+   "yes": {
+    "mobile": 0.0851,
+    "web": 0.1192,
+    "desktop": 0.0601,
+    "design": 0.1645,
+    "research": 0.0159,
+    "tools": 0.0421,
+    "open_source": 0.0159
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 581.5
+  },
+  {
+   "id": "hel-23",
+   "split": "held_out",
+   "gold": [
+    "open_source",
+    "tools",
+    "web"
+   ],
+   "tags": [
+    "web",
+    "tools"
+   ],
+   "yes": {
+    "mobile": 0.0331,
+    "web": 0.977,
+    "desktop": 0.0293,
+    "design": 0.0421,
+    "research": 0.0067,
+    "tools": 0.7549,
+    "open_source": 0.0601
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 663.3
+  },
+  {
+   "id": "hel-24",
+   "split": "held_out",
+   "gold": [
+    "design",
+    "mobile",
+    "research"
+   ],
+   "tags": [
+    "mobile"
+   ],
+   "yes": {
+    "mobile": 0.5312,
+    "web": 0.2018,
+    "desktop": 0.0534,
+    "design": 0.3486,
+    "research": 0.3486,
+    "tools": 0.0373,
+    "open_source": 0.0059
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 801.2
+  },
+  {
+   "id": "hel-25",
+   "split": "held_out",
+   "gold": [
+    "desktop",
+    "open_source",
+    "tools"
+   ],
+   "tags": [
+    "desktop",
+    "tools",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.023,
+    "web": 0.0293,
+    "desktop": 0.9707,
+    "design": 0.1067,
+    "research": 0.0141,
+    "tools": 0.8933,
+    "open_source": 0.9399
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 604.3
+  },
+  {
+   "id": "hel-26",
+   "split": "held_out",
+   "gold": [
+    "design",
+    "mobile",
+    "tools"
+   ],
+   "tags": [
+    "mobile",
+    "design",
+    "tools"
+   ],
+   "yes": {
+    "mobile": 0.9941,
+    "web": 0.0159,
+    "desktop": 0.0421,
+    "design": 0.9047,
+    "research": 0.0159,
+    "tools": 0.9707,
+    "open_source": 0.0675
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 612.9
+  },
+  {
+   "id": "hel-27",
+   "split": "held_out",
+   "gold": [
+    "design",
+    "web"
+   ],
+   "tags": [
+    "web"
+   ],
+   "yes": {
+    "mobile": 0.0851,
+    "web": 0.9876,
+    "desktop": 0.0203,
+    "design": 0.4378,
+    "research": 0.0059,
+    "tools": 0.3775,
+    "open_source": 0.0421
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 626.8
+  },
+  {
+   "id": "hel-28",
+   "split": "held_out",
+   "gold": [],
+   "tags": [],
+   "yes": {
+    "mobile": 0.0601,
+    "web": 0.0534,
+    "desktop": 0.0331,
+    "design": 0.0675,
+    "research": 0.0293,
+    "tools": 0.0474,
+    "open_source": 0.0159
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 688.7
+  },
+  {
+   "id": "hel-29",
+   "split": "held_out",
+   "gold": [
+    "design",
+    "mobile",
+    "research"
+   ],
+   "tags": [
+    "mobile",
+    "research"
+   ],
+   "yes": {
+    "mobile": 0.9579,
+    "web": 0.0331,
+    "desktop": 0.0203,
+    "design": 0.0759,
+    "research": 0.5927,
+    "tools": 0.0474,
+    "open_source": 0.0025
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 666.1
+  },
+  {
+   "id": "hel-30",
+   "split": "held_out",
+   "gold": [
+    "desktop",
+    "open_source",
+    "tools"
+   ],
+   "tags": [
+    "web",
+    "desktop",
+    "tools",
+    "open_source"
+   ],
+   "yes": {
+    "mobile": 0.0421,
+    "web": 0.6792,
+    "desktop": 0.867,
+    "design": 0.0675,
+    "research": 0.0076,
+    "tools": 0.9669,
+    "open_source": 0.8355
+   },
+   "unknown_tags": [],
+   "model": "Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+   "ms": 662.7
+  }
+ ],
+ "run_at": "2026-09-28T22:12:31-05:00",
+ "hardware": "Apple M5 Max, 128 GB (developer machine); warm latency is not a benchmark"
+}
