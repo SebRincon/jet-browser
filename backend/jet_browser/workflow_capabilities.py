@@ -608,7 +608,7 @@ class WorkflowCapabilities:
         state, status, summary = args.get("state"), args.get("status"), args.get("summary")
         if not isinstance(state, dict) or len(json.dumps(state).encode("utf-8")) > 32 * 1024:
             raise ValueError("state")
-        if status not in ("review", "pause", "complete"):
+        if status not in ("review", "pause", "complete", "continue"):
             raise ValueError("status")
         if not isinstance(summary, str) or len(summary) > 500:
             raise ValueError("summary")

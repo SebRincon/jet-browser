@@ -118,19 +118,29 @@ authorization are needed. Preserve the collection id, original scope, model, and
 """
 # END WORKSPACE_RULES
 RULES += """
-CUSTOM AND ADAPTIVE WORKFLOWS: For multi-tag feeds, custom scripts, loops, branching,
-summaries, or iterative repairs, use workflow_sdk then save_workflow and run_workflow.
-This takes precedence over the fixed-taxonomy collection recipe above. JavaScript runs
-in bundled JavaScriptCore. jet.call is synchronous and ONLY the SDK capabilities exist.
-First list_tabs and inspect_collection_source (metadata only); preserve the observed
-source/tab. Default model qwen4b_semif_shared. Every category has id,name,description.
-User-authorized categories may be overlapping. Each item can have multiple tags.
+CUSTOM AND ADAPTIVE WORKFLOWS: For multi-tag feeds, summaries, custom scripts, loops,
+branching, or iterative repairs, use save_workflow and run_workflow. This takes
+precedence over the fixed-taxonomy collection recipe above. First list_tabs and
+inspect_collection_source (metadata only); preserve the observed source/tab.
+To organize, tag or summarize a feed or X Bookmarks, do not write JavaScript and do not
+call workflow_sdk: save_workflow with definition.template {name: "tagged_feed", options}
+and no source or capabilities. It already recovers truncated posts, deduplicates, saves
+link/author/date, pauses for review, continues long runs locally and stops on no
+progress. Options: summarize, recover_truncated, first_review (default 10),
+review_every (0 = only the first review; set 10 when the user asks to review every ten),
+max_idle_scrolls. Put the item count in limits.max_items. Decide quickly; keep the call
+small. Only when the template cannot express the request, call workflow_sdk and write
+short custom source. JavaScript runs in bundled JavaScriptCore; jet.call is synchronous
+and ONLY the SDK capabilities exist. Default model qwen4b_semif_shared. Every category
+has id,name,description. User-authorized categories may be overlapping. Each item can
+have multiple tags.
 Before classifying truncated posts use post.recover. If a recovery is blocked, preserve
 the specific blocker and continue other eligible items rather than inventing text.
 Use saved flags and records.list to deduplicate. model.classify returns independent tags;
 model.summarize uses that same local SemIf 4B. records.put copies observed link/author/date.
-Persist checkpoint state after ten newly saved items: run.checkpoint status review yields
-and wakes you automatically. Also checkpoint before the 180-second execution slice ends.
+Custom source: persist checkpoint state after ten newly saved items: run.checkpoint status
+review yields and wakes you automatically. Before the slice budget in jet.input.budget ends,
+checkpoint with status continue to start the next slice locally without waking you.
 The checkpoint contains cursor/state, not a long dump of posts. A resumed source starts
 from the beginning with jet.input.checkpoint; make it idempotent. Use a bounded local
 model.decide question on feed loading/end/no-new-item evidence to choose scroll or stop.
@@ -139,7 +149,8 @@ unless the page proves it. Never spin forever. Use max_items requested by user, 
 requested (default 1800, hard cap 14400), and max_calls<=10000 across all resumes.
 run_workflow returns immediately; finish with a brief acknowledgment and let the card
 show progress. Do not repeatedly poll. For errors inspect read_workflow and workflow_status,
-revise the SAME workflow with expected_revision, keep scope and budgets, and resume.
+revise the SAME workflow with expected_revision (a template workflow is revised by saving
+new template options), keep scope and budgets, and resume.
 At checkpoints workflow_records offers at most five authorized 400-character samples.
 patch_workflow_record edits a paused row's tags or summary with an audit. Source evidence
 can only be replaced by actual post recovery, never by Grok. Scope, model and lifetime

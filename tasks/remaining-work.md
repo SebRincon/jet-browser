@@ -17,7 +17,7 @@ Clean, simple single chat based on the [Orca/T3 source audit](../docs/chat-and-h
 
 ## Next smallest deliverable
 
-**First: staged Grok workflow authoring and safe progress/recovery.** The latest real bookmark request reached its 300-second provider deadline before saving a workflow. Preserve Stop and no-mutation-retry guarantees. See [incident](../docs/incidents/2026-09-28-grok-timeout.md) and [handoff](../docs/HANDOFF.md).
+**First: confirm the repaired Grok authoring path live.** The watchdog, saved-state failure report, `tagged_feed` template and local slice continuation are implemented and tested offline. A user-authorized, isolated rerun of the top-100 bookmark request must confirm Grok selects the template and the run completes. See [incident](../docs/incidents/2026-09-28-grok-timeout.md) and [templates](../docs/portable-workflows.md#built-in-templates).
 
 **Then: held-out categorization, account identity/cursor recovery and wider feed compatibility.** The initial bookmark adapter, per-post chunking and four bounded native passes are complete; see [feed audit](../docs/feed-collections.md). Broader lab foundation continues as **B01 → B02 → B03 → B04 → B05 → B06:** resettable fixtures, bounded choices, shared outcomes, independent runner, one watched task and exact-value extraction. Preserve navigation and Stop. B33–B34 isolate service/runtime and browser profile before native Watch. Offline replay can proceed independently. No desktop takeover.
 
@@ -25,7 +25,7 @@ Clean, simple single chat based on the [Orca/T3 source audit](../docs/chat-and-h
 
 | Work | State | Completion dependency |
 |---|---|---|
-| Grok authoring reliability | Partial: idle watchdog, safe stage/activity traces, cancellation tests and saved-state failure reports landed | Smaller authoring (built-in templates) and a real provider rerun |
+| Grok authoring reliability | Implemented offline: idle watchdog, stage/activity traces, saved-state failure reports, `tagged_feed` template, local slice continuation | A real, user-authorized provider rerun of the bookmark request |
 | U01 chat projection | Implemented; offline tests | Stable turn IDs and collapsed completed steps |
 | H01–H06/H08, U02–U03 website loop | First slice implemented; feed loop has native/resume evidence, wider acceptance pending | Bounded plans/store/local classifier/runner/MCP/results; further child acceptance remains |
 | H07 bookmark source | Initial adapter implemented and live-tested; partial broader acceptance | Account-switch identity, deleted/rate-limited sources and durable remote-cursor recovery remain |

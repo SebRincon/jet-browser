@@ -13,6 +13,10 @@
 - Bundled controller/model/provider/script runtimes and in-app model setup.
 - Initial Git baseline, agent guidance, architecture/development docs and current handoff.
 
+- Built-in `tagged_feed` workflow template: Grok organizes a feed or X Bookmarks with a
+  small `save_workflow` template call instead of writing JavaScript. Workflows can
+  checkpoint `continue` to start the next time slice locally without a Grok turn.
+
 ### Fixed
 
 - Grok turns now end after 150 s of provider silence (no tool running) as well as at
@@ -27,8 +31,8 @@
 
 ### Known limitations
 
-- Grok workflow authoring can still exceed the provider limits; the failure is now
-  bounded, diagnosed and reported from saved state, but not yet prevented.
+- Grok workflow authoring now uses a template call for feed organization; a real
+  provider rerun of the top-100 bookmark request has not yet confirmed it.
 - Real top-100 bookmark completion, held-out accuracy and native background endurance
   remain unverified. Prefilled forms and complex browser controls need more work.
 - Fresh-clone CEF acquisition and full engine dependency locking are incomplete;

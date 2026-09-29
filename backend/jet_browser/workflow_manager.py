@@ -15,6 +15,8 @@ _COUNTERS = ("calls", "saved", "classified", "scrolls", "elapsed_ms")
 _SOURCE_LIMIT = 32 * 1024
 _CHECKPOINT_LIMIT = 32 * 1024
 _RESULT_LIMIT = 32 * 1024
+# Consecutive local continuations that saved nothing before the run pauses itself.
+_CONTINUE_WITHOUT_SAVES = 3
 
 
 class WorkflowYield(Exception):
@@ -72,6 +74,8 @@ class WorkflowManager:
         self._auth_rev = None
         self._stop_action = None
         self._t0 = None
+        self._continuation = None
+        self._idle_continues = {}
 
     def _trace(self, event, **fields):
         trace = getattr(self.service, 'trace', None)
@@ -117,7 +121,7 @@ class WorkflowManager:
         remain_calls = limits["max_calls"] - counters["calls"]
         return max(1, min(180, remain_s)), max(1, min(1000, remain_calls))
 
-    async def start(self, sid, wid):
+    async def start(self, sid, wid, continuing=False):
         if self.running:
             raise RuntimeError("a workflow is already running")
         if getattr(self.service.collections, "running", False):
@@ -145,6 +149,8 @@ class WorkflowManager:
         source = (row.get("definition") or {}).get("source") or ""
         if not isinstance(source, str) or len(source.encode("utf-8")) > _SOURCE_LIMIT:
             raise RuntimeError("workflow source is not runnable")
+        if not continuing:
+            self._idle_continues.pop(wid, None)
         run_id = str(uuid.uuid4())
         revision = row.get("revision")
         self.store.update(
@@ -177,11 +183,14 @@ class WorkflowManager:
             definition = row.get("definition") or {}
             source = definition.get("source") or ""
             counters = _counters(row)
+            before = counters
             seconds, max_calls = self._native_budget(row)
             payload = {
                 "checkpoint": row.get("checkpoint"),
                 "categories": definition.get("categories") or [],
                 "counts": counters,
+                # This slice's own limits, so a script can checkpoint before them.
+                "budget": {"seconds": seconds, "calls": max_calls},
             }
             cap = self._make_capability(sid, wid)
             await cap.open()
@@ -217,6 +226,8 @@ class WorkflowManager:
                 notify = True
             elif yielded.status == "pause":
                 outcome = {"status": "paused", "error": "checkpoint_pause", "result": summary}
+            elif yielded.status == "continue":
+                outcome = {"status": "paused", "error": "checkpoint_continue", "result": summary}
             else:
                 outcome = {"status": "paused", "error": "checkpoint rejected", "result": _MISSING}
             settled = True
@@ -261,10 +272,56 @@ class WorkflowManager:
             self._trace("workflow.end", task_id=wid, session_id=sid, status=outcome["status"], elapsed_ms=delta)
             self.running = False
             self.job = None
+            if settled and outcome["error"] == "checkpoint_continue" and self._stop_action is None:
+                self._schedule_continue(sid, wid, before)
             if notify and self.on_checkpoint is not None:
                 callback = self.on_checkpoint
                 asyncio.get_running_loop().call_soon(callback, sid, wid)
             del run_id, revision
+
+    def _schedule_continue(self, sid, wid, before):
+        """Start the next slice locally when the last one made progress; no provider turn."""
+        try:
+            after = _counters(self.store.get(sid, wid) or {})
+        except Exception:
+            return
+        if after["saved"] > before["saved"]:
+            self._idle_continues[wid] = 0
+        else:
+            self._idle_continues[wid] = self._idle_continues.get(wid, 0) + 1
+        if after["saved"] == before["saved"] and after["scrolls"] == before["scrolls"]:
+            self.store.update(sid, wid, error="continue_no_progress")
+            return
+        if self._idle_continues[wid] >= _CONTINUE_WITHOUT_SAVES:
+            self.store.update(sid, wid, error="continue_no_new_items")
+            return
+        self._continuation = asyncio.get_running_loop().create_task(self._continue(sid, wid))
+
+    async def _continue(self, sid, wid):
+        await asyncio.sleep(0)
+        row = self.store.get(sid, wid) or {}
+        if row.get("status") != "paused" or row.get("error") != "checkpoint_continue":
+            return
+        try:
+            self._trace("workflow.continue", task_id=wid, session_id=sid)
+            await self.start(sid, wid, continuing=True)
+        except Exception as exc:
+            # start() records its own limit errors; others stay visible on the card.
+            fresh = self.store.get(sid, wid) or {}
+            if fresh.get("status") == "paused" and fresh.get("error") == "checkpoint_continue":
+                self.store.update(sid, wid, error="continue_blocked: " + _reason(exc))
+        finally:
+            if self._continuation is asyncio.current_task():
+                self._continuation = None
+
+    async def _cancel_continuation(self):
+        task, self._continuation = self._continuation, None
+        if task is not None and not task.done() and task is not asyncio.current_task():
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
 
     def _wrap(self, name, fn, sid, wid):
         async def wrapped(args):
@@ -354,7 +411,7 @@ class WorkflowManager:
             if not isinstance(args, dict):
                 raise RuntimeError("checkpoint is invalid")
             status = args.get("status")
-            if status not in ("review", "pause", "complete"):
+            if status not in ("review", "pause", "complete", "continue"):
                 raise RuntimeError("checkpoint is invalid")
             summary = args.get("summary", "")
             if not isinstance(summary, str):
@@ -409,6 +466,16 @@ class WorkflowManager:
             return await self.start(sid, wid)
         if action not in ("pause", "stop"):
             raise RuntimeError("unknown workflow action")
+        if not self.running:
+            # Between local slices: cancel the pending continuation instead of failing.
+            await self._cancel_continuation()
+            row = self.store.get(sid, wid)
+            if row and row.get("status") == "paused" and row.get("error") == "checkpoint_continue":
+                if action == "stop":
+                    self.store.update(sid, wid, status="cancelled", error=None)
+                else:
+                    self.store.update(sid, wid, error=None)
+                return self.summary(sid, wid)
         if not (self.running and self._sid == sid and self._wid == wid and self.job is not None):
             raise RuntimeError("workflow run is not active")
         row = self.store.get(sid, wid)
@@ -432,5 +499,6 @@ class WorkflowManager:
         return self.summary(sid, wid)
 
     async def close(self):
+        await self._cancel_continuation()
         if self.running and self._sid and self._wid:
             await self.control(self._sid, self._wid, "pause")

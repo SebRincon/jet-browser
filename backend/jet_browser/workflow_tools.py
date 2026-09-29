@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from . import workflow_templates
 from .workflow_store import CAPABILITIES
 
 NAMES = frozenset(
@@ -27,7 +28,10 @@ _DEFINITION_KEYS = {
     "categories",
     "capabilities",
     "limits",
+    "template",
 }
+# A template selection replaces these two fields; see workflow_templates.
+_TEMPLATE_FILLED = {"source", "capabilities"}
 _LIMITS = {
     "max_seconds": (1, 14400),
     "max_calls": (1, 10000),
@@ -48,8 +52,12 @@ _CALLS = (
 )
 
 _SDK = """\
+Prefer a built-in template (see templates) whenever one fits: call save_workflow with
+definition.template {name, options} and no source or capabilities. Write custom
+JavaScript only when no template can express the request, and keep it small.
 Jet workflow JavaScript runs in a private JavaScriptCore process, not in the page.
-jet.input is {checkpoint, categories, counts}. jet.call(name, args) is synchronous.
+jet.input is {checkpoint, categories, counts, budget}. budget is this slice's
+{seconds, calls}. jet.call(name, args) is synchronous.
 Use saved item flags for deduplication. feed observations include scroll geometry and status_text. end_of_feed=false means unproven, not infinite. Stop after repeated no-progress observations.
 Checkpoint or finish before 180 seconds. A timed-out slice pauses and does not restart.
 Calls, saved items, and elapsed time accumulate across resumes.
@@ -64,7 +72,7 @@ model.summarize {item_id} -> {summary, model}. Local model. Summary must come fr
 records.put {item_id, tags, summary} -> {id, revision}. Copies observed evidence and rejects unknown tags.
 records.list {limit?, offset?} -> {items, total}. Local rows, at most 20 per call.
 records.patch {item_id, expected_revision, patch:{tags?, summary?}} -> row. While running, only the workflow's audited local actor. Grok edits require the workflow to be paused.
-run.checkpoint {state, status:review|pause|complete, summary} yields immediately. The next run sees jet.input.checkpoint. No further script steps run after it.
+run.checkpoint {state, status:review|pause|complete|continue, summary} yields immediately. The next run sees jet.input.checkpoint. No further script steps run after it. review wakes the reviewer; continue starts the next slice locally without review when the slice saved or scrolled; pause waits for the user.
 run.progress {message} posts a short activity line.
 """
 
@@ -137,6 +145,19 @@ def schemas(schema):
         {"id": {"type": "string"}, "name": {"type": "string"}, "description": {"type": "string"}},
         ("id", "name", "description"),
     )
+    option_properties = {}
+    for spec in workflow_templates.TEMPLATES.values():
+        for key, (kind, _default, low, high) in spec["options"].items():
+            option_properties[key] = (
+                {"type": "boolean"} if kind is bool else {"type": "integer", "minimum": low, "maximum": high}
+            )
+    template = obj(
+        {
+            "name": {"type": "string", "enum": sorted(workflow_templates.TEMPLATES)},
+            "options": obj(option_properties, ()),
+        },
+        ("name",),
+    )
     definition = obj(
         {
             "title": {"type": "string"},
@@ -148,16 +169,16 @@ def schemas(schema):
             "categories": {"type": "array", "items": category},
             "capabilities": {"type": "array", "items": capability_items},
             "limits": limits,
+            "template": template,
         },
+        # Either source+capabilities or template; _definition enforces exactly one.
         (
             "title",
-            "source",
             "tab_id",
             "start_url",
             "source_kind",
             "model",
             "categories",
-            "capabilities",
             "limits",
         ),
     )
@@ -171,7 +192,7 @@ def schemas(schema):
     specs = [
         (
             "save_workflow",
-            "Save a workflow definition for the current session.",
+            "Save a workflow for the current session: a built-in template with options, or custom source.",
             {
                 "definition": definition,
                 "workflow_id": {"type": "string"},
@@ -229,7 +250,7 @@ def schemas(schema):
         ),
         (
             "workflow_sdk",
-            "Runtime call reference and a short example script.",
+            "Built-in templates, runtime call reference and a short custom example.",
             {},
             (),
         ),
@@ -279,17 +300,16 @@ def _definition(raw):
     extra = set(raw) - _DEFINITION_KEYS
     if extra:
         raise ValueError("unknown field: " + sorted(extra)[0])
-    for key in _DEFINITION_KEYS:
+    template = raw.get("template")
+    if template is not None and "source" in raw:
+        raise ValueError("use either source or template, not both")
+    required = _DEFINITION_KEYS - {"template"} - (_TEMPLATE_FILLED if template is not None else set())
+    for key in sorted(required):
         if key not in raw:
             raise ValueError(key + " is required")
     for key in ("title", "tab_id", "start_url", "source_kind", "model"):
         if not isinstance(raw[key], str) or not raw[key].strip():
             raise ValueError(key + " is required")
-    source = raw["source"]
-    if not isinstance(source, str) or not source.strip():
-        raise ValueError("source is required")
-    if len(source.encode("utf-8")) > 32768:
-        raise ValueError("source is too large")
     if not isinstance(raw["categories"], list):
         raise ValueError("categories must be a list")
     categories = []
@@ -304,14 +324,6 @@ def _definition(raw):
         if not isinstance(item.get("description"), str):
             raise ValueError("category description is required")
         categories.append({"id": item["id"], "name": item.get("name", item["id"]), "description": item["description"]})
-    if not isinstance(raw["capabilities"], list):
-        raise ValueError("capabilities must be a list")
-    allowed = set(_capability_names())
-    capabilities = []
-    for name in raw["capabilities"]:
-        if not isinstance(name, str) or (allowed and name not in allowed):
-            raise ValueError("unknown capability")
-        capabilities.append(name)
     limits_raw = raw["limits"]
     if not isinstance(limits_raw, dict):
         raise ValueError("limits must be an object")
@@ -323,6 +335,22 @@ def _definition(raw):
         if key not in limits_raw:
             raise ValueError(key + " is required")
         limits[key] = _int_in(limits_raw[key], lo, hi, key)
+    if template is not None:
+        source, capabilities = workflow_templates.render(template, raw["source_kind"], limits)
+    else:
+        source = raw["source"]
+        if not isinstance(source, str) or not source.strip():
+            raise ValueError("source is required")
+        if not isinstance(raw["capabilities"], list):
+            raise ValueError("capabilities must be a list")
+        allowed = set(_capability_names())
+        capabilities = []
+        for name in raw["capabilities"]:
+            if not isinstance(name, str) or (allowed and name not in allowed):
+                raise ValueError("unknown capability")
+            capabilities.append(name)
+    if len(source.encode("utf-8")) > 32768:
+        raise ValueError("source is too large")
     return {
         "title": raw["title"].strip(),
         "source": source,
@@ -420,12 +448,17 @@ async def tool(service, name, args):
         if "expected_revision" in data:
             kwargs["expected_revision"] = _int_in(data["expected_revision"], 0, 10**9, "expected_revision")
         saved = store.save(sid, definition, **kwargs)
-        return {
+        result = {
             "id": saved.get("id"),
             "revision": saved.get("revision"),
             "status": saved.get("status"),
             "title": saved.get("title") or definition["title"],
         }
+        template = data["definition"].get("template")
+        if template is not None:
+            result["template"] = template["name"]
+            result["capabilities"] = definition["capabilities"]
+        return result
     if name == "read_workflow":
         data = _args(args, {"workflow_id", "revision"}, ("workflow_id",))
         wid = data["workflow_id"]
@@ -508,6 +541,7 @@ async def tool(service, name, args):
         allowed = set(_capability_names())
         calls = [call for call in _CALLS if not allowed or call in allowed]
         return {
+            "templates": workflow_templates.catalog(),
             "capabilities": calls,
             "documentation": _SDK,
             "example_source": _EXAMPLE,

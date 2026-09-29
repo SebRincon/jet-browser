@@ -10,7 +10,7 @@ Use the same chat, for example:
 
 > Write a JavaScript workflow to organize up to 100 bookmarks on this tab. Use overlapping mobile, web, desktop, design, research, tools and open-source tags. Save each observed link, author, posted date and a local summary. Recover collapsed posts before labeling them. Review the first 10, repair weak summaries or revise the script if needed, then continue within a ten-minute local execution budget. You may share small review samples with Grok.
 
-Grok fetches the SDK, saves version 1 and starts a background run. Its compact card shows saved/classified counts, runtime, state and source revision. Open the card to inspect records/source or export CSV into the conversation workspace. The source tab stays owned while the user browses elsewhere. Stop ends further dispatch. One agent browser job runs at a time; the existing chat remains available.
+For organizing, tagging or summarizing a feed or X Bookmarks, Grok now selects the built-in `tagged_feed` template with a few options instead of writing JavaScript (see [Built-in templates](#built-in-templates)). For anything the template cannot express, Grok fetches the SDK and writes custom source. Either way it saves version 1 and starts a background run. Its compact card shows saved/classified counts, runtime, state and source revision. Open the card to inspect records/source or export CSV into the conversation workspace. The source tab stays owned while the user browses elsewhere. Stop ends further dispatch. One agent browser job runs at a time; the existing chat remains available.
 
 At a review checkpoint the runtime pauses and asks Grok to inspect bounded authorized samples. Grok may repair tags/summaries, change taxonomy or JavaScript, then resume the same workflow. Runtime errors also enter this repair path. Repeated no-progress reviews stop automatic retry. Scope, source identity, local model and original budgets cannot silently increase. A user escalation is still necessary when the task cannot be resolved inside its authority.
 
@@ -29,13 +29,26 @@ At a review checkpoint the runtime pauses and asks Grok to inspect bounded autho
 | `records.put`, `records.list` | Durable deduplicated records with observed metadata |
 | `records.patch` | Audited summary/tag correction without inventing source evidence |
 | `run.progress` | Compact progress message |
-| `run.checkpoint` | Persist script state and pause, request review or finish |
+| `run.checkpoint` | Persist script state and pause, request review, continue locally or finish |
 
 The public MCP lifecycle is `workflow_sdk`, `save_workflow`, `read_workflow`, `run_workflow`, `workflow_status`, `control_workflow`, `workflow_records`, `patch_workflow_record`. Grok writes source directly through these finite tools; no shell or source checkout is needed. Source revisions are immutable and use expected-version checks. Records preserve their original capture and every later correction.
 
-Definitions declare tab, start URL, source kind, model, taxonomy, enabled capabilities and limits. Source is capped at 32 KB. A native invocation is at most 180 seconds/1,000 SDK calls; checkpoints preserve state across invocations. The original cumulative authorization is at most four hours of local execution, 10,000 SDK calls and 5,000 records. Grok planning/review latency is separate from local execution time. Restart restores records and pauses interrupted runs without automatically replaying actions.
+Definitions declare tab, start URL, source kind, model, taxonomy, enabled capabilities and limits. Source is capped at 32 KB. A native invocation (slice) is at most 180 seconds/1,000 SDK calls; `jet.input.budget` gives the current slice's own `{seconds, calls}` and checkpoints preserve state across slices. `run.checkpoint` status `continue` ends a slice and starts the next one locally, with no provider turn, only when the slice saved or scrolled. After three consecutive continuations with no new record, or a slice with no progress at all, the run pauses with `continue_no_new_items`/`continue_no_progress`. Pause or Stop between slices cancels the pending continuation. A slice that hits the hard timeout without a checkpoint still pauses and wakes Grok for review. The original cumulative authorization is at most four hours of local execution, 10,000 SDK calls and 5,000 records. Grok planning/review latency is separate from local execution time. Restart restores records and pauses interrupted runs without automatically replaying actions.
 
 Review sharing follows the existing user preference: at most five 400-character excerpts per review, with no paging through the whole private dataset. A restricted review profile can operate only on the same workflow/session. Full records stay in local SQLite and are available to the UI and local script. Grok is a remote model; the categorization and summary model calls run locally.
+
+## Built-in templates
+
+`save_workflow` accepts `definition.template = {name, options}` in place of `source` and `capabilities`; exactly one form is allowed. Jet renders vetted source with the options frozen into an `OPTIONS` header and stores it like any other revision, so `read_workflow`, revisions, scope checks and the runtime are unchanged. `workflow_sdk` lists templates and their option bounds. A template turns authoring into a small tool call, which removes the long script-writing turn behind the [2026-09-28 timeout](incidents/2026-09-28-grok-timeout.md).
+
+`tagged_feed` v1 (`backend/jet_browser/workflow_templates.py`):
+
+- Skips saved items. On X Bookmarks it recovers truncated posts; a blocked recovery keeps the partial evidence (still marked truncated) and tags it rather than inventing text. Recovery is disabled for other feeds.
+- Applies independent local tags, optionally a local summary, and saves the observed link, author and date.
+- Pauses for review after `first_review` items (default 10), then every `review_every` items (0 = no periodic review).
+- Before its slice budget ends it checkpoints `continue`; the next slice resumes from the current page without a Grok turn.
+- Completes at `limits.max_items` or a proven end of feed. After `max_idle_scrolls` scrolls reveal nothing new, a local `model.decide` chooses whether to keep scrolling; the run pauses after twice that many.
+- Local model failures on three items pause for review; failed item ids are skipped on later slices.
 
 ## Packaging and data
 
