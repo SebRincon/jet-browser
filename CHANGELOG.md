@@ -54,8 +54,8 @@
 
 ### Known limitations
 
-- Grok workflow authoring now uses a template call for feed organization; a real
-  provider rerun of the top-100 bookmark request has not yet confirmed it.
+- The real top-100 bookmark request has not yet been rerun; a paid synthetic rerun of the
+  same request shape passed (template saved at 31 s, 20/20 records).
 - Real top-100 bookmark completion, held-out accuracy and native background endurance
   remain unverified. Prefilled forms and complex browser controls need more work.
 - The pinned CEF (vten frame-lease build) has passed a clean-worktree build, package

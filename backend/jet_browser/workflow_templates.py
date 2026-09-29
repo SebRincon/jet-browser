@@ -243,3 +243,12 @@ def render(template, source_kind, limits):
         "const OPTIONS = Object.freeze(" + json.dumps(options, sort_keys=True) + ");\n"
     )
     return header + spec["body"].lstrip("\n"), capabilities
+
+
+def effective_options(source):
+    """The frozen OPTIONS of rendered template source, or None for custom source."""
+    prefix = "const OPTIONS = Object.freeze("
+    for line in source.splitlines()[:3]:
+        if line.startswith(prefix) and line.endswith(");"):
+            return json.loads(line[len(prefix):-2])
+    return None

@@ -55,6 +55,10 @@ async def test_save_workflow_accepts_a_small_template_call(tmp_path):
                               workflows=SimpleNamespace(running=False))
     saved = await workflow_tools.tool(service, "save_workflow", {"definition": template_definition({"review_every": 10})})
     assert saved["template"] == "tagged_feed" and "post.recover" in saved["capabilities"]
+    assert saved["options"]["review_every"] == 10 and saved["options"]["max_items"] == 25 and "note" not in saved
+    feed = await workflow_tools.tool(service, "save_workflow",
+                                     {"definition": template_definition({"recover_truncated": True}, source_kind="feed")})
+    assert feed["options"]["recover_truncated"] is False and "x_bookmarks" in feed["note"]
     row = store.get("session", saved["id"])
     assert row["definition"]["source"].startswith("// Jet built-in template tagged_feed v1")
     with pytest.raises(ValueError, match="either source or template"):

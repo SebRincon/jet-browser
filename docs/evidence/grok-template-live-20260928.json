@@ -1,0 +1,151 @@
+{
+ "run_at": "2026-09-28T22:48-05:00",
+ "kind": "paid live Grok (1.0.41) + packaged runtime from main (pinned vten CEF build) + SemIf 4B + isolated headless Chromium; synthetic 25-post feed; no native window, no user data",
+ "command": "python3.12 scripts/verify_portable_workflow.py --scenario template ...",
+ "request": "Organize the first 20 bookmarks ... overlapping tags, summary, link, date ... review the first ten",
+ "passed": true,
+ "grok_chose_template": true,
+ "wall_seconds": 134.45,
+ "grok_turns": [
+  {
+   "purpose": "authoring",
+   "duration_ms": 65080,
+   "tool_calls": 9,
+   "first_save_ms": 30808
+  },
+  {
+   "purpose": "checkpoint review",
+   "duration_ms": 49362,
+   "tool_calls": 4
+  }
+ ],
+ "workflow": {
+  "status": "completed",
+  "revision": 2,
+  "counters": {
+   "calls": 79,
+   "saved": 20,
+   "classified": 20,
+   "scrolls": 13,
+   "elapsed_ms": 30299
+  },
+  "limits": {
+   "max_seconds": 1800,
+   "max_calls": 2000,
+   "max_items": 20
+  },
+  "categories": [
+   {
+    "id": "mobile",
+    "name": "Mobile",
+    "description": "Posts about phones, tablets, mobile apps, or mobile platforms. May overlap with other tags."
+   },
+   {
+    "id": "web",
+    "name": "Web",
+    "description": "Posts about websites, browsers, web apps, or web platforms. May overlap with other tags."
+   },
+   {
+    "id": "desktop",
+    "name": "Desktop",
+    "description": "Posts about desktop apps, desktop operating systems, or desktop platforms. May overlap with other tags."
+   },
+   {
+    "id": "design",
+    "name": "Design",
+    "description": "Posts about UI, UX, visual design, or design tools. May overlap with other tags."
+   },
+   {
+    "id": "research",
+    "name": "Research",
+    "description": "Posts about studies, papers, investigations, or research findings. May overlap with other tags."
+   },
+   {
+    "id": "tools",
+    "name": "Tools",
+    "description": "Posts about software tools, utilities, or developer tooling. May overlap with other tags."
+   },
+   {
+    "id": "open_source",
+    "name": "Open source",
+    "description": "Posts about open-source software, licenses, or public source projects. May overlap with other tags."
+   }
+  ]
+ },
+ "records": 20,
+ "unique_urls": 20,
+ "with_summary": 20,
+ "with_date": 20,
+ "tag_counts": {
+  "web": 11,
+  "design": 10,
+  "tools": 17,
+  "research": 4,
+  "open_source": 6,
+  "desktop": 3,
+  "mobile": 3
+ },
+ "assistant_messages": [
+  "I'll organize the first 20 bookmarks on this tab with overlapping tags, a short summary, the link, and the date, and pause after the first ten so you can review them.",
+  "The tab is the synthetic feed. I'll tag the first 20 with overlapping labels, a short summary, the link, and the date, and pause after the first ten for review.",
+  "Recovery of truncated posts was left off. I'll turn that on, then start the run.",
+  "I'm organizing the first 20 bookmarks on this tab with overlapping tags, a short summary, the link, and the date. I'll pause after the first ten so you can review them, then continue. You can pause it anytime.",
+  "I'll review the paused bookmark run and its sample records, then continue the same 20-item scope.",
+  "The first ten samples have overlapping tags, summaries, links, and dates, with no truncated posts. I\u2019ll continue the same run through the remaining bookmarks.",
+  "The first ten bookmarks have overlapping tags, short summaries, links, and dates, so I\u2019m continuing through the remaining ten."
+ ],
+ "sample": [
+  {
+   "url": "https://workflow.test/posts/1",
+   "published_at": "2026-09-27T10:00:00Z",
+   "tags": [
+    "web",
+    "design",
+    "tools"
+   ],
+   "summary": "The post describes a browser design toolkit featuring reusable components and color themes."
+  },
+  {
+   "url": "https://workflow.test/posts/2",
+   "published_at": "2026-09-26T10:00:00Z",
+   "tags": [
+    "web",
+    "research",
+    "tools"
+   ],
+   "summary": "The post announces a research study evaluating AI agents that operate web browsers."
+  },
+  {
+   "url": "https://workflow.test/posts/3",
+   "published_at": "2026-09-25T10:00:00Z",
+   "tags": [
+    "tools",
+    "open_source"
+   ],
+   "summary": "The post describes a fast, MIT-licensed command line tool for searching code."
+  },
+  {
+   "url": "https://workflow.test/posts/4",
+   "published_at": "2026-09-24T10:00:00Z",
+   "tags": [
+    "desktop",
+    "design",
+    "tools"
+   ],
+   "summary": "The post describes a macOS menu bar utility designed for window tiling."
+  },
+  {
+   "url": "https://workflow.test/posts/5",
+   "published_at": "2026-09-23T10:00:00Z",
+   "tags": [
+    "web",
+    "design"
+   ],
+   "summary": "The post provides typography guidance for product landing pages."
+  }
+ ],
+ "observations": [
+  "Grok saved a second revision only to enable recover_truncated, which the template forces off for generic feeds; save_workflow now returns effective options with a note.",
+  "Authoring narration used four short messages instead of one acknowledgment."
+ ]
+}

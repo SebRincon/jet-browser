@@ -458,6 +458,11 @@ async def tool(service, name, args):
         if template is not None:
             result["template"] = template["name"]
             result["capabilities"] = definition["capabilities"]
+            result["options"] = workflow_templates.effective_options(definition["source"])
+            if definition["source_kind"] != "x_bookmarks":
+                # Otherwise Grok re-saves to "enable" an option the template ignores here.
+                result["note"] = "recover_truncated applies only to source_kind x_bookmarks; it is off for this source."
+
         return result
     if name == "read_workflow":
         data = _args(args, {"workflow_id", "revision"}, ("workflow_id",))

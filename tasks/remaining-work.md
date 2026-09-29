@@ -17,7 +17,7 @@ Clean, simple single chat based on the [Orca/T3 source audit](../docs/chat-and-h
 
 ## Next smallest deliverable
 
-**First: confirm the repaired Grok authoring path live.** The watchdog, saved-state failure report, `tagged_feed` template and local slice continuation are implemented and tested offline. A user-authorized, isolated rerun of the top-100 bookmark request must confirm Grok selects the template and the run completes. See [incident](../docs/incidents/2026-09-28-grok-timeout.md) and [templates](../docs/portable-workflows.md#built-in-templates).
+**First (done 2026-09-28): confirm the repaired Grok authoring path live** — the paid synthetic rerun passed.**Next: the real top-100 archive run and native UI checks.** The watchdog, saved-state failure report, `tagged_feed` template and local slice continuation are implemented and tested offline. A user-authorized, isolated rerun of the top-100 bookmark request must confirm Grok selects the template and the run completes. See [incident](../docs/incidents/2026-09-28-grok-timeout.md) and [templates](../docs/portable-workflows.md#built-in-templates).
 
 **Then: held-out categorization, account identity/cursor recovery and wider feed compatibility.** The initial bookmark adapter, per-post chunking and four bounded native passes are complete; see [feed audit](../docs/feed-collections.md). Broader lab foundation continues as **B01 → B02 → B03 → B04 → B05 → B06:** resettable fixtures, bounded choices, shared outcomes, independent runner, one watched task and exact-value extraction. Preserve navigation and Stop. B33–B34 isolate service/runtime and browser profile before native Watch. Offline replay can proceed independently. No desktop takeover.
 
@@ -25,7 +25,7 @@ Clean, simple single chat based on the [Orca/T3 source audit](../docs/chat-and-h
 
 | Work | State | Completion dependency |
 |---|---|---|
-| Grok authoring reliability | Implemented offline: idle watchdog, stage/activity traces, saved-state failure reports, `tagged_feed` template, local slice continuation | A real, user-authorized provider rerun of the bookmark request |
+| Grok authoring reliability | Done: live paid rerun of the incident-shaped request passed 2026-09-28 (template saved at 31 s, 20/20 records) | Real top-100 archive run (user-started, isolated) |
 | U01 chat projection | Implemented; offline tests | Stable turn IDs and collapsed completed steps |
 | H01–H06/H08, U02–U03 website loop | First slice implemented; feed loop has native/resume evidence, wider acceptance pending | Bounded plans/store/local classifier/runner/MCP/results; further child acceptance remains |
 | Tag calibration | Baseline measured 2026-09-28 on synthetic held-out tags (SemIf micro F1 0.788; threshold gave no gain) | Improve design/research recall on development, then score a new held-out set; real-archive spot checks with user permission |

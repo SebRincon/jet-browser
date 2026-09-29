@@ -1,6 +1,6 @@
 # Grok authoring timeout — 2026-09-28
 
-Status: mitigated 2026-09-28 (see Follow-up below); provider root cause unknown. All times America/Chicago (CDT). This sanitized
+Status: resolved for the authoring path 2026-09-28 (see Follow-up and live rerun below); provider stall cause unknown. All times America/Chicago (CDT). This sanitized
 record contains no bookmark text, credentials or provider reasoning content.
 
 The user asked to organize the first 100 bookmarks with overlapping tags, summaries,
@@ -60,3 +60,11 @@ For this incident's timeline, the new client would have ended the turn at about
 reported that nothing was saved or started. Reducing how much the model must write
 is tracked separately (built-in workflow templates). A real provider rerun is still
 needed to confirm the repaired flow end to end.
+
+## Live rerun — 2026-09-28 22:48 CDT
+
+The incident-shaped request (20 synthetic bookmarks, review at ten) ran through paid Grok
+1.0.41 with the repaired build, headless and isolated ([evidence](../evidence/grok-template-live-20260928.json)).
+Grok chose the `tagged_feed` template and first saved it after 31 s; the authoring turn
+ended normally at 65 s. The checkpoint review took 49 s and the run completed 20 unique
+records. No watchdog stall occurred. The real top-100 run is a separate, user-started check.
