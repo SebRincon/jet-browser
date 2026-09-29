@@ -1,5 +1,18 @@
 # Verification
 
+
+## 2026-09-28 evening checkpoint
+
+Offline and local checks for commits `d35bdd8`..`checkpoint-2026-09-28b`:
+
+- 369 backend tests with isolated Chromium headless shell 1228 (real-DOM, JavaScriptCore template runs, prefilled-input delivery faults); 62 app and 9 vendored-chat tests; ruff and `flutter analyze` clean.
+- Clean worktree (no ignored files): `install_cef.sh` via `gh` (17 s), tampered and wrong-build sources rejected; lock-based engine setup reproduced all four verified environments exactly; release app build; full package; relocated minimal-PATH service health/state.
+- Ad-hoc hardened-runtime signing of that bundle: `codesign --verify --deep --strict` passed; service, JetWorkflow, Grok `--version` and SemIf (MLX + torch) ran.
+- `verify_portable_workflow.py --scenario template-local` on that bundle: 20 unique records, one review, 59 s ([evidence](evidence/template-local-20260928.json)).
+- Tag calibration, SemIf 4B, synthetic held-out: micro F1 0.788 ([evidence](evidence/tagging-semif-20260928.json)).
+
+Not run: any paid Grok turn, any native CEF window (pinned CEF, hardened runtime, prefilled form, hidden-tab endurance), Developer ID signing or notarization.
+
 ## Initial source baseline and handoff — 2026-09-28
 
 **345 backend tests, 61 Flutter app tests and 9 vendored-chat tests passed.** Backend

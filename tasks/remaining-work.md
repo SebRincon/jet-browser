@@ -4,7 +4,7 @@ Updated 2026-09-28. Owner: standalone Jet browser-agent experience. Charter: [SP
 
 ## Current truth
 
-- Initial source baseline and [agent handoff](../docs/HANDOFF.md) are prepared on `main`. Final checks: 345 backend, 61 app and 9 vendored-chat tests passed; lint/analyzers clean. Late progress can no longer overwrite completed local tasks. The existing bundle has not been rebuilt for that guard.
+- 2026-09-28 evening checkpoint (`checkpoint-2026-09-28b`): Grok stall watchdog and saved-state reports, `tagged_feed` template with local slice continuation, pinned vten CEF, locked engines, release signing, >15-tab selection, native input delivery guard, tag calibration baseline. Checks: 369 backend, 62 app and 9 vendored-chat tests passed; lint/analyzers clean. Live paid-Grok and native UI confirmations are pending user go-ahead; see [handoff](../docs/HANDOFF.md).
 
 - Implemented foundations: standalone CEF shell, local shadcn/vten chat forks, one chat, Grok ACP, local adapters, durable sessions, private traces, Stop fences, navigation goals and Wikipedia/YouTube checks.
 - Partial: general form DONE remains `manual_check`; the prefilled-input failure is guarded offline (no press or typing unless pointer and focus reach the target) but its native cause is unconfirmed. Packaged native startup, DOM read and chat hide/restore now pass after the accessibility repair; background endurance is still open.
