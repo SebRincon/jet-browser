@@ -60,7 +60,7 @@ async def test_save_workflow_accepts_a_small_template_call(tmp_path):
                                      {"definition": template_definition({"recover_truncated": True}, source_kind="feed")})
     assert feed["options"]["recover_truncated"] is False and "x_bookmarks" in feed["note"]
     row = store.get("session", saved["id"])
-    assert row["definition"]["source"].startswith("// Jet built-in template tagged_feed v1")
+    assert row["definition"]["source"].startswith("// Jet built-in template tagged_feed v2")
     with pytest.raises(ValueError, match="either source or template"):
         await workflow_tools.tool(service, "save_workflow",
                                   {"definition": {**template_definition(), "source": "return 1;"}})
@@ -241,3 +241,62 @@ async def test_template_endurance_many_local_slices_to_the_item_limit(tmp_path):
     assert records == 300 == len(urls) == row["counters"]["saved"]
     assert row["checkpoint"]["partial"] == len([n for n in range(0, 300, 40)])  # Blocked recoveries kept partial.
     assert row["counters"]["calls"] <= row["definition"]["limits"]["max_calls"]
+
+
+class BranchWorker(Worker):
+    """Tags nothing in the yes/no pass; picks 'web' as the best tag; expands cut-off posts."""
+
+    def __init__(self):
+        super().__init__()
+        self.questions = []
+
+    def predict(self, mode, req):
+        answers = {}
+        for qid, question in req["questions"].items():
+            criteria = question["criteria"]
+            self.questions.append(qid if qid != "q" else "decide:" + ",".join(sorted(criteria)))
+            if "expand" in criteria:
+                label = "expand"
+            elif qid == "best":
+                label = "web" if "web" in criteria else "none"
+            else:
+                label = "no"
+            answers[qid] = dict(valid=True, label=label, probabilities=None, confidence=None)
+        return {"model": "pinned-qwen-id", "answers": answers}
+
+
+async def test_template_v2_opens_cut_off_posts_and_second_passes_untagged(tmp_path):
+    feed = Feed(6)
+    feed.items[1]["text"] = "Five lessons from shipping our browser extension…"
+    feed.items[1]["truncated"] = False
+    worker = BranchWorker()
+    store, wid, manager, _ = template_world(tmp_path, feed, {"first_review": 0}, max_items=6)
+    manager.capability_factory = lambda s, st, sid, wid, stop, progress: WorkflowCapabilities(
+        s, st, sid, wid, stop, progress, worker=worker, collector_factory=feed.factory, recover=feed.recover)
+    await manager.start("session", wid)
+    await settle(manager)
+    row = store.get("session", wid)
+    assert row["status"] == "completed", row["error"]
+    # The unflagged "…" post was opened because the local model chose to expand it.
+    assert feed.items[1]["url"] in feed.recovered
+    assert row["checkpoint"]["expanded_by_decision"] == 1
+    records = store.records("session", wid, limit=20)["items"]
+    assert all(r["tags"] == ["web"] for r in records)  # Every post got the second-pass tag.
+    assert row["checkpoint"]["fallback_tags"] == 6 and row["checkpoint"]["untagged"] == 0
+    assert "decide:expand,keep" in worker.questions and worker.questions.count("best") == 6
+
+
+async def test_template_v2_branches_can_be_turned_off(tmp_path):
+    feed = Feed(3)
+    feed.items[1]["text"] = "Cut off here..."
+    feed.items[1]["truncated"] = False
+    worker = BranchWorker()
+    store, wid, manager, _ = template_world(
+        tmp_path, feed, {"first_review": 0, "expand_cut_off": False, "fallback_tag": False}, max_items=3)
+    manager.capability_factory = lambda s, st, sid, wid, stop, progress: WorkflowCapabilities(
+        s, st, sid, wid, stop, progress, worker=worker, collector_factory=feed.factory, recover=feed.recover)
+    await manager.start("session", wid)
+    await settle(manager)
+    row = store.get("session", wid)
+    assert row["status"] == "completed" and row["checkpoint"]["untagged"] == 3
+    assert feed.items[1]["url"] not in feed.recovered and "best" not in worker.questions

@@ -27,6 +27,9 @@
 - Tag calibration harness (`scripts/eval_tagging.py`) and a 90-post synthetic corpus with
   fixed development/calibration/held-out splits; SemIf 4B baseline recorded in
   `docs/evidence/tagging-semif-20260928.json`.
+- `tagged_feed` v2: the local model decides whether an unflagged post that ends mid-thought
+  should be opened in full, and untagged posts get a one-best-category second pass
+  (`model.best_tag`): development micro F1 0.791 → 0.854 with no added false tags.
 
 ### Fixed
 

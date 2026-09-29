@@ -26,6 +26,7 @@ CAPABILITIES = (
     "model.decide",
     "model.classify",
     "model.summarize",
+    "model.best_tag",
     "records.put",
     "records.list",
     "records.patch",
@@ -510,15 +511,22 @@ class WorkflowStore:
             self._store_record(conn, sid, wid, existing)
             return existing
 
-    def recover_record(self, sid, wid, item_id, observed, expected_revision):
-        """Code-owned evidence replacement. Not exposed as a model write API."""
+    def recover_record(self, sid, wid, item_id, observed, expected_revision, requested_by=None):
+        """Code-owned evidence replacement. Not exposed as a model write API.
+
+        requested_by="grok" is a reviewer-requested recovery of a stopped run: the code
+        still opens and verifies the exact post; the reviewer never supplies text.
+        """
         _sid(sid)
         _wid(wid)
         _int(expected_revision, "expected_revision")
+        if requested_by not in (None, "grok"):
+            _fail("requested_by")
         with self._tx() as conn:
             obj = self._obj(self._row(conn, sid, wid))
-            if obj["status"] != "running":
-                _fail("recovery requires active workflow")
+            allowed_status = ("paused", "completed") if requested_by else ("running",)
+            if obj["status"] not in allowed_status:
+                _fail("recovery requires active workflow" if not requested_by else "pause required")
             existing = self._load_record(conn, sid, wid, item_id)
             if existing is None or existing["revision"] != expected_revision:
                 _fail("revision conflict")
@@ -536,6 +544,8 @@ class WorkflowStore:
                 return existing
             audit = _audit("local", existing, "source_recovery")
             audit["previous_content_hash"] = existing["content_hash"]
+            if requested_by:
+                audit["requested_by"] = requested_by
             existing["audit"] = (existing["audit"] + [audit])[-_AUDIT_MAX:]
             existing.update(incoming)
             existing["content_hash"] = hashlib.sha256(incoming["text"].encode()).hexdigest()
@@ -555,7 +565,8 @@ class WorkflowStore:
             _fail("patch")
         with self._tx() as conn:
             obj = self._obj(self._row(conn, sid, wid))
-            if obj["status"] != "paused" and not (actor == "local" and obj["status"] == "running"):
+            # A completed run can still be corrected; only a running one belongs to its script.
+            if obj["status"] not in ("paused", "completed") and not (actor == "local" and obj["status"] == "running"):
                 _fail("pause required")
             existing = self._load_record(conn, sid, wid, item_id)
             if existing is None:

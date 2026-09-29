@@ -26,6 +26,9 @@ const state = {
   reviews: prior.reviews | 0,
   reviewed_at: prior.reviewed_at | 0,
   partial: prior.partial | 0,
+  expanded_by_decision: prior.expanded_by_decision | 0,
+  fallback_tags: prior.fallback_tags | 0,
+  untagged: prior.untagged | 0,
   failed_ids: Array.isArray(prior.failed_ids) ? prior.failed_ids.slice(-50) : [],
   slices: (prior.slices | 0) + 1,
   saved: 0
@@ -67,10 +70,31 @@ function reviewDue() {
   return every > 0 && saved - state.reviewed_at >= every;
 }
 
+// Text the extractor did not flag can still end mid-thought ("..." or "…").
+function looksCutOff(text) {
+  return /(\u2026|\.\.\.)\s*$/.test(String(text || '')) || /\bshow more\s*$/i.test(String(text || ''));
+}
+
 // Returns whether a record now exists for the item.
 function organize(item) {
   let stored = false;
-  if (item.truncated) {
+  let expand = Boolean(item.truncated);
+  if (!expand && OPTIONS.expand_cut_off && OPTIONS.recover_truncated && looksCutOff(item.text)) {
+    // A local branch: the model decides whether the full post is worth opening.
+    const decision = tryModel('model.decide', {
+      question: 'Does this post look cut off, so the full post should be opened before tagging?',
+      choices: {
+        expand: 'Open the full post: the visible text ends mid-thought or hides the rest',
+        keep: 'Keep: the visible text is complete enough to tag and summarize'
+      },
+      item_id: item.id
+    });
+    if (decision && decision.choice === 'expand') {
+      expand = true;
+      state.expanded_by_decision += 1;
+    }
+  }
+  if (expand) {
     if (OPTIONS.recover_truncated) {
       const recovered = call('post.recover', { item_id: item.id }) || {};
       stored = true; // Recovery saves the observed evidence before opening the post.
@@ -93,7 +117,17 @@ function organize(item) {
     const summarized = tryModel('model.summarize', { item_id: item.id });
     summary = summarized ? String(summarized.summary || '').slice(0, 1000) : '';
   }
-  call('records.put', { item_id: item.id, tags: classified.tags || [], summary: summary });
+  let tags = classified.tags || [];
+  if (!tags.length && OPTIONS.fallback_tag) {
+    // Second pass: one best category or none (measured: fewer missed tags, no new false ones).
+    const best = tryModel('model.best_tag', { item_id: item.id });
+    if (best && best.tag) {
+      tags = [best.tag];
+      state.fallback_tags += 1;
+    }
+  }
+  if (!tags.length) state.untagged += 1;
+  call('records.put', { item_id: item.id, tags: tags, summary: summary });
   return true;
 }
 
@@ -127,7 +161,8 @@ while (true) {
     if (reviewDue()) {
       state.reviews += 1;
       state.reviewed_at = saved;
-      stop('review', 'Organized ' + saved + ' items; checkpoint ' + state.reviews + ' is ready for review.');
+      stop('review', 'Organized ' + saved + ' items; checkpoint ' + state.reviews + ' is ready for review (' +
+        state.untagged + ' untagged, ' + state.partial + ' with partial text so far).');
     }
   }
   if (saved >= OPTIONS.max_items) {
@@ -161,6 +196,8 @@ while (true) {
 _TAGGED_FEED_OPTIONS = {
     "summarize": (bool, True, None, None),
     "recover_truncated": (bool, True, None, None),
+    "expand_cut_off": (bool, True, None, None),
+    "fallback_tag": (bool, True, None, None),
     "first_review": (int, 10, 0, 100),
     "review_every": (int, 0, 0, 1000),
     "max_idle_scrolls": (int, 3, 1, 10),
@@ -168,10 +205,12 @@ _TAGGED_FEED_OPTIONS = {
 
 TEMPLATES = {
     "tagged_feed": {
-        "version": 1,
+        "version": 2,
         "description": (
-            "Organize a feed or X Bookmarks: recover truncated posts, apply overlapping tags "
-            "from the categories, optionally summarize, save link/author/date, skip saved items, "
+            "Organize a feed or X Bookmarks: recover truncated posts (and, on X, let the local "
+            "model open posts whose text looks cut off), apply overlapping tags from the categories "
+            "with a one-best-category second pass for untagged posts, optionally summarize, save "
+            "link/author/date, skip saved items, "
             "pause for review after first_review items and then every review_every items "
             "(0 = none), continue long runs locally between time slices, stop at max_items, "
             "at the end of the feed, or after repeated scrolls reveal nothing new."
@@ -179,7 +218,7 @@ TEMPLATES = {
         "options": _TAGGED_FEED_OPTIONS,
         "capabilities": (
             "feed.observe", "feed.scroll", "post.recover", "model.decide", "model.classify",
-            "model.summarize", "records.put", "records.list", "run.checkpoint", "run.progress",
+            "model.summarize", "model.best_tag", "records.put", "records.list", "run.checkpoint", "run.progress",
         ),
         "body": _TAGGED_FEED,
     },

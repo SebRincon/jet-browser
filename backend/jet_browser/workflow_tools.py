@@ -44,6 +44,7 @@ _CALLS = (
     "model.decide",
     "model.classify",
     "model.summarize",
+    "model.best_tag",
     "records.put",
     "records.list",
     "records.patch",
@@ -69,6 +70,7 @@ post.recover {item_id} -> {status:"recovered", blocked:false, item, id, revision
 model.decide {question, choices:{id:description}, text or item_id} -> {choice, model}. At most 8 choices. Local readout only.
 model.classify {item_id} -> {tags:[category ids], unknown_tags, model}. Uses this workflow's categories as independent tags.
 model.summarize {item_id} -> {summary, model}. Local model. Summary must come from source evidence.
+model.best_tag {item_id} -> {tag or null, model}. One best category or none; a second pass for items model.classify left untagged.
 records.put {item_id, tags, summary} -> {id, revision}. Copies observed evidence and rejects unknown tags.
 records.list {limit?, offset?} -> {items, total}. Local rows, at most 20 per call.
 records.patch {item_id, expected_revision, patch:{tags?, summary?}} -> row. While running, only the workflow's audited local actor. Grok edits require the workflow to be paused.

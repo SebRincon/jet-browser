@@ -41,10 +41,12 @@ Review sharing follows the existing user preference: at most five 400-character 
 
 `save_workflow` accepts `definition.template = {name, options}` in place of `source` and `capabilities`; exactly one form is allowed. Jet renders vetted source with the options frozen into an `OPTIONS` header and stores it like any other revision, so `read_workflow`, revisions, scope checks and the runtime are unchanged. `workflow_sdk` lists templates and their option bounds. A template turns authoring into a small tool call, which removes the long script-writing turn behind the [2026-09-28 timeout](incidents/2026-09-28-grok-timeout.md).
 
-`tagged_feed` v1 (`backend/jet_browser/workflow_templates.py`):
+`tagged_feed` v2 (`backend/jet_browser/workflow_templates.py`; v1 revisions keep their frozen source):
 
 - Skips saved items. On X Bookmarks it recovers truncated posts; a blocked recovery keeps the partial evidence (still marked truncated) and tags it rather than inventing text. Recovery is disabled for other feeds.
-- Applies independent local tags, optionally a local summary, and saves the observed link, author and date.
+- On X Bookmarks, a post the extractor did not flag but whose text ends mid-thought ("…") goes to a local `model.decide` branch: expand (open the exact post) or keep (`expand_cut_off`, default on).
+- Applies independent local tags; a post left untagged gets one second-pass `model.best_tag` question (one best category or none; `fallback_tag`, default on). Then an optional local summary, and the observed link, author and date.
+- Review checkpoints report how many posts are still untagged or partial so the reviewer can fix them.
 - Pauses for review after `first_review` items (default 10), then every `review_every` items (0 = no periodic review).
 - Before its slice budget ends it checkpoints `continue`; the next slice resumes from the current page without a Grok turn.
 - Completes at `limits.max_items` or a proven end of feed. After `max_idle_scrolls` scrolls reveal nothing new, a local `model.decide` chooses whether to keep scrolling; the run pauses after twice that many.
@@ -63,7 +65,7 @@ SemIf 4B on 2026-09-28 ([evidence](evidence/tagging-semif-20260928.json)):
 | Calibration | 0.500 | 0.771 | 0.774 | 10 | 12 |
 | Held-out (scored once) | 0.467 | 0.788 | 0.785 | 5 | 16 of 55 |
 
-A single yes-probability threshold chosen on calibration (0.55) scored 0.787 micro F1
+The v2 second pass (`model.best_tag` on untagged posts) raised micro F1 on development from 0.791 to 0.854 and on calibration from 0.771 to 0.784, with no added false tags ([evidence](evidence/tagging-fallback-20260928.json); held-out 0.788 → 0.800 is a second look). A single yes-probability threshold chosen on calibration (0.55) scored 0.787 micro F1
 on held-out, so the shipped decision (the model's own yes/no) stays. Precision is high;
 recall is the weakness, worst for design (held-out recall 0.33) and research (0.57). The
 prompt-injection post received no tags. Prompt changes must be tuned on development and

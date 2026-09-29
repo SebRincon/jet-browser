@@ -102,7 +102,12 @@ async def run(model):
             cap._items[case["id"]] = {"id": case["id"], "text": case["text"], "url": START_URL}
             started = time.perf_counter()
             result = await cap.model_classify({"item_id": case["id"]})
+            fallback = None
+            if not result["tags"]:
+                # The tagged_feed v2 second pass: one best category, or none.
+                fallback = (await cap.model_best_tag({"item_id": case["id"]}))["tag"]
             rows.append({"id": case["id"], "split": case["split"], "gold": case["tags"], "tags": result["tags"],
+                         "fallback": fallback,
                          "yes": {tag: round(worker.probabilities.get(tag, 0.0), 4) for tag in tags},
                          "unknown_tags": result["unknown_tags"], "model": result["model"],
                          "ms": round((time.perf_counter() - started) * 1000, 1)})
@@ -112,6 +117,7 @@ async def run(model):
 
     split = {name: [row for row in rows if row["split"] == name] for name in ("development", "calibration", "held_out")}
     shipped = lambda row, tag: tag in row["tags"]
+    with_fallback = lambda row, tag: tag in row["tags"] or tag == row.get("fallback")
     thresholds = [round(0.05 * step, 2) for step in range(1, 20)]
     sweep = {t: scores(split["calibration"], tags, lambda row, tag, t=t: row["yes"][tag] >= t)["micro_f1"]
              for t in thresholds}
@@ -121,6 +127,8 @@ async def run(model):
         "corpus": str(CORPUS.relative_to(ROOT)), "model": model,
         "model_identity": rows[0]["model"] if rows else None,
         "shipped_decision": {name: scores(items, tags, shipped) for name, items in split.items()},
+        "with_best_tag_fallback": {name: scores(items, tags, with_fallback) for name, items in split.items()},
+        "fallback_calls": sum(1 for row in rows if not row["tags"]),
         "calibration_threshold_sweep_micro_f1": sweep,
         "selected_threshold": best,
         "held_out_with_selected_threshold": scores(split["held_out"], tags,
@@ -143,6 +151,12 @@ def main():
     summary = {key: report[key] for key in ("model", "selected_threshold", "warm_median_ms")}
     summary["shipped"] = {name: {k: v[k] for k in ("exact_match", "micro_f1", "macro_f1", "false_positive_tags", "missed_tags")}
                           for name, v in report["shipped_decision"].items()}
+    summary["with_fallback"] = {name: {k: v[k] for k in ("exact_match", "micro_f1", "macro_f1", "false_positive_tags", "missed_tags")}
+                                for name, v in report["with_best_tag_fallback"].items()}
+    summary["untagged_before"] = {name: sum(1 for r in report["rows"] if r["split"] == name and not r["tags"])
+                                  for name in ("development", "calibration", "held_out")}
+    summary["untagged_after"] = {name: sum(1 for r in report["rows"] if r["split"] == name and not r["tags"] and not r["fallback"])
+                                 for name in ("development", "calibration", "held_out")}
     tuned = report["held_out_with_selected_threshold"]
     summary["held_out_tuned"] = {k: tuned[k] for k in ("exact_match", "micro_f1", "macro_f1", "false_positive_tags", "missed_tags")}
     print(json.dumps(summary, indent=1))
