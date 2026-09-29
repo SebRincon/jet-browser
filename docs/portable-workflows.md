@@ -37,6 +37,24 @@ Definitions declare tab, start URL, source kind, model, taxonomy, enabled capabi
 
 Review sharing follows the existing user preference: at most five 400-character excerpts per review, with no paging through the whole private dataset. A restricted review profile can operate only on the same workflow/session. Full records stay in local SQLite and are available to the UI and local script. Grok is a remote model; the categorization and summary model calls run locally.
 
+## Reviewer repairs
+
+At a checkpoint, or after a run completes, Grok fixes records rather than leaving them
+for later (`backend/jet_browser/workflow_repair.py`). Grok chooses; code acts:
+
+- `workflow_records` with `needs: untagged | truncated` lists matching record ids and
+  flags, never post text.
+- `recover_workflow_record` opens one cut-off X post in an owned tab, expands a single
+  observed Show more, stores the exact observed text (audited as a source recovery
+  `requested_by: grok`) and re-tags/re-summarizes it locally. Each post is attempted at
+  most once per turn, at most 20 per turn, and never retried.
+- `retag_workflow_records` re-runs local tagging, including the second pass, on up to 20
+  stored records, optionally re-summarizing.
+
+All three require a paused or completed run, honor Stop, and return metadata only. When
+a problem repeats, the review prompt tells Grok to change template options or the script
+with `save_workflow` and run again.
+
 ## Built-in templates
 
 `save_workflow` accepts `definition.template = {name, options}` in place of `source` and `capabilities`; exactly one form is allowed. Jet renders vetted source with the options frozen into an `OPTIONS` header and stores it like any other revision, so `read_workflow`, revisions, scope checks and the runtime are unchanged. `workflow_sdk` lists templates and their option bounds. A template turns authoring into a small tool call, which removes the long script-writing turn behind the [2026-09-28 timeout](incidents/2026-09-28-grok-timeout.md).

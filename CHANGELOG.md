@@ -30,6 +30,9 @@
 - `tagged_feed` v2: the local model decides whether an unflagged post that ends mid-thought
   should be opened in full, and untagged posts get a one-best-category second pass
   (`model.best_tag`): development micro F1 0.791 → 0.854 with no added false tags.
+- Reviewer repair tools: Grok can list untagged or cut-off records (ids only), have code open
+  and expand an exact X post into a record, and re-run local tagging on up to 20 records;
+  reviews are told to fix records and improve the loop instead of deferring.
 
 ### Fixed
 

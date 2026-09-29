@@ -491,7 +491,9 @@ class Service:
         if not isinstance(args, dict):
             raise ValueError('Tool arguments must be an object')
         if self.workflow_review is not None:
-            if name not in workflow_tools.NAMES or (name != 'workflow_sdk' and args.get('workflow_id') != self.workflow_review[1]):
+            if name == 'list_tabs':
+                pass  # Read-only; run_workflow re-verifies the saved tab itself.
+            elif name not in workflow_tools.NAMES or (name != 'workflow_sdk' and args.get('workflow_id') != self.workflow_review[1]):
                 raise ValueError('Workflow review is limited to its own workflow')
         if self.auto_review is not None:
             if name not in {'collection_review', 'review_collection', 'recover_collection_item'} or args.get('collection_id') != self.auto_review[1]:

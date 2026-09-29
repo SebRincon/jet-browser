@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from . import workflow_templates
+from . import workflow_repair, workflow_templates
 from .workflow_store import CAPABILITIES
 
 NAMES = frozenset(
@@ -15,6 +15,8 @@ NAMES = frozenset(
         "workflow_records",
         "patch_workflow_record",
         "workflow_sdk",
+        "recover_workflow_record",
+        "retag_workflow_records",
     }
 )
 
@@ -231,13 +233,34 @@ def schemas(schema):
         ),
         (
             "workflow_records",
-            "Record counts, or short review excerpts when sharing is enabled.",
+            "Record counts, or short review excerpts when sharing is enabled. With needs "
+            "(untagged, truncated or all) also lists matching record ids and flags, never text.",
             {
                 "workflow_id": {"type": "string"},
                 "limit": {"type": "integer", "minimum": 0, "maximum": 5},
                 "offset": {"type": "integer", "minimum": 0, "maximum": 0},
+                "needs": {"type": "string", "enum": ["all", "untagged", "truncated"]},
             },
             ("workflow_id",),
+        ),
+        (
+            "recover_workflow_record",
+            "Open one saved X post in an owned tab, expand Show more if observed, store the exact "
+            "observed text, then re-tag and re-summarize it locally. Paused or completed workflow; "
+            "each post at most once per turn; never retried. Returns metadata only.",
+            {"workflow_id": {"type": "string"}, "item_id": {"type": "string"}},
+            ("workflow_id", "item_id"),
+        ),
+        (
+            "retag_workflow_records",
+            "Re-run local tagging (with the one-best-category second pass) on up to 20 saved "
+            "records, optionally re-summarizing. Paused or completed workflow. Audited; metadata only.",
+            {
+                "workflow_id": {"type": "string"},
+                "item_ids": {"type": "array", "items": {"type": "string"}, "minItems": 1, "maxItems": 20},
+                "summarize": {"type": "boolean"},
+            },
+            ("workflow_id", "item_ids"),
         ),
         (
             "patch_workflow_record",
@@ -499,11 +522,21 @@ async def tool(service, name, args):
             raise ValueError("workflow_id is invalid")
         return await workflows.control(sid, data["workflow_id"], data["action"])
     if name == "workflow_records":
-        data = _args(args, {"workflow_id", "limit", "offset"}, ("workflow_id",))
+        data = _args(args, {"workflow_id", "limit", "offset", "needs"}, ("workflow_id",))
         wid = data["workflow_id"]
         if not isinstance(wid, str) or not wid:
             raise ValueError("workflow_id is invalid")
         _int_in(data.get("offset", 0), 0, 0, "offset")
+        if "needs" in data:
+            if data["needs"] not in ("all", "untagged", "truncated"):
+                raise ValueError("needs must be all, untagged or truncated")
+            total, rows = workflow_repair.flagged(store, sid, wid, data["needs"])
+            result = {"total": total, "matching": len(rows), "flagged": [
+                {"id": r["id"], "truncated": bool(r.get("truncated")), "tags": r.get("tags") or [],
+                 "has_summary": bool(r.get("summary"))} for r in rows[:50]]}
+            if getattr(service, "share_review_samples", False):
+                result["items"] = [_excerpt(r) for r in rows[:_int_in(data.get("limit", 5), 0, 5, "limit")]]
+            return result
         if not getattr(service, "share_review_samples", False):
             listed = store.records(sid, wid, limit=0, offset=0)
             return {"total": int(listed.get("total") or 0)}
@@ -543,6 +576,15 @@ async def tool(service, name, args):
             "tags": updated.get("tags"),
             "summary": updated.get("summary"),
         }
+    if name == "recover_workflow_record":
+        data = _args(args, {"workflow_id", "item_id"}, ("workflow_id", "item_id"))
+        return await workflow_repair.recover(service, sid, data["workflow_id"], data["item_id"])
+    if name == "retag_workflow_records":
+        data = _args(args, {"workflow_id", "item_ids", "summarize"}, ("workflow_id", "item_ids"))
+        if "summarize" in data and not isinstance(data["summarize"], bool):
+            raise ValueError("summarize must be true or false")
+        return await workflow_repair.retag(service, sid, data["workflow_id"], data["item_ids"],
+                                           summarize=data.get("summarize", False))
     if name == "workflow_sdk":
         _args(args, set(), ())
         allowed = set(_capability_names())
