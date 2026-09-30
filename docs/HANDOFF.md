@@ -4,6 +4,20 @@ Checkpoint: 2026-09-29, app `0.1.0+1`, tag `checkpoint-2026-09-29a` on `main`.
 Not a public release. Start with [AGENTS.md](../AGENTS.md), then
 [architecture](architecture.md) and [development commands](development.md).
 
+## Published (2026-09-30)
+
+- Public at [SebRincon/jet-browser](https://github.com/SebRincon/jet-browser) under Apache-2.0,
+  with commits authored by the GitHub noreply address. Clone with `--recurse-submodules`.
+- The Flutter dependencies are public submodules pinned by SHA:
+  [flutter_cef_browser](https://github.com/SebRincon/flutter_cef_browser),
+  [vten_chat](https://github.com/SebRincon/vten_chat) and
+  [shadcn_flutter_jet](https://github.com/SebRincon/shadcn_flutter_jet).
+- Every other dependency's source, pin and license is in
+  [THIRD_PARTY.md](dependencies/THIRD_PARTY.md).
+- Still private: the CEF build (proprietary codecs), SebRincon/webview_cef and vten.ai.
+  A native build from a public clone needs that CEF artifact; everything else builds and
+  tests. A fresh public clone passed backend tests and app analyze/tests.
+
 ## What the product does
 
 Jet is a standalone Chromium browser with a Flutter/shadcn shell and vten's
