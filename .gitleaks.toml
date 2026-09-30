@@ -6,6 +6,7 @@ useDefault = true
 [[allowlists]]
 description = "SHA256 file fingerprints in two source-provenance manifests"
 condition = "AND"
-paths = ['^tasks/browser-lab-baseline\.json$']
+# The CEF plugin's old EXTRACTION.json remains in history (the plugin is now a submodule).
+paths = ['^vendor/flutter_cef_browser/EXTRACTION\.json$', '^tasks/browser-lab-baseline\.json$']
 regexTarget = "line"
 regexes = ['^\+?\s*"(?:app/lib/[^"\r\n]+\.dart|macos/Frameworks/include/[^"\r\n]+\.h)": "[a-f0-9]{64}",?\s*$']
