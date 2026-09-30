@@ -20,7 +20,7 @@ trap 'rm -rf -- "$work"' EXIT
 for engine in lfm laya semif text; do
   python="${ENV_ROOT}/${engine}/bin/python"
   [[ -x "$python" ]] || { echo "missing ${python}; run scripts/setup_models.sh" >&2; exit 1; }
-  # Only exact index pins are lockable; laya-mlx (local) and mlx-lm (git) are excluded.
+  # Only exact index pins are lockable; laya-mlx and mlx-lm come from pinned git commits.
   uv pip freeze --color never --python "$python" 2>/dev/null | grep -E '^[A-Za-z0-9_.-]+==' > "${work}/${engine}.in"
   # torch 2.14 publishes macOS arm64 wheels for 14.0+ only; Jet's engines target that floor.
   MACOSX_DEPLOYMENT_TARGET=14.0 uv pip compile "${work}/${engine}.in" --color never --quiet --generate-hashes --no-deps \

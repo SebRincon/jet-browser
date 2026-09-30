@@ -1,6 +1,7 @@
 # Vten chat port audit
 
-Source checkout (read-only): `/Users/sebastian/Developer/Projects/vten` at
+Published as [SebRincon/vten_chat](https://github.com/SebRincon/vten_chat) (pinned as the `vendor/vten_chat`
+submodule). Source: vten.ai (private repository) at
 `cc497919140469d58c71849f44210e35c3206766`. Chat sources were clean. Nothing in
 that checkout is edited or imported at runtime. Recorded `origin/main` is newer;
 this port follows the local UI at the SHA above.

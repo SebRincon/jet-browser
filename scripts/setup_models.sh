@@ -13,8 +13,9 @@ for JET_ENV in lfm laya semif text; do
   # sync (not install) removes anything the lock does not list.
   uv pip sync --python ".runtime/envs/$JET_ENV/bin/python" --require-hashes "$LOCKS/$JET_ENV.txt"
 done
-# Git and local packages cannot carry wheel hashes. Their dependencies are already
+# Git packages cannot carry wheel hashes; they are pinned to exact commits instead. Their dependencies are already
 # locked above, so they are installed without resolving anything new.
-uv pip install --python .runtime/envs/laya/bin/python --no-deps ./vendor/local-engines/laya-mlx
+uv pip install --python .runtime/envs/laya/bin/python --no-deps \
+  'laya-mlx @ git+https://github.com/mizorewww/laya-mlx@0a859518634112655cb97c745dbf04f5191aaf13'
 uv pip install --python .runtime/envs/semif/bin/python --no-deps \
   'mlx-lm @ git+https://github.com/ml-explore/mlx-lm.git@a63e24c389382619eb6d9af656e3b46024be217a'

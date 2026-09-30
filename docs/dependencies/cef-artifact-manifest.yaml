@@ -7,7 +7,7 @@
 # used (framework 72f77a75…, wrapper cd15103a…). It lacks vten's frame-lease patches
 # and cannot be reproduced from a published source. Absolute paths are provenance.
 generated_at: "2026-05-13T00:25:19Z"
-source_distribution: "/Users/sebastian/Developer/cef_7727/chromium_git/chromium/src/cef/binary_distrib/cef_binary_147.0.11+g04f1d22+chromium-147.0.7727.138_macosarm64"
+source_distribution: "<maintainer CEF build tree>/chromium_git/chromium/src/cef/binary_distrib/cef_binary_147.0.11+g04f1d22+chromium-147.0.7727.138_macosarm64"
 cef:
   version: "147.0.11+g04f1d22+chromium-147.0.7727.138"
   commit_hash: "04f1d2223ba2e742534a4f655ed63e4ae7c73545"
@@ -17,17 +17,17 @@ chromium:
   tag: "147.0.7727.138"
   revision: "022a5605792996d967e05acda7091c2bd9b915db"
 source:
-  chromium_source_root: "/Users/sebastian/Developer/cef_7727/chromium_git/chromium/src"
+  chromium_source_root: "<maintainer CEF build tree>/chromium_git/chromium/src"
   cef_revision: "04f1d2223ba2e742534a4f655ed63e4ae7c73545"
 target:
   os: "macos"
   arch: "arm64"
 artifacts:
-  framework: "/Users/sebastian/Developer/webview_cef/flutter_cef_browser/macos/Frameworks/Chromium Embedded Framework.framework"
+  framework: "<maintainer webview_cef checkout>/flutter_cef_browser/macos/Frameworks/Chromium Embedded Framework.framework"
   framework_binary_sha256: "72f77a751e3a9d0a5314a08ee2d1f5df80214701b8f074c37af40c9e6531d3f9"
-  wrapper: "/Users/sebastian/Developer/webview_cef/flutter_cef_browser/macos/Frameworks/libcef_dll_wrapper.a"
+  wrapper: "<maintainer webview_cef checkout>/flutter_cef_browser/macos/Frameworks/libcef_dll_wrapper.a"
   wrapper_sha256: "cd15103afd358d175ff69aad6ac7a091dbd0d723e277d61a4bfdbe715caeeaa8"
-  include: "/Users/sebastian/Developer/webview_cef/flutter_cef_browser/macos/Frameworks/include"
+  include: "<maintainer webview_cef checkout>/flutter_cef_browser/macos/Frameworks/include"
 gn_args_raw: |
   is_official_build=true
   is_debug=false

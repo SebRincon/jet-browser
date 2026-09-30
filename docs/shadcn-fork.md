@@ -5,13 +5,14 @@ vendored at `vendor/shadcn_flutter`. The application depends on it through
 `path: ../vendor/shadcn_flutter`. There are no paths, links or runtime imports
 back into vten.
 
-Source: `/Users/sebastian/Developer/Projects/vten/deps/shadcn_flutter`, Git revision
+Published as [SebRincon/shadcn_flutter_jet](https://github.com/SebRincon/shadcn_flutter_jet) and pinned here as
+the `vendor/shadcn_flutter` git submodule. Source: `vibe-coder-app/shadcn_flutter` (private), Git revision
 `8dc009e44cb915525243a07f7c6e705c0261f9ea`, package version `0.0.47`. The source was
 dirty in `lib/src/components/form/select.dart`; that actual working-copy file was
 preserved intentionally. The original source checkout was not changed. The local
 copy includes library code, fonts/icons, tests, pubspec, original BSD 3-Clause
-license, README and changelog. `EXTRACTION.json` records the revision, dirty status
-and hashes of all 222 copied files. No `.git` pointer or external symlink was copied.
+license, README and changelog. Its `PROVENANCE.md` records the source revision and the
+dirty file; the submodule's commit SHA pins the exact content.
 
 The app uses real `ShadcnApp`, Geist typography, `ThemeData(radius: 0.5)`, Shadcn
 text fields, buttons, icons, tooltips and select popup. This follows vten's

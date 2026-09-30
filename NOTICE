@@ -1,0 +1,16 @@
+Jet Browser
+Copyright 2026 Sebastian Rincon
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This product includes or builds on third-party software, each under its own license:
+- flutter_cef_browser (BSD 3-Clause), vten_chat (Apache-2.0) and shadcn_flutter
+  (BSD 3-Clause, © Thito Yalasatria Sunarya), as git submodules under vendor/;
+- the Chromium Embedded Framework (BSD 3-Clause) and Chromium, whose notices ship in
+  vendor/flutter_cef_browser/licenses/;
+- jev_ultrafast (MIT, © Browser Use), SemIf semif_phase1 (MIT, © TheoLeeCJ) and the
+  LFM2.5-350M-RLCD rlcd code (MIT, © notnotsamuel), vendored with their licenses;
+- laya-mlx (Apache-2.0) and mlx-lm (MIT), installed from pinned commits;
+- the Grok Build CLI (xAI), bundled in packaged apps under its own license.
+
+Exact sources, commits and licenses: docs/dependencies/THIRD_PARTY.md.

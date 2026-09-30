@@ -74,12 +74,12 @@ API and later feature docs describe extensions.
 | CEF plugin | `vendor/flutter_cef_browser`, source `a14b590260a0ed334a7a089db0f733f5818bc0c9` | Native sibling views; exact CEF 147.0.11 / Chromium 147.0.7727.138 assets required |
 | Grok Build | Latest release, bundled at build time and updated in Jet's own Grok home at runtime (floor 1.0.41; verified live with 1.0.44); `native/RuntimeLicenses/sources.json` | ACP stdio plus scoped MCP; sign-in in Jet's setup |
 | Controller | `backend/pyproject.toml`, `backend/uv.lock`; bundled CPython 3.12.13 | aiohttp/httpx and local OpenTelemetry; no remote telemetry exporter |
-| Local engines | `vendor/local-engines/*requirements.txt`, vendored Laya package | LFM RLCD 350M, Laya 421M, typed Laya 421M, SemIf/Qwen 4B |
+| Local engines | `vendor/local-engines/` (hash-locked in `locks/`), laya-mlx and mlx-lm pinned to git commits; see [third-party](dependencies/THIRD_PARTY.md) | LFM RLCD 350M, Laya 421M, typed Laya 421M, SemIf/Qwen 4B |
 | Weight downloads | `model-downloads.json` | Pinned snapshots, sizes, SHA256; includes separate Qwen 0.8B typing helper |
 | Markdown | `markdown_widget` 2.3.2+8, app lockfile | Rendered content only; no execution |
 
-The vten checkout at `/Users/sebastian/Developer/Projects/vten` and original oui
+The vten.ai source (private) and the maintainer's original oui
 experiments are reference sources only. No runtime imports or filesystem links
 should point back into them. See [extraction hashes](extracted-source.json),
-[shadcn details](shadcn-fork.md) and vendor `EXTRACTION.json` files. No project-wide
+[shadcn details](shadcn-fork.md) and each submodule's `PROVENANCE.md`. No project-wide
 redistribution license is inferred from these third-party licenses.

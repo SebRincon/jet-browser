@@ -2,7 +2,7 @@
 
 ## Objective
 
-Create a separate, runnable macOS browser in `/Users/sebastian/Developer/Projects/jet-browser`. The browser has its own Chromium profile, custom tabs/address bar and ONE agent chat interface. Local browser tasks are tools invoked by that main agent and appear as inline activity/results in the same conversation, not a separate local chat or task composer. Grok Build CLI supplies general chat/research and can delegate bounded browser tasks to the same local finite-choice models tested in the Jev demo. The app has no runtime dependency on the vten IDE or its daemon.
+Create a separate, runnable macOS browser in this repository. The browser has its own Chromium profile, custom tabs/address bar and ONE agent chat interface. Local browser tasks are tools invoked by that main agent and appear as inline activity/results in the same conversation, not a separate local chat or task composer. Grok Build CLI supplies general chat/research and can delegate bounded browser tasks to the same local finite-choice models tested in the Jev demo. The app has no runtime dependency on the vten IDE or its daemon.
 
 The user selected Grok Build CLI first. Codex and Claude adapters remain future work rather than simulated integrations.
 

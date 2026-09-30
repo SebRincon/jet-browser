@@ -1,6 +1,0 @@
-include: package:flutter_lints/flutter.yaml
-
-analyzer:
-  errors:
-    # Unchanged upstream files import symbols their newer SDK also exports.
-    unnecessary_import: ignore

@@ -10,7 +10,7 @@ The plugin was copied from
 `vten/deps/webview_cef/flutter_cef_browser` at
 `a14b590260a0ed334a7a089db0f733f5818bc0c9` (the source submodule was clean).
 The initial plugin copy preserved the original sources. A small additive local patch
-now provides acknowledged native-view input dispatch; see below. `EXTRACTION.json`
+now provides acknowledged native-view input dispatch; see below. the plugin's `PROVENANCE.md` ([SebRincon/flutter_cef_browser](https://github.com/SebRincon/flutter_cef_browser))
 records SHA-256 hashes of 553 copied regular files. The macOS Runner was seeded
 from that plugin's `benchmark_app/macos`, preserving its CEF helper copy/sign
 phase, then renamed to `Jet Browser` / `dev.sebastian.jetbrowser`.
@@ -88,7 +88,7 @@ protocol semantics. The native dispatcher validates the whitelist again. No
 remote debugging socket, arbitrary protocol method, page value assignment or
 clipboard fallback is exposed. Browser close rejects pending input; a ten-second
 acknowledgement timeout reports an uncertain result without retrying. Native
-user mouse/keyboard handling is unchanged. `EXTRACTION.json` retains original
+user mouse/keyboard handling is unchanged. the plugin's `PROVENANCE.md` ([SebRincon/flutter_cef_browser](https://github.com/SebRincon/flutter_cef_browser)) retains original
 source hashes plus a separate `local_patches` map for the four changed plugin files.
 
 ## Verification
@@ -100,7 +100,7 @@ Shadcn composer/settings flow, Markdown behavior, dark-theme text contrast,
 finite exact-tab history commands, session/draft isolation, trace retrieval/copy
 and manual-scroll preservation. The vten-style chat/tracing release rebuild
 passed; see `artifacts/native-build-vten-tracing.log`.
-`flutter build macos --release --dart-define=JET_ROOT=/Users/sebastian/Developer/Projects/jet-browser`
+`flutter build macos --release --dart-define=JET_ROOT="$PWD"`
 built `app/build/macos/Build/Products/Release/Jet Browser.app` (349.4 MB).
 The copied native plugin emits existing compiler warnings; no build errors.
 Live end-to-end results are recorded separately in the project integration docs.

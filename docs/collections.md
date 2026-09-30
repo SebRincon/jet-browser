@@ -7,7 +7,7 @@ Implemented 2026-09-28 with Grok Build source generation and independent review/
 Quit Jet when it is idle, then load the new app and sidecar:
 
 ```sh
-cd /Users/sebastian/Developer/Projects/jet-browser
+cd jet-browser  # repository root
 ./scripts/start.sh --restart-service
 ```
 

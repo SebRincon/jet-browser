@@ -4,6 +4,13 @@
 
 ### Added
 
+- Open-source release preparation: Apache-2.0 `LICENSE` and `NOTICE`, a public README, and
+  `docs/dependencies/THIRD_PARTY.md` listing every dependency with repository, pinned
+  commit or revision, and license. The Flutter packages are now git submodules pinned by
+  SHA to public repos (SebRincon/flutter_cef_browser, vten_chat, shadcn_flutter_jet);
+  laya-mlx installs from upstream commit `0a85951`; local paths in docs became repository
+  links.
+
 - Standalone macOS Chromium browser, dark Flutter/shadcn UI and vendored vten chat.
 - One local-first conversation, Grok ACP/MCP, durable history and private tracing.
 - Local LFM, Laya and SemIf adapters; intent-aware navigation and bounded collection jobs.

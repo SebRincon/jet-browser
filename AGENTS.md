@@ -20,8 +20,10 @@ its own repository; do not modify the source vten or oui projects.
 
 - One chat/composer. Reuse `vendor/vten_chat`, `vendor/shadcn_flutter` and Jet's
   dark theme; see [UI provenance](docs/vten-chat-port-audit.md) and
-  [shadcn fork](docs/shadcn-fork.md). Vendor packages are local forks, not links
-  into vten. Preserve licenses, extraction records and focused patch notes.
+  [shadcn fork](docs/shadcn-fork.md). `vendor/flutter_cef_browser`, `vendor/vten_chat`
+  and `vendor/shadcn_flutter` are git submodules pinned by SHA to public repos
+  (SebRincon/flutter_cef_browser, vten_chat, shadcn_flutter_jet). Change them there,
+  then bump the submodule; preserve their licenses and `PROVENANCE.md`.
 - Grok Build CLI is the main provider through ACP. Local models handle repeated
   finite decisions. Claude Code/Codex adapters are future work; no silent provider
   substitution or global provider configuration changes.

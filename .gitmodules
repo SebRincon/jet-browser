@@ -1,0 +1,9 @@
+[submodule "vendor/flutter_cef_browser"]
+	path = vendor/flutter_cef_browser
+	url = https://github.com/SebRincon/flutter_cef_browser.git
+[submodule "vendor/vten_chat"]
+	path = vendor/vten_chat
+	url = https://github.com/SebRincon/vten_chat.git
+[submodule "vendor/shadcn_flutter"]
+	path = vendor/shadcn_flutter
+	url = https://github.com/SebRincon/shadcn_flutter_jet.git

@@ -14,6 +14,11 @@ dependencies:
     path: ../vendor/vten_chat
   flutter_cef_browser:
     path: ../vendor/flutter_cef_browser
+dependency_overrides:
+  # vten_chat pins shadcn_flutter by git SHA for standalone use; the app and vten_chat
+  # share the same submodule checkout (vendor/shadcn_flutter, pinned in .gitmodules).
+  shadcn_flutter:
+    path: ../vendor/shadcn_flutter
 dev_dependencies:
   flutter_test:
     sdk: flutter
