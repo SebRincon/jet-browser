@@ -40,15 +40,15 @@
   "review_actions": "added missing tags and corrected summaries on sampled records (37 records carry a Grok audit entry)"
  },
  "incidents_during_run": [
-  "Review at 10 ended because the workflow review profile denied read-only list_tabs; fixed in c10b7d8, service restarted with the fix and the paused run resumed from the card control.",
-  "Item 51: a detail-tab Runtime.evaluate timed out after 12 s and paused the slice; Grok's error review resumed it. Fixed in 84cb282 (blocked recovery, not a run failure); that item remains partial and untagged."
+  "Review at 10 ended because the workflow review profile denied read-only list_tabs; fixed in bb85d63, service restarted with the fix and the paused run resumed from the card control.",
+  "Item 51: a detail-tab Runtime.evaluate timed out after 12 s and paused the slice; Grok's error review resumed it. Fixed in fa924be (blocked recovery, not a run failure); that item remains partial and untagged."
  ],
  "quality_gaps": [
   "23 of 100 records have no tags (local recall; reviews sample 5 per checkpoint). Some posts may fit none of the seven tags; not assessed without reading content."
  ],
  "repair_pass_2026-09-29": {
   "request": "Some bookmarks have no tags and at least one is still cut off; fix them in the same run.",
-  "build": "dist rebuilt from b0e0e68 with pinned Grok 1.0.41; same isolated profile and X session",
+  "build": "dist rebuilt from 16d669f with pinned Grok 1.0.41; same isolated profile and X session",
   "grok_tools": {
    "workflow_records": 3,
    "retag_workflow_records": 2,
@@ -65,7 +65,7 @@
  },
  "repair_pass_2_2026-09-29": {
   "request": "Fourteen bookmarks still have no tags; tag the ones that fit, leave any that fit none.",
-  "build": "service at e495e3d (patch fix), same isolated profile",
+  "build": "service at e058691 (patch fix), same isolated profile",
   "grok_tools": {
    "workflow_records": 4,
    "patch_workflow_record": 10,

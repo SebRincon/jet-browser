@@ -7,7 +7,7 @@ Grok is no longer pinned. With the packager bundling Grok 1.0.44 (the latest sta
 
 ## 2026-09-28 evening checkpoint
 
-Offline and local checks for commits `d35bdd8`..`checkpoint-2026-09-28b`:
+Offline and local checks for commits `ec14ab6`..`checkpoint-2026-09-28b`:
 
 - 369 backend tests with isolated Chromium headless shell 1228 (real-DOM, JavaScriptCore template runs, prefilled-input delivery faults); 62 app and 9 vendored-chat tests; ruff and `flutter analyze` clean.
 - Clean worktree (no ignored files): `install_cef.sh` via `gh` (17 s), tampered and wrong-build sources rejected; lock-based engine setup reproduced all four verified environments exactly; release app build; full package; relocated minimal-PATH service health/state.

@@ -140,9 +140,9 @@ Checks at this checkpoint: 394 backend (real-DOM and JavaScriptCore included), 6
   earlier native checks. `scripts/install_cef.sh --check` tells which is installed.
 - Running at handoff: port 9198 only, the isolated real-run profile
   (`/private/tmp/jet-live-20260928`) with your X session, 100 records and the CSV.
-  - Its app runs from the rebuilt `dist/` (`b0e0e68`, pinned Grok 1.0.41). Do not
+  - Its app runs from the rebuilt `dist/` (`16d669f`, pinned Grok 1.0.41). Do not
     repackage `dist/` while it is open.
-  - Its service was restarted from the checkout backend (`e495e3d`) with
+  - Its service was restarted from the checkout backend (`e058691`) with
     `JET_GROK_HOME=~/.grok`, so it reuses the developer's Grok sign-in.
   - The user is browsing in that window.
   Ports 9168 and 9148 are down. Closing a Jet window does not stop its service; stop a
